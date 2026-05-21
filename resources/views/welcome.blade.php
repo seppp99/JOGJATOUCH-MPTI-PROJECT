@@ -233,7 +233,7 @@
                         <span class="font-serif-display text-4xl font-bold text-[#E35D25] mb-3 group-hover:scale-105 transition-transform duration-300">03</span>
                         <h3 class="text-lg font-bold text-[#1E1B19] mb-2">Pelayanan Ramah</h3>
                         <p class="text-sm text-[#1E1B19]/70 leading-relaxed">
-                            Tim ahli kami mengedepankan keramahan dalam melayani setiap sesi konsultasi untuk memberikan solusi terarah yang sesuai dengan budget Anda.
+                            Tim kami mengedepankan keramahan dalam melayani setiap sesi konsultasi untuk memberikan solusi terarah yang sesuai dengan budget Anda.
                         </p>
                     </div>
                 </div>
