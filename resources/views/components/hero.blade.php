@@ -52,18 +52,18 @@
                         <!-- Content Screen (Jogjatouch Graphic) -->
                         <div class="flex-1 rounded-xl bg-gradient-to-b from-[#FFF2EC] to-[#FFE6DA] flex flex-col items-center justify-center p-3 relative overflow-hidden">
                             <!-- Inner Orange "J" Logo in phone -->
-                            <div class="w-10 h-18 bg-[#E35D25] rounded-lg rotate-12 flex items-center justify-center font-bold text-white text-3xl shadow-lg shadow-[#E35D25]/30 mb-4 z-10">
-                                J
+                            <div class="w-12 h-12 rounded-xl bg-[#FFFFFF] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300">
+                                <img src="{{ asset('assets/logo jogja touch border white.png') }}" alt="Jogja Touch Logo" class="w-10 h-10">
                             </div>
                             <!-- Vertical text inside smartphone mockup -->
-                            <div class="text-[10px] md:text-xs font-bold tracking-widest text-[#1E1B19]/70 uppercase z-10 flex flex-col items-center gap-1 font-serif-display italic">
+                            <div class="text-[12px] md:text-xs font-bold tracking-widest text-[#1E1B19]/70 uppercase z-10 flex flex-col items-center gap-1 font-serif-display italic mt-3">
                                 <span>J</span>
                                 <span>O</span>
                                 <span>G</span>
                                 <span>J</span>
                                 <span>A</span>
                             </div>
-                            <div class="text-[9px] md:text-[10px] font-semibold text-[#E35D25] tracking-widest uppercase mt-1 z-10">
+                            <div class="text-[9px] md:text-[10px] font-semibold text-[#E35D25] tracking-widest uppercase mt-2 z-10">
                                 TOUCH
                             </div>
                         </div>
