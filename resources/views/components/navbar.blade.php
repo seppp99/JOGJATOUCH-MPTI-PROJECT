@@ -4,8 +4,8 @@
         
         <!-- Logo -->
         <a href="#" class="flex items-center gap-2 group">
-            <div class="w-10 h-10 rounded-xl bg-[#E35D25] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300">
-                J
+            <div class="w-15 h-15 rounded-xl bg-[#FFFFFF] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300">
+                <img src="{{ asset('assets/logo jogja touch border white.png') }}" alt="Jogja Touch Logo" class="w-12 h-12">
             </div>
             <span class="font-serif-display font-bold text-xl tracking-tight">Jogja<span class="text-[#E35D25]">touch</span></span>
         </a>
