@@ -7,8 +7,8 @@
             <!-- Brand Column -->
             <div class="lg:col-span-2 flex flex-col items-start">
                 <a href="#" class="flex items-center gap-2 group mb-6">
-                    <div class="w-9 h-9 rounded-xl bg-[#E35D25] flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300">
-                        J
+                    <div class="w-9 h-9 rounded-xl bg-[#131110] flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300"> 
+                        <img src="{{ asset('assets/logo jogja touch border white.png') }}" alt="Jogja Touch Logo" class="w-12 h-10">
                     </div>
                     <span class="font-serif-display font-bold text-lg tracking-tight">Jogja<span class="text-[#E35D25]">touch</span></span>
                 </a>
