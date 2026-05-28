@@ -16,7 +16,7 @@
             </div>
 
             <div class="relative z-10 flex flex-col sm:flex-row gap-4 w-full sm:w-auto shrink-0">
-                <a href="https://wa.me/6281234567890" target="_blank" class="inline-flex items-center justify-center px-8 py-4 rounded-full text-base font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-lg shadow-[#E35D25]/15">
+                <a href="https://wa.me/6281779911230" target="_blank" class="inline-flex items-center justify-center px-8 py-4 rounded-full text-base font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-lg shadow-[#E35D25]/15">
                     Hubungi Whatsapp
                 </a>
                 <a href="#layanan" class="inline-flex items-center justify-center px-8 py-4 rounded-full text-base font-semibold border border-white/20 hover:bg-white/5 transition-all text-white">
