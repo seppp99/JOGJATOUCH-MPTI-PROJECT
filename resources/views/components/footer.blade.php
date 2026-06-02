@@ -73,7 +73,7 @@
         </div>
 
         <div class="flex flex-col sm:flex-row items-center justify-between text-xs text-white/40 gap-4">
-            <span>&copy; 2026 Jogjatouch. All rights reserved.</span>
+            <span>&copy; 2026 Team Corebyte x Jogjatouch. All rights reserved.</span>
             <div class="flex gap-6">
                 <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
                 <a href="#" class="hover:text-white transition-colors">Cookie Policy</a>
