@@ -1,5 +1,5 @@
 <!-- SECTION 2: HERO SECTION -->
-<section class="relative pt-12 pb-24 md:pt-20 md:pb-32 overflow-hidden">
+<section id="home" class="relative pt-12 pb-24 md:pt-20 md:pb-32 overflow-hidden scroll-mt-24">
     <!-- Glow background decor -->
     <div class="absolute -top-40 right-0 w-[600px] h-[600px] bg-glow-orange pointer-events-none rounded-full"></div>
     
@@ -96,33 +96,185 @@
 
         </div>
 
-        <!-- SECTION 3: THREE STATS / METRICS GRID -->
-        <div id="tentang" class="grid grid-cols-1 md:grid-cols-3 gap-12 pt-16 mt-20 border-t border-[#1E1B19]/10">
-            <!-- Stat 1 -->
-            <div class="flex flex-col items-start group">
-                <span class="font-serif-display text-4xl font-bold text-[#E35D25] mb-3 group-hover:scale-105 transition-transform duration-300">01</span>
-                <h3 class="text-lg font-bold text-[#1E1B19] mb-2">Kualitas Premium</h3>
-                <p class="text-sm text-[#1E1B19]/70 leading-relaxed">
-                    Kami selalu menghadirkan layanan terbaik dengan material, komponen, dan standardisasi pengerjaan kelas premium untuk kenyamanan jangka panjang.
-                </p>
-            </div>
-            <!-- Stat 2 -->
-            <div class="flex flex-col items-start group">
-                <span class="font-serif-display text-4xl font-bold text-[#E35D25] mb-3 group-hover:scale-105 transition-transform duration-300">02</span>
-                <h3 class="text-lg font-bold text-[#1E1B19] mb-2">Tepat Waktu</h3>
-                <p class="text-sm text-[#1E1B19]/70 leading-relaxed">
-                    Setiap pengerjaan hardware, desain, maupun pencetakan memiliki estimasi waktu yang transparan dan selalu diselesaikan secara disiplin dan tepat waktu.
-                </p>
-            </div>
-            <!-- Stat 3 -->
-            <div class="flex flex-col items-start group">
-                <span class="font-serif-display text-4xl font-bold text-[#E35D25] mb-3 group-hover:scale-105 transition-transform duration-300">03</span>
-                <h3 class="text-lg font-bold text-[#1E1B19] mb-2">Pelayanan Ramah</h3>
-                <p class="text-sm text-[#1E1B19]/70 leading-relaxed">
-                    Tim ahli kami mengedepankan keramahan dalam melayani setiap sesi konsultasi untuk memberikan solusi terarah yang sesuai dengan budget Anda.
-                </p>
-            </div>
+    </div>
+</section>
+
+<!-- SECTION 3: TENTANG KAMI — Stats / Metrics Grid (section terpisah agar scroll spy bekerja) -->
+<section id="tentang" class="py-24 bg-[#FBF9F6] scroll-mt-24">
+    <div class="max-w-6xl mx-auto px-6">
+        
+        <!-- Optional Section Header inside Tentang Kami -->
+        <div class="text-center mb-16">
+            <span class="text-xs font-bold text-[#E35D25] tracking-widest uppercase block mb-4">TENTANG KAMI</span>
+            <h2 class="font-serif-display text-4xl md:text-5xl font-semibold tracking-tight text-[#1E1B19] leading-none">
+                Pekerjaan yang telah <span class="italic text-[#E35D25] font-serif-display">kami selesaikan.</span>
+            </h2>
         </div>
 
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8">
+            
+            <!-- Card 1: Kualitas Premium -->
+            <div class="relative group overflow-hidden h-[340px] rounded-[24px] bg-[#26221F] shadow-lg transition-transform duration-300 hover:-translate-y-1">
+                <!-- Image Tag (siap dimasukkan di public/assets/about/kualitas.jpg) -->
+                @if(file_exists(public_path('assets/about/kualitas.jpg')))
+                    <img src="{{ asset('assets/about/kualitas.jpg') }}" alt="Kualitas Premium" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105">
+                    <!-- Overlay Dark to ensure readability -->
+                    <div class="absolute inset-0 bg-[#26221F]/80 z-10 transition-opacity duration-300 group-hover:bg-[#26221F]/85"></div>
+                @else
+                    <!-- Fallback Gradient matching mockup Card 1 (Dark brown/charcoal) -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-[#2E2925] to-[#1E1B19] z-10"></div>
+                @endif
+                
+                <!-- Card Content -->
+                <div class="relative z-20 h-full flex flex-col items-center justify-center text-center p-8 transition-all duration-300">
+                    <span class="absolute top-6 right-8 text-[44px] font-serif font-medium leading-none text-white/10 select-none">01</span>
+                    
+                    <h3 class="font-serif text-3xl font-medium text-white transition-all duration-300 group-hover:-translate-y-1">
+                        Kualitas Premium
+                    </h3>
+                    
+                    <!-- Reveal on Hover description -->
+                    <p class="text-sm text-white/80 leading-relaxed max-w-[280px] mt-4 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:max-h-[140px] transform translate-y-4 group-hover:translate-y-0">
+                        Kami selalu menghadirkan layanan terbaik dengan material, komponen, dan standardisasi pengerjaan kelas premium untuk kenyamanan jangka panjang.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 2: Tepat Waktu -->
+            <div class="relative group overflow-hidden h-[340px] rounded-[24px] bg-[#A0522D] shadow-lg transition-transform duration-300 hover:-translate-y-1">
+                <!-- Image Tag (siap dimasukkan di public/assets/about/waktu.jpg) -->
+                @if(file_exists(public_path('assets/about/waktu.jpg')))
+                    <img src="{{ asset('assets/about/waktu.jpg') }}" alt="Tepat Waktu" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105">
+                    <!-- Overlay Dark to ensure readability -->
+                    <div class="absolute inset-0 bg-[#A0522D]/80 z-10 transition-opacity duration-300 group-hover:bg-[#A0522D]/85"></div>
+                @else
+                    <!-- Fallback Gradient matching mockup Card 2 (Warm brown/rust gradient) -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-[#b25b29] to-[#803a15] z-10"></div>
+                @endif
+                
+                <!-- Card Content -->
+                <div class="relative z-20 h-full flex flex-col items-center justify-center text-center p-8 transition-all duration-300">
+                    <span class="absolute top-6 right-8 text-[44px] font-serif font-medium leading-none text-white/10 select-none">02</span>
+                    
+                    <h3 class="font-serif text-3xl font-medium text-white transition-all duration-300 group-hover:-translate-y-1">
+                        Tepat Waktu
+                    </h3>
+                    
+                    <!-- Reveal on Hover description -->
+                    <p class="text-sm text-white/80 leading-relaxed max-w-[280px] mt-4 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:max-h-[140px] transform translate-y-4 group-hover:translate-y-0">
+                        Setiap pengerjaan hardware, desain, maupun pencetakan memiliki estimasi waktu yang transparan dan selalu diselesaikan secara disiplin dan tepat waktu.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 3: Pelayanan Ramah -->
+            <div class="relative group overflow-hidden h-[340px] rounded-[24px] bg-[#FF8C00] shadow-lg transition-transform duration-300 hover:-translate-y-1">
+                <!-- Image Tag (siap dimasukkan di public/assets/about/pelayanan.jpg) -->
+                @if(file_exists(public_path('assets/about/pelayanan.jpg')))
+                    <img src="{{ asset('assets/about/pelayanan.jpg') }}" alt="Pelayanan Ramah" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105">
+                    <!-- Overlay Dark to ensure readability -->
+                    <div class="absolute inset-0 bg-[#FF8C00]/80 z-10 transition-opacity duration-300 group-hover:bg-[#FF8C00]/85"></div>
+                @else
+                    <!-- Fallback Gradient matching mockup Card 3 (Soft orange/salmon gradient) -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-[#ffa366] to-[#e66000] z-10"></div>
+                @endif
+                
+                <!-- Card Content -->
+                <div class="relative z-20 h-full flex flex-col items-center justify-center text-center p-8 transition-all duration-300">
+                    <span class="absolute top-6 right-8 text-[44px] font-serif font-medium leading-none text-white/10 select-none">03</span>
+                    
+                    <h3 class="font-serif text-3xl font-medium text-white transition-all duration-300 group-hover:-translate-y-1">
+                        Pelayanan Ramah
+                    </h3>
+                    
+                    <!-- Reveal on Hover description -->
+                    <p class="text-sm text-white/80 leading-relaxed max-w-[280px] mt-4 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:max-h-[140px] transform translate-y-4 group-hover:translate-y-0">
+                        Tim ahli kami mengedepankan keramahan dalam melayani setiap sesi konsultasi untuk memberikan solusi terarah yang sesuai dengan budget Anda.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 4: Unknown -->
+            <div class="relative group overflow-hidden h-[340px] rounded-[24px] bg-[#A0522D] shadow-lg transition-transform duration-300 hover:-translate-y-1">
+                <!-- Image Tag (siap dimasukkan di public/assets/about/waktu.jpg) -->
+                @if(file_exists(public_path('assets/about/waktu.jpg')))
+                    <img src="{{ asset('assets/about/waktu.jpg') }}" alt="Tepat Waktu" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105">
+                    <!-- Overlay Dark to ensure readability -->
+                    <div class="absolute inset-0 bg-[#A0522D]/80 z-10 transition-opacity duration-300 group-hover:bg-[#A0522D]/85"></div>
+                @else
+                    <!-- Fallback Gradient matching mockup Card 2 (Warm brown/rust gradient) -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-[#b25b29] to-[#803a15] z-10"></div>
+                @endif
+                
+                <!-- Card Content -->
+                <div class="relative z-20 h-full flex flex-col items-center justify-center text-center p-8 transition-all duration-300">
+                    <span class="absolute top-6 right-8 text-[44px] font-serif font-medium leading-none text-white/10 select-none">02</span>
+                    
+                    <h3 class="font-serif text-3xl font-medium text-white transition-all duration-300 group-hover:-translate-y-1">
+                        Tepat Waktu
+                    </h3>
+                    
+                    <!-- Reveal on Hover description -->
+                    <p class="text-sm text-white/80 leading-relaxed max-w-[280px] mt-4 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:max-h-[140px] transform translate-y-4 group-hover:translate-y-0">
+                        Setiap pengerjaan hardware, desain, maupun pencetakan memiliki estimasi waktu yang transparan dan selalu diselesaikan secara disiplin dan tepat waktu.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 5: Unknown -->
+            <div class="relative group overflow-hidden h-[340px] rounded-[24px] bg-[#A0522D] shadow-lg transition-transform duration-300 hover:-translate-y-1">
+                <!-- Image Tag (siap dimasukkan di public/assets/about/waktu.jpg) -->
+                @if(file_exists(public_path('assets/about/waktu.jpg')))
+                    <img src="{{ asset('assets/about/waktu.jpg') }}" alt="Tepat Waktu" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105">
+                    <!-- Overlay Dark to ensure readability -->
+                    <div class="absolute inset-0 bg-[#A0522D]/80 z-10 transition-opacity duration-300 group-hover:bg-[#A0522D]/85"></div>
+                @else
+                    <!-- Fallback Gradient matching mockup Card 2 (Warm brown/rust gradient) -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-[#b25b29] to-[#803a15] z-10"></div>
+                @endif
+                
+                <!-- Card Content -->
+                <div class="relative z-20 h-full flex flex-col items-center justify-center text-center p-8 transition-all duration-300">
+                    <span class="absolute top-6 right-8 text-[44px] font-serif font-medium leading-none text-white/10 select-none">02</span>
+                    
+                    <h3 class="font-serif text-3xl font-medium text-white transition-all duration-300 group-hover:-translate-y-1">
+                        Tepat Waktu
+                    </h3>
+                    
+                    <!-- Reveal on Hover description -->
+                    <p class="text-sm text-white/80 leading-relaxed max-w-[280px] mt-4 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:max-h-[140px] transform translate-y-4 group-hover:translate-y-0">
+                        Setiap pengerjaan hardware, desain, maupun pencetakan memiliki estimasi waktu yang transparan dan selalu diselesaikan secara disiplin dan tepat waktu.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Card 6: Unknown -->
+            <div class="relative group overflow-hidden h-[340px] rounded-[24px] bg-[#A0522D] shadow-lg transition-transform duration-300 hover:-translate-y-1">
+                <!-- Image Tag (siap dimasukkan di public/assets/about/waktu.jpg) -->
+                @if(file_exists(public_path('assets/about/waktu.jpg')))
+                    <img src="{{ asset('assets/about/waktu.jpg') }}" alt="Tepat Waktu" class="absolute inset-0 w-full h-full object-cover z-0 transition-transform duration-500 group-hover:scale-105">
+                    <!-- Overlay Dark to ensure readability -->
+                    <div class="absolute inset-0 bg-[#A0522D]/80 z-10 transition-opacity duration-300 group-hover:bg-[#A0522D]/85"></div>
+                @else
+                    <!-- Fallback Gradient matching mockup Card 2 (Warm brown/rust gradient) -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-[#b25b29] to-[#803a15] z-10"></div>
+                @endif
+                
+                <!-- Card Content -->
+                <div class="relative z-20 h-full flex flex-col items-center justify-center text-center p-8 transition-all duration-300">
+                    <span class="absolute top-6 right-8 text-[44px] font-serif font-medium leading-none text-white/10 select-none">02</span>
+                    
+                    <h3 class="font-serif text-3xl font-medium text-white transition-all duration-300 group-hover:-translate-y-1">
+                        Tepat Waktu
+                    </h3>
+                    
+                    <!-- Reveal on Hover description -->
+                    <p class="text-sm text-white/80 leading-relaxed max-w-[280px] mt-4 opacity-0 max-h-0 overflow-hidden transition-all duration-500 ease-in-out group-hover:opacity-100 group-hover:max-h-[140px] transform translate-y-4 group-hover:translate-y-0">
+                        Setiap pengerjaan hardware, desain, maupun pencetakan memiliki estimasi waktu yang transparan dan selalu diselesaikan secara disiplin dan tepat waktu.
+                    </p>
+                </div>
+            </div>
+
+        </div>
     </div>
 </section>
