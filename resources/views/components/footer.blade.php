@@ -7,8 +7,8 @@
             <!-- Brand Column -->
             <div class="lg:col-span-2 flex flex-col items-start">
                 <a href="#" class="flex items-center gap-2 group mb-6">
-                    <div class="w-9 h-9 rounded-xl bg-[#E35D25] flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300">
-                        J
+                    <div class="w-9 h-9 rounded-xl bg-[#131110] flex items-center justify-center text-white font-bold text-lg shadow-sm shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300"> 
+                        <img src="{{ asset('assets/logo jogja touch border white.png') }}" alt="Jogja Touch Logo" class="w-12 h-10">
                     </div>
                     <span class="font-serif-display font-bold text-lg tracking-tight">Jogja<span class="text-[#E35D25]">touch</span></span>
                 </a>
@@ -57,15 +57,15 @@
                 <ul class="space-y-3 text-xs text-white/60">
                     <li class="flex items-start gap-2">
                         <svg class="w-4 h-4 text-[#E35D25] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-                        <span>info@jogjatouch.com</span>
+                        <span><a href="mailto:jogjatouch@gmail.com" class="hover:text-[#E35D25] transition-colors">jogjatouch@gmail.com</a></span>
                     </li>
                     <li class="flex items-start gap-2">
                         <svg class="w-4 h-4 text-[#E35D25] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.94.725l.548 2.2a1 1 0 00.996.823h.005a1 1 0 00.996-.823l.548-2.2A1 1 0 0113.28 3H16.5a2 2 0 012 2v13.5a2 2 0 01-2 2h-3.28a1 1 0 01-.94-.725l-.548-2.2a1 1 0 00-.996-.823h-.005a1 1 0 00-.996.823l-.548 2.2a1 1 0 01-.94.725H5a2 2 0 01-2-2V5z"/></svg>
-                        <span>+62 812-3456-7890</span>
+                        <span><a href="https://wa.me/6281779911230" target="_blank" rel="noopener noreferrer" class="hover:text-[#E35D25] transition-colors">+62 817-7991-1230</a></span>
                     </li>
                     <li class="flex items-start gap-2">
                         <svg class="w-4 h-4 text-[#E35D25] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span>Sleman, D.I. Yogyakarta, Indonesia</span>
+                        <span><a href="https://maps.app.goo.gl/gRgXYwMzRwYRooUu7" target="_blank" rel="noopener noreferrer" class="hover:text-[#E35D25] transition-colors">D.I. Yogyakarta, Indonesia</a></span>
                     </li>
                 </ul>
             </div>
