@@ -12,13 +12,12 @@
 
         <!-- Desktop Navigation Menu Pills -->
         <nav class="hidden md:flex items-center bg-[#1E1B19]/5 p-1 rounded-full border border-[#1E1B19]/5">
-            <a href="#" class="px-5 py-2 rounded-full text-sm font-medium bg-[#1E1B19] text-white shadow-sm transition-all duration-300">Beranda</a>
-            <a href="#tentang" class="px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Tentang kami</a>
-            <a href="#layanan" class="px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
-            <a href="#fitur" class="px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Fitur</a>
-            <a href="#tracking" class="px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Cek Pesanan</a>
+            <a href="#home" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Beranda</a>
+            <a href="#tentang" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Tentang kami</a>
+            <a href="#layanan" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
+            <a href="#fitur" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Fitur</a>
+            <a href="#tracking" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Cek Pesanan</a>
         </nav>
-
         <!-- CTA Button (Desktop) -->
         <div class="hidden md:block">
             <a href="#cta" class="inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] transition-colors duration-300 shadow-lg shadow-[#E35D25]/15">
@@ -40,11 +39,11 @@
     <!-- Mobile Navigation Drawer -->
     <div id="mobile-menu" class="hidden md:hidden w-full bg-[#FBF9F6] border-t border-[#1E1B19]/5 px-6 py-6 space-y-4 absolute left-0 right-0 shadow-lg">
         <nav class="flex flex-col space-y-3">
-            <a href="#" class="px-4 py-2.5 rounded-xl text-base font-semibold bg-[#1E1B19]/5 text-[#1E1B19]">Beranda</a>
-            <a href="#tentang" class="px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Tentang kami</a>
-            <a href="#layanan" class="px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
-            <a href="#fitur" class="px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Fitur</a>
-            <a href="#tracking" class="px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Cek Pesanan</a>
+            <a href="#home" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Beranda</a>
+            <a href="#tentang" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Tentang kami</a>
+            <a href="#layanan" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
+            <a href="#fitur" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Fitur</a>
+            <a href="#tracking" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Cek Pesanan</a>
         </nav>
         <div class="pt-4 border-t border-[#1E1B19]/5">
             <a href="#cta" class="w-full flex items-center justify-center px-6 py-3.5 rounded-xl text-base font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] transition-colors shadow-md">
