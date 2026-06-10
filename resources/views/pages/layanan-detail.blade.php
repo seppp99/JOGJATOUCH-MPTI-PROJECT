@@ -174,7 +174,7 @@
                                     <input 
                                         type="text" 
                                         name="nama_perusahaan" 
-                                        value="{{ old('nama_perusahaan') }}" 
+                                        value="{{ old('nama_perusahaan', session()->has('user') ? session('user.name') : '') }}" 
                                         placeholder="Nama atau perusahaan"
                                         class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200"
                                         required
@@ -187,7 +187,7 @@
                                         <input 
                                             type="tel" 
                                             name="no_whatsapp" 
-                                            value="{{ old('no_whatsapp') }}" 
+                                            value="{{ old('no_whatsapp', session()->has('user') ? session('user.whatsapp') : '') }}" 
                                             placeholder="08xx-xxxx-xxxx"
                                             class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200"
                                             required
@@ -270,7 +270,7 @@
                                     <input 
                                         type="text" 
                                         name="nama_perusahaan" 
-                                        value="{{ old('nama_perusahaan') }}" 
+                                        value="{{ old('nama_perusahaan', session()->has('user') ? session('user.name') : '') }}" 
                                         placeholder="Ketik nama Anda"
                                         class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200"
                                         required
@@ -283,7 +283,7 @@
                                         <input 
                                             type="tel" 
                                             name="no_whatsapp" 
-                                            value="{{ old('no_whatsapp') }}" 
+                                            value="{{ old('no_whatsapp', session()->has('user') ? session('user.whatsapp') : '') }}" 
                                             placeholder="08xx-xxxx-xxxx"
                                             class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200"
                                             required

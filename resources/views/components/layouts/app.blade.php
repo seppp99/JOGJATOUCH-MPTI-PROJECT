@@ -67,6 +67,9 @@
         <!-- FOOTER -->
         <x-footer />
 
+        <!-- LOGIN MODAL -->
+        <x-login-modal />
+
         <!-- SCRIPTS -->
         @stack('scripts')
 
