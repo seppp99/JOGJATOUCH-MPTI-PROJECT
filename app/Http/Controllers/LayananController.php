@@ -392,6 +392,29 @@ class LayananController extends Controller
             Log::warning("Order could not be saved to database: " . $e->getMessage());
         }
 
+        // IMPORTANT: Save order to session's orders_db if user is logged in (SKIP DATABASE as per requirement)
+        if (session()->has('user')) {
+            $ordersDb = session('orders_db', []);
+            
+            // Create order entry with mock ID and status
+            $newOrder = [
+                'id' => rand(1000, 9999),
+                'service_slug' => $slug,
+                'package_selected' => $validated['package_selected'],
+                'nama_perusahaan' => $validated['nama_perusahaan'],
+                'no_whatsapp' => $validated['no_whatsapp'],
+                'email_kerja' => $validated['email_kerja'],
+                'masalah_utama' => $validated['masalah_utama'],
+                'price' => $this->getPackagePrice($slug, $validated['package_selected']),
+                'date' => now()->format('d M Y'),
+                'status' => 'masuk', // Newly submitted orders start with 'masuk' status
+                'payment_status' => 'belum_bayar' // Default payment status for new orders
+            ];
+            
+            $ordersDb[] = $newOrder;
+            session(['orders_db' => $ordersDb]);
+        }
+
         // Store standard preview in session for user visual confirmation without active DB
         session()->flash('success_order', [
             'service_title' => $service['title_prefix'] . ' ' . str_replace('.', '', $service['title_italic']),
@@ -404,5 +427,25 @@ class LayananController extends Controller
         ]);
 
         return redirect()->back();
+    }
+
+    /**
+     * Helper: Get package price by service slug and package name
+     */
+    private function getPackagePrice($serviceSlug, $packageName)
+    {
+        $services = $this->getServices();
+        
+        if (!isset($services[$serviceSlug])) {
+            return 'Hubungi kami';
+        }
+
+        foreach ($services[$serviceSlug]['options'] as $option) {
+            if ($option['name'] === $packageName) {
+                return $option['price'];
+            }
+        }
+
+        return 'Hubungi kami';
     }
 }
