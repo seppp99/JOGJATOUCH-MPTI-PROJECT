@@ -65,7 +65,7 @@
                     </li>
                     <li class="flex items-start gap-2">
                         <svg class="w-4 h-4 text-[#E35D25] shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        <span><a href="https://maps.app.goo.gl/gRgXYwMzRwYRooUu7" target="_blank" rel="noopener noreferrer" class="hover:text-[#E35D25] transition-colors">D.I. Yogyakarta, Indonesia</a></span>
+                        <span><a href="https://maps.app.goo.gl/czywbX3yQW2fdAEt6" target="_blank" rel="noopener noreferrer" class="hover:text-[#E35D25] transition-colors">D.I. Yogyakarta, Indonesia</a></span>
                     </li>
                 </ul>
             </div>
