@@ -3,12 +3,14 @@
         Buat Akun Pelanggan — JogjaTouch
     </x-slot:title>
 
-    <main class="min-h-[80vh] flex items-center justify-center py-16 bg-[#FBF9F6] relative overflow-hidden">
-        <!-- Glow Backdrops -->
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-glow-orange opacity-40 blur-3xl pointer-events-none"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-glow-orange opacity-30 blur-3xl pointer-events-none"></div>
+    <main id="daftar-bg" class="min-h-[80vh] flex items-center justify-center py-16 relative overflow-hidden" style="background: linear-gradient(135deg, #ffd4b2 0%, #ffb380 30%, #E35D25 70%, #c2410c 100%);">
+        <!-- Soft blur overlay -->
+        <div class="absolute inset-0 backdrop-blur-[2px] bg-white/5 pointer-events-none"></div>
 
-        <div class="relative w-full max-w-md px-6">
+        <!-- Interactive canvas background -->
+        <canvas id="bg-canvas" class="absolute inset-0 w-full h-full" style="pointer-events:none;"></canvas>
+
+        <div class="relative w-full max-w-md px-6" style="z-index:10;">
             <!-- Main Registration Card -->
             <div class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-[#1E1B19]/5">
                 
@@ -156,6 +158,209 @@
     </main>
 
     @push('scripts')
+    <script>
+        // ── Interactive background: floating silhouettes + water ripple ──
+        (function () {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx    = canvas.getContext('2d');
+            const bg     = document.getElementById('daftar-bg');
+            const mouse  = { x: -999, y: -999 };
+            const ripples    = [];
+            const particles  = [];
+            const NUM_PARTICLES = 28;
+
+            function resize() {
+                canvas.width  = bg.offsetWidth;
+                canvas.height = bg.offsetHeight;
+            }
+            resize();
+            window.addEventListener('resize', resize);
+
+            // Track mouse on the main background element
+            bg.addEventListener('mousemove', (e) => {
+                const r = bg.getBoundingClientRect();
+                mouse.x = e.clientX - r.left;
+                mouse.y = e.clientY - r.top;
+            });
+
+            // Create ripple on click or every 600ms of movement
+            let lastRipple = 0;
+            bg.addEventListener('mousemove', (e) => {
+                const now = Date.now();
+                if (now - lastRipple > 600) {
+                    const r = bg.getBoundingClientRect();
+                    ripples.push(new Ripple(e.clientX - r.left, e.clientY - r.top));
+                    lastRipple = now;
+                }
+            });
+            bg.addEventListener('click', (e) => {
+                const r = bg.getBoundingClientRect();
+                ripples.push(new Ripple(e.clientX - r.left, e.clientY - r.top, 1.4));
+            });
+
+            // ── Ripple ──
+            function Ripple(x, y, scale = 1) {
+                this.x = x; this.y = y;
+                this.radius    = 0;
+                this.maxRadius = 160 * scale;
+                this.speed     = 2.5 * scale;
+                this.done      = false;
+                this.draw = function () {
+                    const progress = this.radius / this.maxRadius;
+                    ctx.save();
+                    ctx.globalAlpha = 0.35 * (1 - progress);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                    ctx.lineWidth   = 1.5 * (1 - progress * 0.5);
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                    // second inner ring
+                    if (this.radius > 20) {
+                        ctx.globalAlpha = 0.15 * (1 - progress);
+                        ctx.beginPath();
+                        ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
+                        ctx.stroke();
+                    }
+                    ctx.restore();
+                };
+                this.update = function () {
+                    this.radius += this.speed;
+                    if (this.radius >= this.maxRadius) this.done = true;
+                };
+            }
+
+            // ── Particle (floating silhouette) ──
+            const SHAPES = ['circle', 'hex', 'ring', 'plus', 'triangle', 'diamond'];
+            function Particle() {
+                this.reset = function () {
+                    this.x    = Math.random() * canvas.width;
+                    this.y    = Math.random() * canvas.height;
+                    this.vx   = (Math.random() - 0.5) * 0.25;
+                    this.vy   = (Math.random() - 0.5) * 0.25;
+                    this.size = Math.random() * 32 + 10;
+                    this.base = this.opacity = Math.random() * 0.18 + 0.06;
+                    this.shape    = SHAPES[Math.floor(Math.random() * SHAPES.length)];
+                    this.rotation = Math.random() * Math.PI * 2;
+                    this.rotSpeed = (Math.random() - 0.5) * 0.008;
+                };
+                this.reset();
+
+                this.update = function () {
+                    // ripple push
+                    ripples.forEach(rp => {
+                        const dx = this.x - rp.x, dy = this.y - rp.y;
+                        const d  = Math.hypot(dx, dy);
+                        const delta = Math.abs(d - rp.radius);
+                        if (delta < 40) {
+                            const f = ((40 - delta) / 40) * 0.6 * (rp.radius / rp.maxRadius < 0.5 ? 1 : 0.4);
+                            const a = Math.atan2(dy, dx);
+                            this.vx += Math.cos(a) * f;
+                            this.vy += Math.sin(a) * f;
+                        }
+                    });
+
+                    // mouse soft repulsion
+                    const dx = this.x - mouse.x, dy = this.y - mouse.y;
+                    const d  = Math.hypot(dx, dy);
+                    if (d < 110 && d > 0) {
+                        const f = ((110 - d) / 110) * 0.45;
+                        this.vx += (dx / d) * f;
+                        this.vy += (dy / d) * f;
+                    }
+
+                    // dampen + drift
+                    this.vx *= 0.96; this.vy *= 0.96;
+                    this.x  += this.vx; this.y += this.vy;
+                    this.rotation += this.rotSpeed;
+
+                    // opacity pulse near mouse
+                    this.opacity = d < 200
+                        ? this.base + (0.25 - this.base) * (1 - d / 200)
+                        : this.base;
+
+                    // wrap edges
+                    const pad = 60;
+                    if (this.x < -pad)              this.x = canvas.width  + pad;
+                    if (this.x > canvas.width  + pad) this.x = -pad;
+                    if (this.y < -pad)              this.y = canvas.height + pad;
+                    if (this.y > canvas.height + pad) this.y = -pad;
+                };
+
+                this.draw = function () {
+                    const s = this.size;
+                    ctx.save();
+                    ctx.translate(this.x, this.y);
+                    ctx.rotate(this.rotation);
+                    ctx.globalAlpha  = this.opacity;
+                    ctx.strokeStyle  = 'rgba(255,255,255,0.95)';
+                    ctx.fillStyle    = 'rgba(255,255,255,0.08)';
+                    ctx.lineWidth    = 1.4;
+
+                    ctx.beginPath();
+                    switch (this.shape) {
+                        case 'circle':
+                            ctx.arc(0, 0, s / 2, 0, Math.PI * 2);
+                            ctx.fill(); ctx.stroke();
+                            break;
+                        case 'ring':
+                            ctx.arc(0, 0, s / 2, 0, Math.PI * 2); ctx.stroke();
+                            ctx.beginPath();
+                            ctx.arc(0, 0, s / 5, 0, Math.PI * 2); ctx.stroke();
+                            break;
+                        case 'hex':
+                            for (let i = 0; i < 6; i++) {
+                                const a = (i / 6) * Math.PI * 2 - Math.PI / 6;
+                                i === 0 ? ctx.moveTo(Math.cos(a) * s/2, Math.sin(a) * s/2)
+                                        : ctx.lineTo(Math.cos(a) * s/2, Math.sin(a) * s/2);
+                            }
+                            ctx.closePath(); ctx.fill(); ctx.stroke();
+                            break;
+                        case 'plus': {
+                            const t = s / 3;
+                            ctx.rect(-t/2, -s/2, t, s);
+                            ctx.rect(-s/2, -t/2, s, t);
+                            ctx.fill();
+                            break;
+                        }
+                        case 'triangle':
+                            ctx.moveTo(0, -s/2);
+                            ctx.lineTo(s/2, s/2);
+                            ctx.lineTo(-s/2, s/2);
+                            ctx.closePath(); ctx.fill(); ctx.stroke();
+                            break;
+                        case 'diamond':
+                            ctx.moveTo(0, -s/2);
+                            ctx.lineTo(s/2, 0);
+                            ctx.lineTo(0,  s/2);
+                            ctx.lineTo(-s/2, 0);
+                            ctx.closePath(); ctx.fill(); ctx.stroke();
+                            break;
+                    }
+                    ctx.restore();
+                };
+            }
+
+            for (let i = 0; i < NUM_PARTICLES; i++) particles.push(new Particle());
+
+            // ── Animation loop ──
+            function loop() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // update & draw ripples
+                for (let i = ripples.length - 1; i >= 0; i--) {
+                    ripples[i].update();
+                    ripples[i].draw();
+                    if (ripples[i].done) ripples.splice(i, 1);
+                }
+
+                // update & draw particles
+                particles.forEach(p => { p.update(); p.draw(); });
+
+                requestAnimationFrame(loop);
+            }
+            loop();
+        })();
+    </script>
     <script>
         let resendCountdown = 21;
         let countdownInterval = null;
