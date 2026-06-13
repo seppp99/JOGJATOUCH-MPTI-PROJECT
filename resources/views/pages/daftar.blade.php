@@ -3,7 +3,7 @@
         Buat Akun Pelanggan — JogjaTouch
     </x-slot:title>
 
-    <main id="daftar-bg" class="min-h-[80vh] flex items-center justify-center py-16 relative overflow-hidden" style="background: linear-gradient(135deg, #ffd4b2 0%, #ffb380 30%, #E35D25 70%, #c2410c 100%);">
+    <main id="daftar-bg" class="min-h-[80vh] flex items-center justify-center py-16 relative overflow-hidden" style="background: #ffffff;">
         <!-- Soft blur overlay -->
         <div class="absolute inset-0 backdrop-blur-[2px] bg-white/5 pointer-events-none"></div>
 
@@ -174,7 +174,25 @@
                 canvas.height = bg.offsetHeight;
             }
             resize();
-            window.addEventListener('resize', resize);
+            window.addEventListener('resize', () => { resize(); initOrbs(); });
+
+            // ── Moving radial orbs ──
+            const orbs = [];
+            function initOrbs() {
+                orbs.length = 0;
+                for (let i = 0; i < 5; i++) {
+                    orbs.push({
+                        x:     Math.random() * canvas.width,
+                        y:     Math.random() * canvas.height,
+                        r:     Math.random() * 180 + 160,
+                        vx:    (Math.random() - 0.5) * 0.9,
+                        vy:    (Math.random() - 0.5) * 0.9,
+                        phase: Math.random() * Math.PI * 2,
+                        speed: Math.random() * 0.35 + 0.15,
+                    });
+                }
+            }
+            initOrbs();
 
             // Track mouse on the main background element
             bg.addEventListener('mousemove', (e) => {
@@ -208,15 +226,15 @@
                 this.draw = function () {
                     const progress = this.radius / this.maxRadius;
                     ctx.save();
-                    ctx.globalAlpha = 0.35 * (1 - progress);
-                    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+                    ctx.globalAlpha = 0.45 * (1 - progress);
+                    ctx.strokeStyle = 'rgba(227,93,37,0.9)';
                     ctx.lineWidth   = 1.5 * (1 - progress * 0.5);
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                     ctx.stroke();
                     // second inner ring
                     if (this.radius > 20) {
-                        ctx.globalAlpha = 0.15 * (1 - progress);
+                        ctx.globalAlpha = 0.22 * (1 - progress);
                         ctx.beginPath();
                         ctx.arc(this.x, this.y, this.radius * 0.6, 0, Math.PI * 2);
                         ctx.stroke();
@@ -292,8 +310,8 @@
                     ctx.translate(this.x, this.y);
                     ctx.rotate(this.rotation);
                     ctx.globalAlpha  = this.opacity;
-                    ctx.strokeStyle  = 'rgba(255,255,255,0.95)';
-                    ctx.fillStyle    = 'rgba(255,255,255,0.08)';
+                    ctx.strokeStyle  = 'rgba(227,93,37,0.85)';
+                    ctx.fillStyle    = 'rgba(227,93,37,0.07)';
                     ctx.lineWidth    = 1.4;
 
                     ctx.beginPath();
@@ -344,7 +362,29 @@
 
             // ── Animation loop ──
             function loop() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                // White base
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Moving radial orbs
+                const t = Date.now() * 0.001;
+                orbs.forEach(o => {
+                    o.x += o.vx; o.y += o.vy;
+                    if (o.x < -o.r) o.x = canvas.width  + o.r;
+                    if (o.x > canvas.width  + o.r) o.x = -o.r;
+                    if (o.y < -o.r) o.y = canvas.height + o.r;
+                    if (o.y > canvas.height + o.r) o.y = -o.r;
+
+                    const pulse = 0.5 + 0.5 * Math.sin(t * o.speed + o.phase);
+                    const alpha = (0.03 + pulse * 0.17).toFixed(2); // 0.03 → 0.20
+
+                    const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+                    g.addColorStop(0,    `rgba(255,153,80,${alpha})`);
+                    g.addColorStop(0.5,  `rgba(255,185,130,${(parseFloat(alpha) * 0.45).toFixed(2)})`);
+                    g.addColorStop(1,    'rgba(255,255,255,0)');
+                    ctx.fillStyle = g;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                });
 
                 // update & draw ripples
                 for (let i = ripples.length - 1; i >= 0; i--) {
