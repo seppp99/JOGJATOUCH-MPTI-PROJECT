@@ -1,5 +1,6 @@
 <!-- SECTION 2: HERO SECTION -->
 <section id="home" class="relative pt-12 pb-24 md:pt-20 md:pb-32 overflow-hidden scroll-mt-24">
+    <canvas id="hero-ripple-canvas" class="absolute inset-0 w-full h-full pointer-events-none" style="z-index:100;"></canvas>
     <!-- Glow background decor -->
     <div class="absolute -top-40 right-0 w-[600px] h-[600px] bg-glow-orange pointer-events-none rounded-full"></div>
     
@@ -77,9 +78,8 @@
                         <div class="w-3 h-3 bg-[#E35D25] rounded-full"></div>
                     </div>
                     
-                    <div class="absolute bottom-6 right-6 w-20 h-20 md:w-28 md:h-28 bg-white/80 backdrop-blur-md rounded-full shadow-lg border border-white/30 z-20 flex flex-col items-center justify-center text-center p-2">
-                        <span class="font-serif-display text-lg md:text-xl font-bold text-[#E35D25]">J</span>
-                        <span class="text-[8px] md:text-[9px] tracking-wider uppercase font-semibold text-[#1E1B19]/60">Touch</span>
+                    <div class="absolute bottom-6 right-6 w-16 h-16 md:w-20 md:h-20 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/40 z-20 flex items-center justify-center animate-bounce" style="animation-duration: 4s;">
+                        <div class="w-3 h-3 bg-[#E35D25] rounded-full"></div>
                     </div>
 
                     <!-- Decorative background dots -->
@@ -98,6 +98,93 @@
 
     </div>
 </section>
+
+@push('scripts')
+<script>
+(function () {
+    const section = document.getElementById('home');
+    const canvas  = document.getElementById('hero-ripple-canvas');
+    const ctx     = canvas.getContext('2d');
+    const rings   = [];
+    let animating = false;
+
+    function resize() {
+        canvas.width  = section.offsetWidth;
+        canvas.height = section.offsetHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    window.heroRippleBurst = function (btn) {
+        resize();
+        const sr = section.getBoundingClientRect();
+        const br = btn.getBoundingClientRect();
+        const cx = br.left + br.width  / 2 - sr.left;
+        const cy = br.top  + br.height / 2 - sr.top;
+        const maxR = Math.hypot(canvas.width, canvas.height);
+        const now  = performance.now();
+
+        for (let i = 0; i < 8; i++) {
+            rings.push({
+                x:         cx,
+                y:         cy,
+                radius:    0,
+                maxR:      maxR,
+                speed:     6 + Math.random() * 7,
+                lw:        1.5 + Math.random() * 2.5,
+                startTime: now + i * 75,
+            });
+        }
+
+        if (!animating) {
+            animating = true;
+            requestAnimationFrame(loop);
+        }
+    };
+
+    function loop(now) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+
+        for (let i = rings.length - 1; i >= 0; i--) {
+            const r = rings[i];
+            if (now < r.startTime) { alive = true; continue; }
+
+            const elapsed  = now - r.startTime;
+            r.radius = r.speed * (elapsed / 16);
+            const progress = Math.min(r.radius / r.maxR, 1);
+            const alpha    = 0.6 * (1 - progress * progress);
+
+            if (alpha < 0.005 || progress >= 1) { rings.splice(i, 1); continue; }
+            alive = true;
+
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.strokeStyle = '#E35D25';
+            ctx.lineWidth   = r.lw * (1 - progress * 0.55);
+            ctx.beginPath();
+            ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            if (r.radius > 40) {
+                ctx.globalAlpha = alpha * 0.25;
+                ctx.lineWidth   = 0.8;
+                ctx.beginPath();
+                ctx.arc(r.x, r.y, r.radius * 0.6, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            ctx.restore();
+        }
+
+        if (alive) {
+            requestAnimationFrame(loop);
+        } else {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            animating = false;
+        }
+    }
+})();
+</script>
+@endpush
 
 <!-- SECTION 3: TENTANG KAMI — Stats / Metrics Grid (section terpisah agar scroll spy bekerja) -->
 <section id="tentang" class="py-24 bg-[#FBF9F6] scroll-mt-24">
