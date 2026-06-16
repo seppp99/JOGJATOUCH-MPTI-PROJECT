@@ -78,7 +78,7 @@
                         <div class="w-3 h-3 bg-[#E35D25] rounded-full"></div>
                     </div>
                     
-                    <div class="absolute bottom-6 right-6 w-16 h-16 md:w-20 md:h-20 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/40 z-20 flex items-center justify-center animate-bounce" style="animation-duration: 4s;">
+                    <div class="absolute bottom-6 right-6 w-16 h-16 md:w-24 md:h-24 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/40 z-20 flex items-center justify-center animate-bounce" style="animation-duration: 4.5s;">
                         <div class="w-3 h-3 bg-[#E35D25] rounded-full"></div>
                     </div>
 
