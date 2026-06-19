@@ -17,13 +17,16 @@ Route::get('/daftar', [AuthController::class, 'registerPage'])->name('daftar');
 Route::post('/register/send-otp', [AuthController::class, 'sendOtpRegister'])->name('register.send-otp');
 Route::post('/register/verify-otp', [AuthController::class, 'verifyOtpRegister'])->name('register.verify-otp');
 
+Route::get('/login', [AuthController::class, 'loginPage'])->name('login');
+Route::post('/login/submit', [AuthController::class, 'loginSubmit'])->name('login.submit');
+
 // Backwards-compatible aliases for existing login modal (some views still call these names)
 Route::post('/login/send-otp', [AuthController::class, 'sendOtpRegister'])->name('login.send-otp');
 Route::post('/login/verify-otp', [AuthController::class, 'verifyOtpRegister'])->name('login.verify-otp');
 
 Route::get('/akun', function () {
     if (!session()->has('user')) {
-        return redirect()->route('daftar')->with('error', 'Silakan login terlebih dahulu.');
+        return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
     }
     return view('pages.akun');
 })->name('akun');
