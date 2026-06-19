@@ -58,7 +58,10 @@
                     </svg>
                 </a>
             @else
-                <!-- Guest CTA / Daftar -->
+                <!-- Guest CTA / Masuk & Daftar -->
+                <a href="{{ route('login') }}" class="text-sm font-semibold text-[#1E1B19]/70 hover:text-[#1E1B19] transition-colors px-4 py-2">
+                    Masuk
+                </a>
                 <a href="{{ route('daftar') }}" class="cursor-pointer inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] transition-colors duration-300 shadow-lg shadow-[#E35D25]/15">
                     Daftar
                 </a>
@@ -104,9 +107,14 @@
                     </svg>
                 </a>
             @else
-                <a href="{{ route('daftar') }}" class="w-full flex items-center justify-center px-6 py-3.5 rounded-xl text-base font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] transition-colors shadow-md">
-                    Daftar
-                </a>
+                <div class="flex flex-col gap-2.5">
+                    <a href="{{ route('login') }}" class="w-full flex items-center justify-center px-6 py-3.5 rounded-xl text-base font-semibold border border-[#1E1B19]/10 bg-white text-[#1E1B19] hover:bg-[#FBF9F6] transition-colors shadow-sm">
+                        Masuk
+                    </a>
+                    <a href="{{ route('daftar') }}" class="w-full flex items-center justify-center px-6 py-3.5 rounded-xl text-base font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] transition-colors shadow-md">
+                        Daftar
+                    </a>
+                </div>
             @endif
         </div>
     </div>

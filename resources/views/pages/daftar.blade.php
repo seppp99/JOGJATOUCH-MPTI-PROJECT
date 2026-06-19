@@ -12,8 +12,15 @@
 
         <div class="relative w-full max-w-md px-6" style="z-index:10;">
             <!-- Main Registration Card -->
-            <div class="bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-[#1E1B19]/5">
+            <div class="relative bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-[#1E1B19]/5">
                 
+                <!-- Close Button -->
+                <button onclick="window.location.href='/'" class="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#1E1B19]/5 flex items-center justify-center text-[#1E1B19]/70 hover:bg-[#1E1B19]/10 transition-colors" aria-label="Close">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
                 <!-- Logo -->
                 <div class="flex justify-center mb-6">
                     <div class="w-14 h-14 rounded-2xl border border-neutral-100 bg-white p-2 flex items-center justify-center shadow-sm">
@@ -25,10 +32,10 @@
                 <div id="step-registration-form">
                     <div class="text-center mb-8">
                         <h3 class="font-serif-display text-3xl font-extrabold tracking-tight text-[#1E1B19]">
-                            Buat <span class="text-[#E35D25] italic font-semibold">Akun Baru</span>
+                            Buat <span class="text-[#E35D25] italic font-semibold">akun baru</span>
                         </h3>
                         <p class="text-sm text-[#1E1B19]/60 mt-3 leading-relaxed">
-                            Daftarkan nama & nomor WhatsApp Anda untuk memantau pesanan layanan secara real-time.
+                            Daftar untuk memantau pesanan dan riwayat layanan Anda.
                         </p>
                     </div>
 
@@ -39,48 +46,63 @@
                             <label for="reg-name" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 Nama Lengkap
                             </label>
-                            <input type="text" id="reg-name" required placeholder="Contoh: Vegli Raif" 
+                            <input type="text" id="reg-name" required placeholder="Nama lengkap Anda" 
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
                         </div>
 
-                        <!-- Whatsapp Input -->
-                        <div class="mb-6">
-                            <label for="reg-whatsapp" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
-                                No. WhatsApp
+                        <!-- Email Input -->
+                        <div class="mb-4">
+                            <label for="reg-email" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
+                                Email
                             </label>
-                            <input type="text" id="reg-whatsapp" required placeholder="08xx atau +62 8xx" 
+                            <input type="email" id="reg-email" required placeholder="nama@email.com" 
+                                class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
+                        </div>
+
+                        <!-- Telepon Input -->
+                        <div class="mb-4">
+                            <label for="reg-whatsapp" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
+                                No. Telepon
+                            </label>
+                            <input type="text" id="reg-whatsapp" required placeholder="+62 8xx" 
+                                class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
+                        </div>
+
+                        <!-- Password Input -->
+                        <div class="mb-4">
+                            <label for="reg-password" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
+                                Password
+                            </label>
+                            <input type="password" id="reg-password" required placeholder="Minimal 6 karakter" 
+                                class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
+                        </div>
+
+                        <!-- Konfirmasi Password Input -->
+                        <div class="mb-6">
+                            <label for="reg-password-confirm" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
+                                Konfirmasi Password
+                            </label>
+                            <input type="password" id="reg-password-confirm" required placeholder="Ulangi password" 
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
                             <p id="reg-error" class="hidden text-xs text-red-500 mt-2 font-medium"></p>
                         </div>
 
                         <!-- Submit Button -->
                         <button type="submit" class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-[#E35D25] hover:bg-[#c74c1a] text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#E35D25]/15 active:scale-[0.98]">
-                            <!-- Phone Icon -->
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M6.62 10.79a15.15 15.15 0 006.59 6.59l2.2-2.2a1 1 0 011.11-.27 11.72 11.72 0 003.7 1.09 1 1 0 01.95 1v3.58a1 1 0 01-1 1A16 16 0 013 3a1 1 0 011-1h3.58a1 1 0 011 .95 11.72 11.72 0 001.09 3.7 1 1 0 01-.27 1.11l-2.2 2.2z"/>
+                            <span>Daftar & Masuk</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            <span>Kirim Kode OTP via WhatsApp</span>
                         </button>
                     </form>
 
-                    <!-- Divider -->
-                    <div class="flex items-center my-6">
-                        <div class="flex-grow border-t border-[#1E1B19]/10"></div>
-                        <span class="mx-4 text-[10px] font-bold tracking-wider text-[#1E1B19]/40 uppercase">Atau</span>
-                        <div class="flex-grow border-t border-[#1E1B19]/10"></div>
+                    <!-- Sudah punya akun link -->
+                    <div class="text-center mt-6">
+                        <span class="text-xs text-[#1E1B19]/60 font-medium">Sudah punya akun? </span>
+                        <a href="{{ route('login') }}" class="text-xs text-[#E35D25] hover:underline font-bold inline-flex items-center gap-1">
+                            Masuk di sini &rarr;
+                        </a>
                     </div>
-
-                    <!-- Google Registration -->
-                    <button onclick="handleGoogleRegister()" class="w-full flex items-center justify-center gap-3 py-3.5 px-6 rounded-full border border-[#1E1B19]/15 bg-white hover:bg-[#FBF9F6] text-sm font-semibold text-[#1E1B19] transition-all duration-300 active:scale-[0.98]">
-                        <!-- Google Logo -->
-                        <svg class="w-4 h-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/>
-                        </svg>
-                        <span>Daftar dengan Google</span>
-                    </button>
                 </div>
 
                 <!-- STEP 2: VERIFICATION OTP -->
@@ -409,17 +431,38 @@
         function submitRegistration(e) {
             e.preventDefault();
             const name = document.getElementById('reg-name').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
             const whatsapp = document.getElementById('reg-whatsapp').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const passwordConfirm = document.getElementById('reg-password-confirm').value;
             const errorElement = document.getElementById('reg-error');
 
-            if (!name || !whatsapp) {
-                errorElement.textContent = 'Nama dan nomor WhatsApp wajib diisi.';
+            if (!name || !email || !whatsapp || !password || !passwordConfirm) {
+                errorElement.textContent = 'Semua field wajib diisi.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            if (password.length < 6) {
+                errorElement.textContent = 'Password minimal harus 6 karakter.';
+                errorElement.classList.remove('hidden');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                errorElement.textContent = 'Konfirmasi password tidak cocok.';
                 errorElement.classList.remove('hidden');
                 return;
             }
 
             errorElement.classList.add('hidden');
-            tempUser = { name, whatsapp };
+            tempUser = { 
+                name, 
+                email, 
+                whatsapp, 
+                password, 
+                password_confirmation: passwordConfirm 
+            };
 
             // Call backend to store registration details temporarily in session
             fetch('{{ route("register.send-otp") }}', {
@@ -428,11 +471,11 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
-                body: JSON.stringify({ name, whatsapp })
+                body: JSON.stringify(tempUser)
             })
-            .then(res => res.json())
-                .then(data => {
-                if (data.success) {
+            .then(async res => {
+                const data = await res.json();
+                if (res.ok && data.success) {
                     document.getElementById('display-wa-number').textContent = data.whatsapp;
                     // Show demo OTP code when backend returns it (for local/demo use)
                     if (data.otp) {
@@ -452,7 +495,11 @@
                         if (firstInput) firstInput.focus();
                     }, 50);
                 } else {
-                    errorElement.textContent = 'Terjadi kesalahan saat mengirim OTP.';
+                    let errorMsg = data.message || 'Terjadi kesalahan saat mengirim OTP.';
+                    if (data.errors) {
+                        errorMsg = Object.values(data.errors).flat().join(' ');
+                    }
+                    errorElement.textContent = errorMsg;
                     errorElement.classList.remove('hidden');
                 }
             })
@@ -488,9 +535,9 @@
                 },
                 body: JSON.stringify({ otp: otpValue })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
+            .then(async res => {
+                const data = await res.json();
+                if (res.ok && data.success) {
                     // Redirect to Customer Account page
                     window.location.href = '{{ route("akun") }}';
                 } else {
@@ -501,34 +548,6 @@
             .catch(err => {
                 errorElement.textContent = 'Verifikasi gagal. Coba lagi.';
                 errorElement.classList.remove('hidden');
-            });
-        }
-
-        function handleGoogleRegister() {
-            const googleName = "Vegli Raif";
-            const googleWA = "+62 856-7890-544332";
-            
-            fetch('{{ route("register.send-otp") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ name: googleName, whatsapp: googleWA })
-            })
-            .then(res => res.json())
-            .then(data => {
-                const otpToUse = (data && data.otp) ? data.otp : '123456';
-                fetch('{{ route("register.verify-otp") }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ otp: otpToUse })
-                }).then(() => {
-                    window.location.href = '{{ route("akun") }}';
-                });
             });
         }
 
