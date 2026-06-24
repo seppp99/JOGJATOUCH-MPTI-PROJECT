@@ -13,7 +13,7 @@
     <div class="space-y-4">
         @php
             // Get current user's WhatsApp for filtering orders
-            $userWhatsapp = session('user.whatsapp');
+            $userWhatsapp = \Illuminate\Support\Facades\Auth::user()->whatsapp_number;
             $ordersDb = session('orders_db', []);
             
             // Filter orders for current user

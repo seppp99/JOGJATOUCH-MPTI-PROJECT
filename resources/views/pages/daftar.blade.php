@@ -39,15 +39,21 @@
                         </p>
                     </div>
 
-                    <form id="register-form" onsubmit="submitRegistration(event)">
+                    @if(session('error'))
+                        <div class="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium text-center">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    <form method="POST" action="{{ route('register.send-otp') }}">
                         @csrf
                         <!-- Nama Input -->
                         <div class="mb-4">
                             <label for="reg-name" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 Nama Lengkap
                             </label>
-                            <input type="text" id="reg-name" required placeholder="Nama lengkap Anda" 
+                            <input type="text" id="reg-name" name="name" value="{{ old('name') }}" required placeholder="Nama lengkap Anda" 
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
+                            @error('name')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
                         </div>
 
                         <!-- Email Input -->
@@ -55,8 +61,9 @@
                             <label for="reg-email" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 Email
                             </label>
-                            <input type="email" id="reg-email" required placeholder="nama@email.com" 
+                            <input type="email" id="reg-email" name="email" value="{{ old('email') }}" required placeholder="nama@email.com" 
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
+                            @error('email')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
                         </div>
 
                         <!-- Telepon Input -->
@@ -64,8 +71,9 @@
                             <label for="reg-whatsapp" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 No. Telepon
                             </label>
-                            <input type="text" id="reg-whatsapp" required placeholder="+62 8xx" 
+                            <input type="text" id="reg-whatsapp" name="whatsapp_number" value="{{ old('whatsapp_number') }}" required placeholder="+62 8xx" 
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
+                            @error('whatsapp_number')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
                         </div>
 
                         <!-- Password Input -->
@@ -73,8 +81,9 @@
                             <label for="reg-password" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 Password
                             </label>
-                            <input type="password" id="reg-password" required placeholder="Minimal 6 karakter" 
+                            <input type="password" id="reg-password" name="password" required placeholder="Minimal 8 karakter" 
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
+                            @error('password')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
                         </div>
 
                         <!-- Konfirmasi Password Input -->
@@ -82,9 +91,8 @@
                             <label for="reg-password-confirm" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 Konfirmasi Password
                             </label>
-                            <input type="password" id="reg-password-confirm" required placeholder="Ulangi password" 
+                            <input type="password" id="reg-password-confirm" name="password_confirmation" required placeholder="Ulangi password" 
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
-                            <p id="reg-error" class="hidden text-xs text-red-500 mt-2 font-medium"></p>
                         </div>
 
                         <!-- Submit Button -->
@@ -105,75 +113,7 @@
                     </div>
                 </div>
 
-                <!-- STEP 2: VERIFICATION OTP -->
-                <div id="step-otp-verification" class="hidden">
-                    <div class="text-center mb-6">
-                        <h3 class="font-serif-display text-3xl font-extrabold tracking-tight text-[#1E1B19]">
-                            Masukkan <span class="text-[#E35D25] italic font-semibold">kode OTP</span>
-                        </h3>
-                        <p class="text-sm text-[#1E1B19]/60 mt-3 leading-relaxed">
-                            6 digit kode telah dikirim ke WhatsApp Anda.
-                        </p>
-                    </div>
 
-                    <!-- Back Button -->
-                    <button onclick="backToRegistrationStep()" class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#1E1B19]/60 hover:text-[#E35D25] mb-4 transition-colors">
-                        &larr; Ganti nomor / nama
-                    </button>
-
-                    <!-- WhatsApp Notification Card -->
-                    <div class="flex items-start gap-4 p-4 bg-[#F2FDF6] rounded-2xl border border-emerald-500/10 mb-6">
-                        <div class="w-10 h-10 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0 shadow-md shadow-emerald-500/20">
-                            <!-- WA SVG Icon -->
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946C.06 5.348 5.397.01 12.008.01c3.202.001 6.212 1.246 8.477 3.513 2.266 2.268 3.507 5.28 3.505 8.484-.004 6.657-5.34 11.997-11.953 11.997-2.005-.001-3.973-.502-5.724-1.455L0 24zm6.59-4.846c1.6.95 3.188 1.449 4.825 1.451 5.436 0 9.86-4.37 9.864-9.799.002-2.63-1.023-5.101-2.885-6.963C16.588 1.981 14.117.957 11.5.957c-5.442 0-9.87 4.372-9.874 9.802-.001 1.774.469 3.506 1.362 5.048L1.933 21.9l6.3-1.656c1.602.875 3.323 1.336 5.08 1.336z"/>
-                            </svg>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-bold text-[#1E1B19]">Cek WhatsApp Anda</h4>
-                            <p class="text-xs text-[#1E1B19]/60 mt-0.5 font-medium leading-relaxed">
-                                Kode dikirim ke <span id="display-wa-number" class="font-bold text-[#1E1B19]/80">+62 856-7890-544332</span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Verification Form -->
-                    <form id="otp-form" onsubmit="submitOtp(event)">
-                        @csrf
-                        <!-- 6 Digit Code Input -->
-                        <div class="mb-6">
-                            <label class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-3">
-                                Kode 6 Digit
-                            </label>
-                            <div class="flex justify-between gap-2.5" id="otp-inputs-container">
-                                @for ($i = 0; $i < 6; $i++)
-                                    <input type="text" maxlength="1" pattern="[0-9]" inputmode="numeric" 
-                                        class="otp-digit-input w-12 h-14 text-center text-xl font-bold rounded-xl bg-[#FBF9F6] border border-[#1E1B19]/10 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/20" 
-                                        placeholder="•" required>
-                                @endfor
-                            </div>
-                            <p id="otp-error" class="hidden text-xs text-red-500 mt-2 font-medium"></p>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-[#E35D25] hover:bg-[#c74c1a] text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#E35D25]/15 active:scale-[0.98]">
-                            <span>Verifikasi & Masuk</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                        </button>
-                    </form>
-
-                    <!-- OTP Footer Meta Info -->
-                    <div class="text-center mt-6 space-y-2">
-                        <p class="text-xs text-[#1E1B19]/60 font-medium">
-                            Belum dapat kode? Kirim ulang dalam <span id="timer-countdown" class="font-bold text-[#1E1B19]">21s</span>
-                        </p>
-                        <p class="text-[11px] text-[#1E1B19]/40 bg-[#FBF9F6] py-2 px-3 rounded-lg border border-[#1E1B19]/5 font-medium">
-                            Demo: gunakan kode <span id="demo-otp-code" class="font-bold text-[#E35D25]">123456</span> untuk login.
-                        </p>
-                    </div>
-                </div>
 
             </div>
         </div>
@@ -423,198 +363,6 @@
             loop();
         })();
     </script>
-    <script>
-        let resendCountdown = 21;
-        let countdownInterval = null;
-        let tempUser = {};
 
-        function submitRegistration(e) {
-            e.preventDefault();
-            const name = document.getElementById('reg-name').value.trim();
-            const email = document.getElementById('reg-email').value.trim();
-            const whatsapp = document.getElementById('reg-whatsapp').value.trim();
-            const password = document.getElementById('reg-password').value;
-            const passwordConfirm = document.getElementById('reg-password-confirm').value;
-            const errorElement = document.getElementById('reg-error');
-
-            if (!name || !email || !whatsapp || !password || !passwordConfirm) {
-                errorElement.textContent = 'Semua field wajib diisi.';
-                errorElement.classList.remove('hidden');
-                return;
-            }
-
-            if (password.length < 6) {
-                errorElement.textContent = 'Password minimal harus 6 karakter.';
-                errorElement.classList.remove('hidden');
-                return;
-            }
-
-            if (password !== passwordConfirm) {
-                errorElement.textContent = 'Konfirmasi password tidak cocok.';
-                errorElement.classList.remove('hidden');
-                return;
-            }
-
-            errorElement.classList.add('hidden');
-            tempUser = { 
-                name, 
-                email, 
-                whatsapp, 
-                password, 
-                password_confirmation: passwordConfirm 
-            };
-
-            // Call backend to store registration details temporarily in session
-            fetch('{{ route("register.send-otp") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(tempUser)
-            })
-            .then(async res => {
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    document.getElementById('display-wa-number').textContent = data.whatsapp;
-                    // Show demo OTP code when backend returns it (for local/demo use)
-                    if (data.otp) {
-                        const demoEl = document.getElementById('demo-otp-code');
-                        if (demoEl) demoEl.textContent = data.otp;
-                    }
-                    
-                    // Transition to OTP verification step
-                    document.getElementById('step-registration-form').classList.add('hidden');
-                    document.getElementById('step-otp-verification').classList.remove('hidden');
-                    
-                    startCountdown();
-                    
-                    // Auto focus first OTP digit input
-                    setTimeout(() => {
-                        const firstInput = document.querySelector('.otp-digit-input');
-                        if (firstInput) firstInput.focus();
-                    }, 50);
-                } else {
-                    let errorMsg = data.message || 'Terjadi kesalahan saat mengirim OTP.';
-                    if (data.errors) {
-                        errorMsg = Object.values(data.errors).flat().join(' ');
-                    }
-                    errorElement.textContent = errorMsg;
-                    errorElement.classList.remove('hidden');
-                }
-            })
-            .catch(err => {
-                errorElement.textContent = 'Koneksi gagal. Coba lagi.';
-                errorElement.classList.remove('hidden');
-            });
-        }
-
-        function submitOtp(e) {
-            e.preventDefault();
-            const errorElement = document.getElementById('otp-error');
-            
-            // Gather OTP digits
-            let otpValue = '';
-            document.querySelectorAll('.otp-digit-input').forEach(input => {
-                otpValue += input.value;
-            });
-
-            if (otpValue.length !== 6) {
-                errorElement.textContent = 'Masukkan 6 digit kode lengkap.';
-                errorElement.classList.remove('hidden');
-                return;
-            }
-
-            errorElement.classList.add('hidden');
-
-            fetch('{{ route("register.verify-otp") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ otp: otpValue })
-            })
-            .then(async res => {
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    // Redirect to Customer Account page
-                    window.location.href = '{{ route("akun") }}';
-                } else {
-                    errorElement.textContent = data.message || 'Kode OTP salah. Gunakan kode 123456.';
-                    errorElement.classList.remove('hidden');
-                }
-            })
-            .catch(err => {
-                errorElement.textContent = 'Verifikasi gagal. Coba lagi.';
-                errorElement.classList.remove('hidden');
-            });
-        }
-
-        function backToRegistrationStep() {
-            document.getElementById('step-otp-verification').classList.add('hidden');
-            document.getElementById('step-registration-form').classList.remove('hidden');
-            clearInterval(countdownInterval);
-        }
-
-        function startCountdown() {
-            resendCountdown = 21;
-            const display = document.getElementById('timer-countdown');
-            display.textContent = `${resendCountdown}s`;
-            
-            clearInterval(countdownInterval);
-            countdownInterval = setInterval(() => {
-                resendCountdown--;
-                if (resendCountdown <= 0) {
-                    clearInterval(countdownInterval);
-                    display.innerHTML = '<button type="button" onclick="resendOtp()" class="text-[#E35D25] hover:underline font-bold">Kirim ulang</button>';
-                } else {
-                    display.textContent = `${resendCountdown}s`;
-                }
-            }, 1000);
-        }
-
-        function resendOtp() {
-            fetch('{{ route("register.send-otp") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify(tempUser)
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    startCountdown();
-                }
-            });
-        }
-
-        // Set up OTP inputs auto-tabbing
-        document.addEventListener('DOMContentLoaded', () => {
-            const inputs = document.querySelectorAll('.otp-digit-input');
-            
-            inputs.forEach((input, index) => {
-                input.addEventListener('input', (e) => {
-                    const value = e.target.value;
-                    if (value && !/^\d$/.test(value)) {
-                        e.target.value = '';
-                        return;
-                    }
-                    
-                    if (value && index < inputs.length - 1) {
-                        inputs[index + 1].focus();
-                    }
-                });
-
-                input.addEventListener('keydown', (e) => {
-                    if (e.key === 'Backspace' && !e.target.value && index > 0) {
-                        inputs[index - 1].focus();
-                    }
-                });
-            });
-        });
-    </script>
     @endpush
 </x-layouts.app>
