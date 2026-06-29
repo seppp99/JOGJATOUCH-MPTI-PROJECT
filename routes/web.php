@@ -24,13 +24,12 @@ Route::post('/login/submit', [AuthController::class, 'loginSubmit'])->name('logi
 Route::get('/lupa-password', [App\Http\Controllers\PasswordResetController::class, 'showForm'])->name('lupa-password');
 Route::post('/lupa-password/send-otp', [App\Http\Controllers\PasswordResetController::class, 'sendOtp'])->name('lupa-password.send-otp');
 Route::get('/lupa-password/verifikasi', [App\Http\Controllers\PasswordResetController::class, 'verifyPage'])->name('lupa-password.verifikasi');
+Route::post('/lupa-password/verify-otp', [App\Http\Controllers\PasswordResetController::class, 'verifyOtp'])->name('lupa-password.verify-otp');
+Route::get('/lupa-password/baru', [App\Http\Controllers\PasswordResetController::class, 'newPassPage'])->name('lupa-password.baru');
+Route::post('/lupa-password/reset', [App\Http\Controllers\PasswordResetController::class, 'reset'])->name('lupa-password.reset');
 
 Route::get('/akun', function () {
     return view('pages.akun');
 })->middleware('auth')->name('akun');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-
-
-
-

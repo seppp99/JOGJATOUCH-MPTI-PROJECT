@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Jobs\SendOtpEmailJob;
 
+use App\Http\Requests\VerifyResetOtpRequest;
+use App\Http\Requests\ResetPasswordRequest;
+use Illuminate\Support\Str;
+
 class PasswordResetController extends Controller
 {
     public function showForm()
@@ -47,7 +51,88 @@ class PasswordResetController extends Controller
 
     public function verifyPage()
     {
-        // Placeholder for phase 2
-        return "Ini halaman input OTP reset password. Tahap 2 belum dikerjakan.";
+        $email = session('reset_pending_email');
+        if (!$email) {
+            return redirect()->route('lupa-password')
+                ->with('status', 'Sesi reset berakhir. Silakan mulai ulang.');
+        }
+
+        return view('pages.lupa-password.verifikasi', ['email' => $email]);
+    }
+
+    public function verifyOtp(VerifyResetOtpRequest $request)
+    {
+        $email = session('reset_pending_email');
+        if (!$email) {
+            return redirect()->route('lupa-password')
+                ->with('status', 'Sesi reset berakhir. Silakan mulai ulang.');
+        }
+
+        $attemptKey = 'reset_otp_attempts:' . $email;
+        if (Cache::get($attemptKey, 0) >= 5) {
+            Cache::forget('otp_reset:' . $email);
+            Cache::forget($attemptKey);
+            session()->forget('reset_pending_email');
+            return redirect()->route('lupa-password')
+                ->with('status', 'Terlalu banyak percobaan salah. Silakan mulai ulang.');
+        }
+
+        $cachedOtp = Cache::get('otp_reset:' . $email);
+        if (!$cachedOtp) {
+            return back()->withErrors(['otp' => 'Kode kadaluarsa. Silakan minta kode baru.']);
+        }
+
+        if ($cachedOtp !== $request->otp) {
+            Cache::put($attemptKey, Cache::get($attemptKey, 0) + 1, now()->addMinutes(30));
+            return back()->withErrors(['otp' => 'Kode OTP salah. Silakan coba lagi.']);
+        }
+
+        // OTP is correct
+        Cache::pull('otp_reset:' . $email);
+        Cache::forget($attemptKey);
+
+        session()->forget('reset_pending_email');
+        session(['reset_email' => $email]);
+
+        return redirect()->route('lupa-password.baru');
+    }
+
+    public function newPassPage()
+    {
+        if (!session('reset_email')) {
+            return redirect()->route('lupa-password')
+                ->with('status', 'Sesi reset berakhir. Silakan mulai ulang.');
+        }
+
+        return view('pages.lupa-password.baru');
+    }
+
+    public function reset(ResetPasswordRequest $request)
+    {
+        $email = session('reset_email');
+        if (!$email) {
+            return redirect()->route('lupa-password')->with('status', 'Sesi reset berakhir. Silakan mulai ulang.');
+        }
+
+        $user = User::where('email', $email)->first();
+        if (!$user) {
+            session()->forget('reset_email');
+            return redirect()->route('lupa-password')->with('status', 'Akun tidak ditemukan. Silakan mulai ulang.');
+        }
+
+        try {
+            $user->password = $request->validated()['password'];
+            $user->setRememberToken(Str::random(60));
+            $user->save();
+        } catch (\Throwable $e) {
+            Log::error('Gagal reset password', ['email' => $email, 'error' => $e->getMessage()]);
+            return back()->withErrors(['password' => 'Terjadi kesalahan. Silakan coba lagi.']);
+        }
+
+        session()->forget('reset_email');
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect()->route('login')->with('status', 'Password berhasil diperbarui. Silakan masuk dengan password baru Anda.');
     }
 }
