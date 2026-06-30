@@ -12,7 +12,7 @@
 
         <!-- Desktop Navigation Menu Pills -->
         <nav class="hidden md:flex items-center bg-[#1E1B19]/5 p-1 rounded-full border border-[#1E1B19]/5">
-            @if(session()->has('user'))
+            @auth
                 <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Beranda</a>
                 <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Tentang Kami</a>
                 <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
@@ -24,19 +24,19 @@
                 <a href="#layanan" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
                 <a href="#fitur" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Fitur</a>
                 <a href="#tracking" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Cek Pesanan</a>
-            @endif
+            @endauth
         </nav>
 
         <!-- Right Side Actions (Desktop) -->
         <div class="hidden md:flex items-center gap-4">
-            @if(session()->has('user'))
+            @auth
                 <!-- Logged In User Dropdown -->
                 <div class="relative" id="user-dropdown-container">
                     <button onclick="toggleUserDropdown()" class="flex items-center gap-2.5 px-4 py-2 rounded-full border border-[#1E1B19]/10 bg-white hover:bg-[#FBF9F6] text-sm font-semibold transition-all">
                         <div class="w-8 h-8 rounded-full bg-[#E35D25] text-white flex items-center justify-center text-sm font-bold">
-                            {{ substr(session('user.name'), 0, 1) }}
+                            {{ substr(Auth::user()->name, 0, 1) }}
                         </div>
-                        <span class="text-[#1E1B19]">{{ session('user.name') }}</span>
+                        <span class="text-[#1E1B19]">{{ Auth::user()->name }}</span>
                         <!-- Chevron Icon -->
                         <svg class="w-4 h-4 text-[#1E1B19]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
@@ -65,7 +65,7 @@
                 <a href="{{ route('daftar') }}" class="cursor-pointer inline-flex items-center justify-center px-6 py-3 rounded-full text-sm font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] transition-colors duration-300 shadow-lg shadow-[#E35D25]/15">
                     Daftar
                 </a>
-            @endif
+            @endauth
         </div>
 
         <!-- Mobile Menu Button -->
@@ -82,7 +82,7 @@
     <!-- Mobile Navigation Drawer -->
     <div id="mobile-menu" class="hidden md:hidden w-full bg-[#FBF9F6] border-t border-[#1E1B19]/5 px-6 py-6 space-y-4 absolute left-0 right-0 shadow-lg">
         <nav class="flex flex-col space-y-3">
-            @if(session()->has('user'))
+            @auth
                 <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Beranda</a>
                 <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Tentang Kami</a>
                 <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
@@ -96,10 +96,10 @@
                 <a href="#layanan" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
                 <a href="#fitur" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Fitur</a>
                 <a href="#tracking" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Cek Pesanan</a>
-            @endif
+            @endauth
         </nav>
         <div class="pt-4 border-t border-[#1E1B19]/5">
-            @if(session()->has('user'))
+            @auth
                 <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="w-full flex items-center justify-center gap-1.5 px-6 py-3.5 rounded-xl text-base font-semibold bg-[#E35D25] text-white hover:bg-[#c74c1a] transition-colors shadow-md">
                     <span>Pesan Layanan</span>
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -115,7 +115,7 @@
                         Daftar
                     </a>
                 </div>
-            @endif
+            @endauth
         </div>
     </div>
 </header>

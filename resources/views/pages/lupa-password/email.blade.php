@@ -1,6 +1,6 @@
 <x-layouts.app>
     <x-slot:title>
-        Masuk ke Akun Pelanggan — JogjaTouch
+        Lupa Password — JogjaTouch
     </x-slot:title>
 
     <main id="login-bg" class="min-h-[80vh] flex items-center justify-center py-16 relative overflow-hidden" style="background: #ffffff;">
@@ -15,7 +15,7 @@
             <div class="relative bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-[#1E1B19]/5">
                 
                 <!-- Close Button -->
-                <button onclick="window.location.href='/'" class="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#1E1B19]/5 flex items-center justify-center text-[#1E1B19]/70 hover:bg-[#1E1B19]/10 transition-colors" aria-label="Close">
+                <button onclick="window.location.href='{{ route('login') }}'" class="absolute top-6 right-6 w-9 h-9 rounded-full bg-[#1E1B19]/5 flex items-center justify-center text-[#1E1B19]/70 hover:bg-[#1E1B19]/10 transition-colors" aria-label="Close">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
@@ -28,58 +28,51 @@
                     </div>
                 </div>
 
-                <!-- LOGIN FORM -->
+                <!-- FORGOT PASSWORD FORM -->
                 <div>
                     <div class="text-center mb-8">
                         <h3 class="font-serif-display text-3xl font-extrabold tracking-tight text-[#1E1B19]">
-                            Masuk ke <span class="text-[#E35D25] italic font-semibold">JogjaTouch</span>
+                            Lupa <span class="text-[#E35D25] italic font-semibold">Password</span>
                         </h3>
                         <p class="text-sm text-[#1E1B19]/60 mt-3 leading-relaxed">
-                            Pantau pesanan Anda, lihat riwayat, dan akses dashboard pelanggan.
+                            Masukkan email yang terdaftar. Kami akan mengirimkan kode OTP untuk mereset password Anda.
                         </p>
                     </div>
 
-                    <form method="POST" action="{{ route('login.submit') }}">
+                    @if(session('status'))
+                        <div class="mb-6 p-4 rounded-xl bg-[#F2FDF6] border border-emerald-500/10 text-emerald-600 text-sm font-medium text-center">
+                            {{ session('status') }}
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('lupa-password.send-otp') }}">
                         @csrf
                         <!-- Email Input -->
-                        <div class="mb-4">
-                            <label for="login-email" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
+                        <div class="mb-6">
+                            <label for="email" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 Email
                             </label>
-                            <input type="email" id="login-email" name="email" required placeholder="nama@email.com" value="{{ old('email') }}"
+                            <input type="email" id="email" name="email" required placeholder="nama@email.com" value="{{ old('email') }}"
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
                             @error('email')
                                 <p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <!-- Password Input -->
-                        <div class="mb-6">
-                            <div class="flex items-center justify-between mb-2">
-                                <label for="login-password" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase">
-                                    Password
-                                </label>
-                                <a href="{{ route('lupa-password') }}" class="text-[11px] font-bold text-[#E35D25] hover:underline" tabindex="-1">Lupa Password?</a>
-                            </div>
-                            <input type="password" id="login-password" name="password" required placeholder="Masukkan password" 
-                                class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
-                        </div>
-
                         <!-- Submit Button -->
                         <button type="submit" class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-[#E35D25] hover:bg-[#c74c1a] text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#E35D25]/15 active:scale-[0.98]">
-                            <span>Masuk</span>
-                            <!-- Sign In Icon -->
+                            <span>Kirim Kode</span>
+                            <!-- Send Icon -->
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"></path>
                             </svg>
                         </button>
                     </form>
 
-                    <!-- Belum punya akun link -->
+                    <!-- Kembali ke masuk link -->
                     <div class="text-center mt-6">
-                        <span class="text-xs text-[#1E1B19]/60 font-medium">Belum punya akun? </span>
-                        <a href="{{ route('daftar') }}" class="text-xs text-[#E35D25] hover:underline font-bold inline-flex items-center gap-1">
-                            Daftar sekarang &rarr;
+                        <a href="{{ route('login') }}" class="text-xs text-[#E35D25] hover:underline font-bold inline-flex items-center gap-1">
+                            &larr; Kembali ke Masuk
                         </a>
                     </div>
                 </div>
@@ -316,6 +309,5 @@
             loop();
         })();
     </script>
-
     @endpush
 </x-layouts.app>
