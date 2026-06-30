@@ -44,10 +44,8 @@
                     </button>
                     <!-- Dropdown Menu -->
                     <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white border border-[#1E1B19]/10 rounded-2xl shadow-xl py-2 z-50">
-                        @unless(request()->routeIs('akun'))
-                            <a href="{{ route('akun') }}" class="block px-5 py-3 text-sm font-medium text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 hover:text-[#1E1B19]">Dashboard Akun</a>
-                            <hr class="border-[#1E1B19]/5">
-                        @endunless
+                        <a href="{{ route('akun') }}" class="block px-5 py-3 text-sm font-medium text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 hover:text-[#1E1B19]">Dashboard Akun</a>
+                        <hr class="border-[#1E1B19]/5">
                         <a href="{{ route('logout') }}" class="block px-5 py-3 text-sm font-medium text-red-500 hover:bg-red-500/5">Keluar</a>
                     </div>
                 </div>
@@ -90,9 +88,7 @@
                 <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
                 <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Portfolio</a>
                 <a href="{{ request()->is('/') ? '#cta' : '/#cta' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Hubungi Kami</a>
-                @unless(request()->routeIs('akun'))
-                    <a href="{{ route('akun') }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Dashboard Akun</a>
-                @endunless
+                <a href="{{ route('akun') }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Dashboard Akun</a>
                 <a href="{{ route('logout') }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-red-500 hover:bg-red-500/5 transition-all">Keluar</a>
             @else
                 <a href="#home" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Beranda</a>
