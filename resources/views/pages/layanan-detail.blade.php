@@ -76,34 +76,34 @@
                 </button>
 
                 <div class="mx-8 md:mx-12 overflow-hidden">
-                    <div class="flex gap-3 transition-all duration-500" id="print-carousel-track" style="align-items:stretch;">
+                    <div class="flex gap-4 transition-all duration-500" id="print-carousel-track" style="align-items:stretch;">
                         @foreach($service['options'] as $i => $opt)
                         <div
                             class="print-product-card flex-shrink-0 flex flex-col rounded-3xl border-2 cursor-pointer transition-all duration-500 overflow-hidden select-none bg-white"
                             data-index="{{ $i }}"
                             onclick="setPrintActive({{ $i }})"
-                            style="width:calc(33.333% - 8px);"
+                            style="width:calc(33.333% - 11px);"
                         >
-                            <div class="p-4 md:p-5 flex-grow relative">
+                            <div class="p-7 md:p-10 relative">
                                 @if(isset($opt['is_popular']) && $opt['is_popular'])
-                                <span class="absolute top-4 right-4 bg-[#E35D25] text-white text-[8px] font-extrabold uppercase tracking-widest px-2 py-1 rounded-md">POPULER</span>
+                                <span class="absolute top-7 right-7 bg-[#E35D25] text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-md">POPULER</span>
                                 @endif
-                                <p class="text-[8px] font-bold tracking-widest uppercase text-[#1E1B19]/40 mb-1.5">{{ $opt['category_sub'] ?? '' }}</p>
-                                <h3 class="font-serif-display text-lg md:text-xl font-bold text-[#1E1B19] mb-2 leading-tight pr-12">{{ $opt['name'] }}</h3>
-                                <p class="text-[11px] text-[#1E1B19]/55 leading-relaxed mb-3 line-clamp-3">{{ $opt['description'] }}</p>
-                                <div class="grid grid-cols-2 gap-x-2 gap-y-1.5 mb-3">
+                                <p class="text-xs font-bold tracking-widest uppercase text-[#1E1B19]/40 mb-3">{{ $opt['category_sub'] ?? '' }}</p>
+                                <h3 class="font-serif-display text-3xl md:text-4xl font-bold text-[#1E1B19] mb-4 leading-tight pr-20">{{ $opt['name'] }}</h3>
+                                <p class="text-sm text-[#1E1B19]/55 leading-relaxed mb-6 line-clamp-3">{{ $opt['description'] }}</p>
+                                <div class="grid grid-cols-2 gap-x-4 gap-y-3 mb-6">
                                     @foreach($opt['features'] as $feat)
-                                    <div class="flex items-center gap-1.5 text-[10px] font-semibold text-[#1E1B19]/70">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-[#E35D25] shrink-0"></span>
+                                    <div class="flex items-center gap-2 text-sm font-semibold text-[#1E1B19]/70">
+                                        <span class="w-2 h-2 rounded-full bg-[#E35D25] shrink-0"></span>
                                         <span class="leading-tight">{{ $feat }}</span>
                                     </div>
                                     @endforeach
                                 </div>
-                                <span class="text-[11px] font-bold text-[#E35D25]">Pilih layanan &rarr;</span>
+                                <span class="text-sm font-bold text-[#E35D25]">Pilih layanan &rarr;</span>
                             </div>
-                            <div class="mx-3 mb-3 rounded-2xl border-2 border-dashed border-[#1E1B19]/10 bg-[#FBF9F6] h-20 flex flex-col items-center justify-center gap-1">
-                                <svg class="w-5 h-5 text-[#1E1B19]/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                <span class="text-[9px] text-[#1E1B19]/30 font-medium text-center px-2">Letakkan foto contoh {{ $opt['name'] }}</span>
+                            <div class="mx-6 mb-6 rounded-2xl border-2 border-dashed border-[#1E1B19]/10 bg-[#FBF9F6] h-44 flex flex-col items-center justify-center gap-2">
+                                <svg class="w-10 h-10 text-[#1E1B19]/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="text-xs text-[#1E1B19]/30 font-medium text-center px-4">Letakkan foto contoh {{ $opt['name'] }}</span>
                             </div>
                         </div>
                         @endforeach
@@ -188,7 +188,7 @@
 
                 {{-- FORM: BUKU CUSTOM --}}
                 <div class="print-form-panel" data-index="0">
-                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl">
+                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
                         <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Buku Custom</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Cetak buku dan file desainmu — atur ukuran, cover, dan jilid.</p></div>
                         <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
                             @csrf
@@ -220,10 +220,6 @@
                             <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
                                 <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
                             </div>
-                            <div class="bg-[#1E1B19] rounded-2xl p-4 flex items-center justify-between">
-                                <div><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Produk</p><p class="text-sm font-bold text-white mt-0.5">Buku Custom <span class="text-white/50">• A4</span></p></div>
-                                <div class="text-right"><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Jumlah</p><p class="text-sm font-bold text-white mt-0.5">• +1</p></div>
-                            </div>
                             <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
                                 <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
@@ -234,7 +230,7 @@
 
                 {{-- FORM: PHOTOBOOK --}}
                 <div class="print-form-panel hidden" data-index="1">
-                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl">
+                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
                         <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Photobook</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Album hardcover A4 — cukup kirim folder fotonya, layout dibantu tim.</p></div>
                         <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
                             @csrf
@@ -276,10 +272,6 @@
                             <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
                                 <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
                             </div>
-                            <div class="bg-[#1E1B19] rounded-2xl p-4 flex items-center justify-between">
-                                <div><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Produk</p><p class="text-sm font-bold text-white mt-0.5">Photobook <span class="text-white/50">• A4 landscape</span></p></div>
-                                <div class="text-right"><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Jumlah</p><p class="text-sm font-bold text-white mt-0.5">• +1</p></div>
-                            </div>
                             <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
                                 <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
@@ -290,7 +282,7 @@
 
                 {{-- FORM: CETAK FOTO --}}
                 <div class="print-form-panel hidden" data-index="2">
-                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl">
+                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
                         <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Cetak Foto</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Cetak foto satuan dari 4R sampai poster raksasa A0.</p></div>
                         <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
                             @csrf
@@ -319,10 +311,6 @@
                             <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
                                 <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
                             </div>
-                            <div class="bg-[#1E1B19] rounded-2xl p-4 flex items-center justify-between">
-                                <div><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Produk</p><p class="text-sm font-bold text-white mt-0.5">Cetak Foto <span class="text-white/50">• 4R</span></p></div>
-                                <div class="text-right"><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Jumlah</p><p class="text-sm font-bold text-white mt-0.5">• +1</p></div>
-                            </div>
                             <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
                                 <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
@@ -331,6 +319,32 @@
                     </div>
                 </div>
             </div>
+            {{-- Confirmation Overlay --}}
+            <div id="print-confirm-overlay" class="fixed inset-0 bg-[#1E1B19]/70 z-50 flex items-center justify-center hidden backdrop-blur-sm px-4">
+                <div class="bg-[#FBF9F6] rounded-[32px] w-full max-w-md shadow-2xl overflow-hidden">
+                    {{-- Header --}}
+                    <div class="bg-[#1E1B19] px-8 py-6">
+                        <p class="text-[9px] font-bold tracking-widest uppercase text-white/40 mb-1">✦ Konfirmasi Pesanan</p>
+                        <h3 class="font-serif-display text-2xl font-bold text-white" id="print-confirm-product">Buku Custom</h3>
+                    </div>
+                    {{-- Body --}}
+                    <div class="px-8 py-6 max-h-[55vh] overflow-y-auto">
+                        <div id="print-confirm-body" class="divide-y divide-[#1E1B19]/5"></div>
+                    </div>
+                    {{-- Actions --}}
+                    <div class="px-8 pb-8 pt-4 flex flex-col gap-3">
+                        <button onclick="submitPrintForm()" class="w-full bg-[#E35D25] hover:bg-[#c74c1a] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
+                            <span>Pesan Sekarang via WhatsApp</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                        <button onclick="closePrintConfirm()" class="w-full border border-[#1E1B19]/15 bg-white hover:bg-[#f0ebe4] text-[#1E1B19] text-sm font-semibold py-3.5 px-6 rounded-full flex items-center justify-center gap-2 transition-colors duration-200">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                            <span>Ubah Pesanan</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             {{-- END PRINTING LAYOUT --}}
 
             @else
@@ -661,23 +675,23 @@
                     // pos 0 = active/center, 1 = right, 2 = left
                     if (pos === 0) {
                         card.style.order = 2;
-                        card.style.opacity = '1';
                         card.style.transform = 'scale(1)';
+                        card.style.opacity = '1';
                         card.style.borderColor = '#E35D25';
-                        card.style.boxShadow = '0 10px 30px rgba(227,93,37,0.15)';
+                        card.style.boxShadow = '0 16px 40px rgba(227,93,37,0.18)';
                         card.style.zIndex = '3';
                     } else if (pos === 1) {
                         card.style.order = 3;
-                        card.style.opacity = '0.55';
-                        card.style.transform = 'scale(0.93)';
-                        card.style.borderColor = '#eee';
+                        card.style.transform = 'scale(0.85)';
+                        card.style.opacity = '0.5';
+                        card.style.borderColor = '#e8e8e8';
                         card.style.boxShadow = 'none';
                         card.style.zIndex = '1';
                     } else {
                         card.style.order = 1;
-                        card.style.opacity = '0.55';
-                        card.style.transform = 'scale(0.93)';
-                        card.style.borderColor = '#eee';
+                        card.style.transform = 'scale(0.85)';
+                        card.style.opacity = '0.5';
+                        card.style.borderColor = '#e8e8e8';
                         card.style.boxShadow = 'none';
                         card.style.zIndex = '1';
                     }
@@ -716,7 +730,74 @@
                 updatePrintCarousel();
             }
 
-            document.addEventListener('DOMContentLoaded', () => updatePrintCarousel());
+            // ── Confirmation overlay logic ──
+            const _printFieldLabels = {
+                nama_perusahaan:  'Nama / Brand',
+                no_whatsapp:      'No. WhatsApp',
+                jumlah:           'Jumlah',
+                ukuran:           'Ukuran',
+                ukuran_cetak:     'Ukuran Cetak',
+                jenis_cover:      'Jenis Cover',
+                penjilidan:       'Penjilidan',
+                jumlah_halaman:   'Jumlah Halaman',
+                cover:            'Cover',
+                kertas_isi:       'Kertas Isi',
+                link_folder_foto: 'Link Folder Foto',
+                finishing_kertas: 'Finishing Kertas',
+                laminasi:         'Laminasi',
+                masalah_utama:    'Catatan',
+            };
+            const _printFieldOrder = Object.keys(_printFieldLabels);
+            let _activePrintForm = null;
+
+            function showPrintConfirm(form) {
+                _activePrintForm = form;
+                const product = form.querySelector('[name="package_selected"]').value;
+                document.getElementById('print-confirm-product').textContent = product;
+
+                let html = '';
+                _printFieldOrder.forEach(name => {
+                    const el = form.querySelector(`[name="${name}"]`);
+                    if (!el) return;
+                    const val = el.value.trim();
+                    if (!val) return;
+                    html += `<div class="flex items-start justify-between gap-4 py-3">
+                        <span class="text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/40 shrink-0 pt-0.5">${_printFieldLabels[name]}</span>
+                        <span class="text-sm font-semibold text-[#1E1B19] text-right leading-snug">${val}</span>
+                    </div>`;
+                });
+
+                document.getElementById('print-confirm-body').innerHTML = html;
+                document.getElementById('print-confirm-overlay').classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closePrintConfirm() {
+                document.getElementById('print-confirm-overlay').classList.add('hidden');
+                document.body.style.overflow = '';
+                _activePrintForm = null;
+            }
+
+            function submitPrintForm() {
+                if (_activePrintForm) {
+                    _activePrintForm.submit();
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                updatePrintCarousel();
+                // Intercept all 3 print form submissions
+                document.querySelectorAll('.print-form-panel form').forEach(form => {
+                    form.addEventListener('submit', function(e) {
+                        e.preventDefault();
+                        showPrintConfirm(this);
+                    });
+                });
+                // Close overlay when clicking backdrop
+                document.getElementById('print-confirm-overlay').addEventListener('click', function(e) {
+                    if (e.target === this) closePrintConfirm();
+                });
+            });
         @else
             // ── Generic service package-selector JS ──
             const serviceOptions = @json($service['options']);
