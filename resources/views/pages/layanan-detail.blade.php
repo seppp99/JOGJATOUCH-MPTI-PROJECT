@@ -59,9 +59,284 @@
                 </div>
             @endif
 
+            @if($service['slug'] === 'printing-cetak')
+            {{-- ─────────────────────────────────────────────────────────── --}}
+            {{-- PRINTING-CETAK CUSTOM LAYOUT                                --}}
+            {{-- ─────────────────────────────────────────────────────────── --}}
+
+            {{-- 1. Section heading --}}
+            <div class="mb-8">
+                <h2 class="font-serif-display text-3xl font-semibold text-[#1E1B19]">Pilih jenis cetak</h2>
+            </div>
+
+            {{-- 2. Product carousel --}}
+            <div class="relative mb-2">
+                <button onclick="printCarouselPrev()" class="absolute -left-2 md:left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-[#1E1B19]/10 flex items-center justify-center shadow-md hover:bg-[#FBF9F6] transition-colors">
+                    <svg class="w-4 h-4 text-[#1E1B19]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </button>
+
+                <div class="mx-8 md:mx-12 overflow-hidden">
+                    <div class="flex gap-3 transition-all duration-500" id="print-carousel-track" style="align-items:stretch;">
+                        @foreach($service['options'] as $i => $opt)
+                        <div
+                            class="print-product-card flex-shrink-0 flex flex-col rounded-3xl border-2 cursor-pointer transition-all duration-500 overflow-hidden select-none bg-white"
+                            data-index="{{ $i }}"
+                            onclick="setPrintActive({{ $i }})"
+                            style="width:calc(33.333% - 8px);"
+                        >
+                            <div class="p-4 md:p-5 flex-grow relative">
+                                @if(isset($opt['is_popular']) && $opt['is_popular'])
+                                <span class="absolute top-4 right-4 bg-[#E35D25] text-white text-[8px] font-extrabold uppercase tracking-widest px-2 py-1 rounded-md">POPULER</span>
+                                @endif
+                                <p class="text-[8px] font-bold tracking-widest uppercase text-[#1E1B19]/40 mb-1.5">{{ $opt['category_sub'] ?? '' }}</p>
+                                <h3 class="font-serif-display text-lg md:text-xl font-bold text-[#1E1B19] mb-2 leading-tight pr-12">{{ $opt['name'] }}</h3>
+                                <p class="text-[11px] text-[#1E1B19]/55 leading-relaxed mb-3 line-clamp-3">{{ $opt['description'] }}</p>
+                                <div class="grid grid-cols-2 gap-x-2 gap-y-1.5 mb-3">
+                                    @foreach($opt['features'] as $feat)
+                                    <div class="flex items-center gap-1.5 text-[10px] font-semibold text-[#1E1B19]/70">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-[#E35D25] shrink-0"></span>
+                                        <span class="leading-tight">{{ $feat }}</span>
+                                    </div>
+                                    @endforeach
+                                </div>
+                                <span class="text-[11px] font-bold text-[#E35D25]">Pilih layanan &rarr;</span>
+                            </div>
+                            <div class="mx-3 mb-3 rounded-2xl border-2 border-dashed border-[#1E1B19]/10 bg-[#FBF9F6] h-20 flex flex-col items-center justify-center gap-1">
+                                <svg class="w-5 h-5 text-[#1E1B19]/20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                                <span class="text-[9px] text-[#1E1B19]/30 font-medium text-center px-2">Letakkan foto contoh {{ $opt['name'] }}</span>
+                            </div>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+
+                <button onclick="printCarouselNext()" class="absolute -right-2 md:right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-[#1E1B19]/10 flex items-center justify-center shadow-md hover:bg-[#FBF9F6] transition-colors">
+                    <svg class="w-4 h-4 text-[#1E1B19]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </div>
+
+            {{-- Navigation hint --}}
+            <div class="flex items-center justify-center gap-3 mb-10">
+                <span class="text-[#1E1B19]/25 text-xs">&larr;</span>
+                <span class="text-[10px] text-[#1E1B19]/40 font-medium tracking-wide">geser kartu untuk lihat semua produk</span>
+                <span class="text-[#1E1B19]/25 text-xs">&rarr;</span>
+            </div>
+
+            {{-- 3. Preview Box --}}
+            <div class="rounded-3xl border-2 border-dashed border-[#1E1B19]/10 bg-[#F9F6F2] p-8 md:p-12 flex flex-col items-center justify-center min-h-[200px] mb-10">
+                <div class="inline-flex items-center gap-2 bg-[#1E1B19] text-white text-xs font-bold px-4 py-2 rounded-full mb-5">
+                    Preview &bull; <span id="print-preview-product">{{ $service['options'][0]['name'] }}</span>
+                </div>
+                <div class="w-14 h-14 rounded-2xl border-2 border-dashed border-[#1E1B19]/15 bg-white flex items-center justify-center mb-3">
+                    <svg class="w-6 h-6 text-[#1E1B19]/25" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                </div>
+                <p class="text-xs text-[#1E1B19]/35 font-medium" id="print-preview-sub">Letakkan foto contoh {{ $service['options'][0]['name'] }} (opsional)</p>
+            </div>
+
+            {{-- 4. Product Detail sections (show/hide per active product) --}}
+            @foreach($service['options'] as $i => $opt)
+            <div class="print-detail-section {{ $i > 0 ? 'hidden' : '' }}" data-index="{{ $i }}">
+                <p class="text-xs font-bold tracking-widest uppercase text-[#E35D25] mb-3">✦ {{ $opt['category_sub'] ?? '' }}</p>
+                <h2 class="font-serif-display text-4xl md:text-5xl font-bold text-[#1E1B19] mb-4 leading-tight">{{ $opt['name'] }}</h2>
+                <p class="text-[#1E1B19]/60 text-base leading-relaxed mb-6 max-w-2xl">{{ $opt['description'] }}</p>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
+                    @foreach($opt['features'] as $feat)
+                    <div class="flex items-center gap-2 text-sm font-semibold text-[#1E1B19]/80">
+                        <svg class="w-4 h-4 text-[#E35D25] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>{{ $feat }}</span>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endforeach
+
+            {{-- 5. Scroll-to-form CTA --}}
+            <div class="mb-10">
+                <button onclick="document.getElementById('print-form-section').scrollIntoView({behavior:'smooth'})"
+                    class="inline-flex items-center gap-2 px-7 py-3.5 rounded-full bg-[#1E1B19] text-white text-sm font-bold hover:bg-[#E35D25] transition-colors duration-300">
+                    <span>Isi formulir pesanan</span>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+            </div>
+
+            {{-- 6. Form Section --}}
+            <div id="print-form-section" class="scroll-mt-24">
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex-grow border-t border-[#1E1B19]/10"></div>
+                    <span class="text-[10px] font-bold tracking-widest uppercase text-[#1E1B19]/40">✦ Formulir Pemesanan</span>
+                    <div class="flex-grow border-t border-[#1E1B19]/10"></div>
+                </div>
+                <h2 class="font-serif-display text-4xl md:text-5xl font-bold text-[#1E1B19] mb-8 leading-tight">
+                    Atur &amp; <span class="text-[#E35D25] italic font-serif">pesan</span> cetakanmu
+                </h2>
+
+                @if ($errors->any())
+                <div class="mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl text-xs text-rose-800 space-y-1 max-w-2xl">
+                    <p class="font-bold">Mohon perbaiki isian berikut:</p>
+                    <ul class="list-disc pl-4 space-y-0.5 font-medium">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+                </div>
+                @endif
+
+                @php
+                $inputCls = 'w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all';
+                $selectCls = 'w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all';
+                $labelCls = 'block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2';
+                $qtyBtnCls = 'w-9 h-9 rounded-lg border border-[#e8dfd3] bg-white flex items-center justify-center text-[#1E1B19] hover:border-[#E35D25] transition-colors font-bold text-lg leading-none';
+                $userName = session()->has('user') ? session('user.name') : '';
+                $userWa = session()->has('user') ? session('user.whatsapp') : '';
+                @endphp
+
+                {{-- FORM: BUKU CUSTOM --}}
+                <div class="print-form-panel" data-index="0">
+                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl">
+                        <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Buku Custom</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Cetak buku dan file desainmu — atur ukuran, cover, dan jilid.</p></div>
+                        <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="package_selected" value="Buku Custom">
+                            <input type="hidden" name="email_kerja" value="{{ $userWa ?: 'info@jogjatouch.com' }}">
+                            <div><label class="{{ $labelCls }}">Nama / Brand</label><input type="text" name="nama_perusahaan" value="{{ old('nama_perusahaan', $userName) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="{{ $labelCls }}">No. WhatsApp</label><input type="tel" name="no_whatsapp" value="{{ old('no_whatsapp', $userWa) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required></div>
+                                <div><label class="{{ $labelCls }}">Jumlah</label>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="this.nextElementSibling.stepDown()" class="{{ $qtyBtnCls }}">−</button>
+                                        <input type="number" name="jumlah" min="1" value="1" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
+                                        <button type="button" onclick="this.previousElementSibling.stepUp()" class="{{ $qtyBtnCls }}">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Ukuran</label>
+                                <select name="ukuran" class="{{ $selectCls }}"><option>A4 - 21 × 29.7 cm</option><option>B5 - 18.2 × 25.7 cm</option><option>A5 - 14.8 × 21 cm</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Jenis Cover</label>
+                                <select name="jenis_cover" class="{{ $selectCls }}"><option>Softcover art carton 260gsm</option><option>Hardcover laminasi doff</option><option>Hardcover laminasi glossy</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Penjilidan</label>
+                                <select name="penjilidan" class="{{ $selectCls }}"><option>Lem panas / perfect bind</option><option>Jahit benang</option><option>Spiral</option><option>Staples saddle stitch</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Jumlah Halaman</label>
+                                <select name="jumlah_halaman" class="{{ $selectCls }}"><option>s/d 40 halaman</option><option>41–80 halaman</option><option>81–120 halaman</option><option>121–200 halaman</option><option>&gt; 200 halaman</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
+                                <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
+                            </div>
+                            <div class="bg-[#1E1B19] rounded-2xl p-4 flex items-center justify-between">
+                                <div><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Produk</p><p class="text-sm font-bold text-white mt-0.5">Buku Custom <span class="text-white/50">• A4</span></p></div>
+                                <div class="text-right"><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Jumlah</p><p class="text-sm font-bold text-white mt-0.5">• +1</p></div>
+                            </div>
+                            <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
+                                <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                            <p class="text-[10px] text-center text-[#1E1B19]/50 font-semibold leading-relaxed">Tim JogjaTouch konfirmasi total final &amp; link upload via WhatsApp</p>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- FORM: PHOTOBOOK --}}
+                <div class="print-form-panel hidden" data-index="1">
+                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl">
+                        <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Photobook</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Album hardcover A4 — cukup kirim folder fotonya, layout dibantu tim.</p></div>
+                        <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="package_selected" value="Photobook">
+                            <input type="hidden" name="email_kerja" value="{{ $userWa ?: 'info@jogjatouch.com' }}">
+                            <div><label class="{{ $labelCls }}">Nama / Brand</label><input type="text" name="nama_perusahaan" value="{{ old('nama_perusahaan', $userName) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="{{ $labelCls }}">No. WhatsApp</label><input type="tel" name="no_whatsapp" value="{{ old('no_whatsapp', $userWa) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required></div>
+                                <div><label class="{{ $labelCls }}">Jumlah</label>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="this.nextElementSibling.stepDown()" class="{{ $qtyBtnCls }}">−</button>
+                                        <input type="number" name="jumlah" min="1" value="1" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
+                                        <button type="button" onclick="this.previousElementSibling.stepUp()" class="{{ $qtyBtnCls }}">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Ukuran</label>
+                                <select name="ukuran" class="{{ $selectCls }}"><option>A4 landscape - 29.7 × 21 cm</option><option>A4 portrait - 21 × 29.7 cm</option><option>Square 20 × 20 cm</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Cover</label>
+                                <select name="cover" class="{{ $selectCls }}"><option>Hardcover laminasi doff</option><option>Hardcover laminasi glossy</option><option>Leather cover premium</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Kertas Isi</label>
+                                <select name="kertas_isi" class="{{ $selectCls }}"><option>Art paper 110gsm</option><option>Art paper 150gsm</option><option>Glossy photo paper</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Jumlah Halaman</label>
+                                <select name="jumlah_halaman" class="{{ $selectCls }}"><option>20 halaman / 10 spread</option><option>28 halaman / 14 spread</option><option>36 halaman / 18 spread</option><option>40 halaman / 20 spread</option></select>
+                            </div>
+                            <div>
+                                <label class="{{ $labelCls }}">☁ Link folder foto (Google Drive / Canva) <span class="text-[#E35D25]">?</span></label>
+                                <p class="text-[10px] text-[#1E1B19]/50 mb-2 leading-relaxed">Kumpulkan semua foto dalam satu folder, lalu tempel linknya. Set akses ke "siapa saja yang memiliki link".</p>
+                                <div class="flex gap-2 mb-2">
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-[#1E1B19]/5 text-[#1E1B19]/60 cursor-pointer hover:bg-[#E35D25]/10 hover:text-[#E35D25] transition-colors">Google Drive</span>
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-[#1E1B19]/5 text-[#1E1B19]/60 cursor-pointer hover:bg-[#E35D25]/10 hover:text-[#E35D25] transition-colors">Canva</span>
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-[#1E1B19]/5 text-[#1E1B19]/60 cursor-pointer hover:bg-[#E35D25]/10 hover:text-[#E35D25] transition-colors">Dropbox</span>
+                                </div>
+                                <input type="url" name="link_folder_foto" placeholder="https://drive.google.com/... atau https://canva.com/..." class="{{ $inputCls }}">
+                            </div>
+                            <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
+                                <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
+                            </div>
+                            <div class="bg-[#1E1B19] rounded-2xl p-4 flex items-center justify-between">
+                                <div><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Produk</p><p class="text-sm font-bold text-white mt-0.5">Photobook <span class="text-white/50">• A4 landscape</span></p></div>
+                                <div class="text-right"><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Jumlah</p><p class="text-sm font-bold text-white mt-0.5">• +1</p></div>
+                            </div>
+                            <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
+                                <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                            <p class="text-[10px] text-center text-[#1E1B19]/50 font-semibold leading-relaxed">Tim JogjaTouch konfirmasi total final &amp; link upload via WhatsApp</p>
+                        </form>
+                    </div>
+                </div>
+
+                {{-- FORM: CETAK FOTO --}}
+                <div class="print-form-panel hidden" data-index="2">
+                    <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl">
+                        <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Cetak Foto</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Cetak foto satuan dari 4R sampai poster raksasa A0.</p></div>
+                        <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
+                            @csrf
+                            <input type="hidden" name="package_selected" value="Cetak Foto">
+                            <input type="hidden" name="email_kerja" value="{{ $userWa ?: 'info@jogjatouch.com' }}">
+                            <div><label class="{{ $labelCls }}">Nama / Brand</label><input type="text" name="nama_perusahaan" value="{{ old('nama_perusahaan', $userName) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="{{ $labelCls }}">No. WhatsApp</label><input type="tel" name="no_whatsapp" value="{{ old('no_whatsapp', $userWa) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required></div>
+                                <div><label class="{{ $labelCls }}">Jumlah</label>
+                                    <div class="flex items-center gap-2">
+                                        <button type="button" onclick="this.nextElementSibling.stepDown()" class="{{ $qtyBtnCls }}">−</button>
+                                        <input type="number" name="jumlah" min="1" value="1" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
+                                        <button type="button" onclick="this.previousElementSibling.stepUp()" class="{{ $qtyBtnCls }}">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Ukuran Cetak</label>
+                                <select name="ukuran_cetak" class="{{ $selectCls }}"><option>4R - 10 × 15 cm</option><option>5R - 12.7 × 17.8 cm</option><option>6R - 15 × 20 cm</option><option>8R - 20 × 25 cm</option><option>A4 - 21 × 29.7 cm</option><option>A3 - 29.7 × 42 cm</option><option>A2 - 42 × 59.4 cm</option><option>A1 - 59.4 × 84.1 cm</option><option>A0 - 84.1 × 118.9 cm</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Finishing Kertas</label>
+                                <select name="finishing_kertas" class="{{ $selectCls }}"><option>Glossy</option><option>Matte / Doff</option><option>Luster / Semi-gloss</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Laminasi</label>
+                                <select name="laminasi" class="{{ $selectCls }}"><option>Tanpa laminasi</option><option>Laminasi glossy</option><option>Laminasi doff</option></select>
+                            </div>
+                            <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
+                                <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
+                            </div>
+                            <div class="bg-[#1E1B19] rounded-2xl p-4 flex items-center justify-between">
+                                <div><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Produk</p><p class="text-sm font-bold text-white mt-0.5">Cetak Foto <span class="text-white/50">• 4R</span></p></div>
+                                <div class="text-right"><p class="text-[9px] text-white/50 font-bold uppercase tracking-wider">Jumlah</p><p class="text-sm font-bold text-white mt-0.5">• +1</p></div>
+                            </div>
+                            <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
+                                <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                            <p class="text-[10px] text-center text-[#1E1B19]/50 font-semibold leading-relaxed">Tim JogjaTouch konfirmasi total final &amp; link upload via WhatsApp</p>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {{-- END PRINTING LAYOUT --}}
+
+            @else
             <!-- Main Dynamic Grid: Services on Left, Form on Right -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
+
                 <!-- LEFT COLUMN: PACKAGES -->
                 <div class="lg:col-span-7 space-y-6">
                     <div class="mb-4">
@@ -366,38 +641,100 @@
                 </div>
 
             </div>
+            @endif
 
         </div>
     </div>
 
     @push('scripts')
         <script>
-            // Store package options locally
+        @if($service['slug'] === 'printing-cetak')
+            // ── Printing-cetak carousel JS ──
+            const printOptions = @json($service['options']);
+            let printActiveIndex = 0;
+
+            function updatePrintCarousel() {
+                const cards = document.querySelectorAll('.print-product-card');
+                const n = cards.length;
+                cards.forEach((card, i) => {
+                    const pos = ((i - printActiveIndex) % n + n) % n;
+                    // pos 0 = active/center, 1 = right, 2 = left
+                    if (pos === 0) {
+                        card.style.order = 2;
+                        card.style.opacity = '1';
+                        card.style.transform = 'scale(1)';
+                        card.style.borderColor = '#E35D25';
+                        card.style.boxShadow = '0 10px 30px rgba(227,93,37,0.15)';
+                        card.style.zIndex = '3';
+                    } else if (pos === 1) {
+                        card.style.order = 3;
+                        card.style.opacity = '0.55';
+                        card.style.transform = 'scale(0.93)';
+                        card.style.borderColor = '#eee';
+                        card.style.boxShadow = 'none';
+                        card.style.zIndex = '1';
+                    } else {
+                        card.style.order = 1;
+                        card.style.opacity = '0.55';
+                        card.style.transform = 'scale(0.93)';
+                        card.style.borderColor = '#eee';
+                        card.style.boxShadow = 'none';
+                        card.style.zIndex = '1';
+                    }
+                });
+
+                // Update detail sections
+                document.querySelectorAll('.print-detail-section').forEach(el => {
+                    el.classList.toggle('hidden', parseInt(el.dataset.index) !== printActiveIndex);
+                });
+
+                // Update form panels
+                document.querySelectorAll('.print-form-panel').forEach(el => {
+                    el.classList.toggle('hidden', parseInt(el.dataset.index) !== printActiveIndex);
+                });
+
+                // Update preview label
+                const opt = printOptions[printActiveIndex];
+                const previewEl = document.getElementById('print-preview-product');
+                if (previewEl) previewEl.textContent = opt.name;
+                const previewSub = document.getElementById('print-preview-sub');
+                if (previewSub) previewSub.textContent = 'Letakkan foto contoh ' + opt.name + ' (opsional)';
+            }
+
+            function setPrintActive(index) {
+                printActiveIndex = index;
+                updatePrintCarousel();
+            }
+
+            function printCarouselPrev() {
+                printActiveIndex = (printActiveIndex - 1 + printOptions.length) % printOptions.length;
+                updatePrintCarousel();
+            }
+
+            function printCarouselNext() {
+                printActiveIndex = (printActiveIndex + 1) % printOptions.length;
+                updatePrintCarousel();
+            }
+
+            document.addEventListener('DOMContentLoaded', () => updatePrintCarousel());
+        @else
+            // ── Generic service package-selector JS ──
             const serviceOptions = @json($service['options']);
 
             function selectPackage(packageName, packageId, index) {
-                // Update hidden input
                 document.getElementById('package-input').value = packageName;
-
-                // Update text display inside form
                 document.getElementById('selected-package-display').textContent = packageName;
-
-                // Update price indicator inside form
                 const option = serviceOptions[index];
                 document.getElementById('selected-price-display').textContent = 'Rp ' + option.price;
 
-                // Update styling of all cards
                 document.querySelectorAll('.package-card').forEach(card => {
                     card.classList.remove('border-[#E35D25]', 'shadow-sm');
                     card.classList.add('border-[#eee]');
                 });
-
-                // Highlight selected card
                 const selectedCard = document.getElementById('card-' + packageId);
                 selectedCard.classList.remove('border-[#eee]');
                 selectedCard.classList.add('border-[#E35D25]', 'shadow-sm');
 
-                // Update radio circles
                 document.querySelectorAll('[id^="radio-outer-"]').forEach(outer => {
                     outer.classList.remove('border-[#E35D25]');
                     outer.classList.add('border-[#ccc]');
@@ -406,13 +743,12 @@
                     inner.classList.remove('scale-100');
                     inner.classList.add('scale-0');
                 });
-
-                // Show selected radio circle
                 document.getElementById('radio-outer-' + packageId).classList.remove('border-[#ccc]');
                 document.getElementById('radio-outer-' + packageId).classList.add('border-[#E35D25]');
                 document.getElementById('radio-inner-' + packageId).classList.remove('scale-0');
                 document.getElementById('radio-inner-' + packageId).classList.add('scale-100');
             }
+        @endif
         </script>
     @endpush
 </x-layouts.app>
