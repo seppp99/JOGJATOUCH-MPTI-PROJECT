@@ -104,9 +104,6 @@
                                         <h3 class="font-serif text-2xl font-bold text-[#1E1B19] leading-tight">
                                             {{ $option['name'] }}
                                         </h3>
-                                        <div class="text-2xl font-semibold text-[#1E1B19] mt-2 md:mt-0 whitespace-nowrap">
-                                            <span class="font-serif text-sm font-medium mr-1 text-[#1E1B19]/60">Rp</span>{{ explode('.', $option['price'])[0] }}<span class="text-xs text-[#1E1B19]/50 font-normal">.{{ explode('.', $option['price'])[1] ?? '000' }}</span>
-                                        </div>
                                     </div>
 
                                     <p class="text-sm text-[#1E1B19]/60 mt-3 leading-relaxed pr-6 md:pr-12 border-b border-[#f3f3f3] pb-5">
@@ -157,13 +154,13 @@
                             <!-- Package Selected Indicator Text in Form -->
                             <div class="bg-[#F1EBE2] border border-[#e6decb]/40 rounded-2xl p-4 flex items-center justify-between">
                                 <div>
-                                    <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#1E1B19]/40 leading-none">Paket Dipilih</p>
+                                    <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#1E1B19]/40 leading-none">Layanan Dipilih</p>
                                     <p class="text-sm font-bold text-[#1E1B19] mt-1.5" id="selected-package-display">
                                         {{ $service['options'][0]['name'] }}
                                     </p>
                                 </div>
-                                <span class="bg-white text-[#E35D25] text-xs font-bold border border-[#e0d6c4] px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap" id="selected-price-display">
-                                    Rp {{ $service['options'][0]['price'] }}
+                                <span class="bg-[#E35D25] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
+                                    Konsultasi Gratis
                                 </span>
                             </div>
 
@@ -381,10 +378,6 @@
 
                 // Update text display inside form
                 document.getElementById('selected-package-display').textContent = packageName;
-
-                // Update price indicator inside form
-                const option = serviceOptions[index];
-                document.getElementById('selected-price-display').textContent = 'Rp ' + option.price;
 
                 // Update styling of all cards
                 document.querySelectorAll('.package-card').forEach(card => {
