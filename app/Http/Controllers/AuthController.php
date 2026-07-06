@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController
 {
@@ -20,132 +21,160 @@ class AuthController
         return view('pages.daftar');
     }
 
+
+
     /**
-     * Handle OTP request for registration
+     * Show login page
      */
-    public function sendOtpRegister(Request $request)
+    public function loginPage()
     {
-        $data = $request->validate([
-            'name' => 'required|string|max:255',
-            'whatsapp' => 'required|string|max:255',
-        ]);
+        if (\Illuminate\Support\Facades\Auth::check()) {
+            return redirect()->route('akun');
+        }
+        return view('pages.login');
+    }
 
-        $name = $data['name'];
-        $whatsapp = $data['whatsapp'];
+    /**
+     * Handle login submission
+     */
+    public function loginSubmit(\App\Http\Requests\LoginRequest $request)
+    {
+        $credentials = $request->only('email', 'password');
+        $remember = $request->boolean('remember');
 
-        // Normalize whatsapp format
-        if (str_starts_with($whatsapp, '0')) {
-            $whatsapp = '+62 ' . substr($whatsapp, 1);
+        if (\Illuminate\Support\Facades\Auth::attempt($credentials, $remember)) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('akun'));
         }
 
-        // Generate a random 6-digit OTP for demo
-        $otp = str_pad(rand(0, 999999), 6, '0', STR_PAD_LEFT);
+        return back()->withErrors(['email' => 'Email atau password salah.'])->onlyInput('email');
+    }
 
-        // Save registration data in temporary session keys
-        session([
-            'temp_reg_name' => $name,
-            'temp_reg_whatsapp' => $whatsapp,
-            'temp_reg_otp' => $otp
-        ]);
+    /**
+     * Handle logout
+     */
+    public function logout(Request $request)
+    {
+        \Illuminate\Support\Facades\Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect('/');
+    }
 
-        // Log the OTP so developers can see the "dummy" WhatsApp message in logs
-        Log::info("Demo OTP for registration: {$whatsapp} -> {$otp}");
+    /**
+     * Handle OTP request for new registration flow
+     */
+    public function sendOtpRegister(\App\Http\Requests\RegisterRequest $request)
+    {
+        $data = $request->validated();
 
-        return response()->json([
-            'success' => true,
-            'whatsapp' => $whatsapp,
-            // For local/demo environments include the OTP in response so the UI can show it
-            'otp' => $otp
-        ]);
+        // Rate Limiting: 3x per jam untuk email yang sama
+        $key = 'register-otp:' . $data['email'];
+        if (\Illuminate\Support\Facades\RateLimiter::tooManyAttempts($key, 3)) {
+            return back()->with('error', 'Terlalu banyak percobaan. Silakan coba lagi setelah 1 jam.')->withInput();
+        }
+        \Illuminate\Support\Facades\RateLimiter::hit($key, 3600); // jendela 1 jam
+
+        try {
+            // Generate OTP 6 digit
+            $otp = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+            // Simpan OTP ke cache (TTL 5 menit)
+            \Illuminate\Support\Facades\Cache::put('otp_register:' . $data['email'], $otp, now()->addMinutes(5));
+
+            // Simpan data registrasi ke cache (TTL 10 menit)
+            $regData = [
+                'name' => $data['name'],
+                'whatsapp_number' => $data['whatsapp_number'],
+                'email' => $data['email'],
+                'password' => \Illuminate\Support\Facades\Hash::make($data['password']),
+            ];
+            \Illuminate\Support\Facades\Cache::put('reg_data:' . $data['email'], $regData, now()->addMinutes(10));
+
+            // Simpan email ke session untuk referensi halaman verifikasi
+            session(['register_email' => $data['email']]);
+
+            // Dispatch job kirim email
+            \App\Jobs\SendOtpEmailJob::dispatch($data['email'], $otp, 'register');
+
+            return redirect()->route('register.verifikasi')->with('success', 'Kode OTP telah dikirim ke email Anda.');
+
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Register OTP Error: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat mengirim OTP.')->withInput();
+        }
+    }
+
+    /**
+     * Show verification page
+     */
+    public function verifyPage()
+    {
+        $email = session('register_email');
+
+        if (!$email) {
+            return redirect()->route('daftar')->with('error', 'Sesi pendaftaran tidak valid atau kedaluwarsa.');
+        }
+
+        return view('pages.verifikasi-otp', compact('email'));
     }
 
     /**
      * Verify OTP and complete registration
      */
-    public function verifyOtpRegister(Request $request)
+    public function verifyOtpRegister(\App\Http\Requests\VerifyOtpRequest $request)
     {
-        $data = $request->validate([
-            'otp' => 'required|string|size:6',
-        ]);
-
-        $otp = $data['otp'];
-        $tempOtp = session('temp_reg_otp');
-        $name = session('temp_reg_name');
-        $whatsapp = session('temp_reg_whatsapp');
-
-        if (!$name || !$whatsapp) {
-            return response()->json(['success' => false, 'message' => 'Sesi pendaftaran kedaluwarsa. Silakan isi form kembali.'], 422);
+        $email = session('register_email');
+        if (!$email) {
+            return redirect()->route('daftar')->with('error', 'Sesi pendaftaran berakhir. Silakan daftar ulang.');
         }
 
-        if ($otp === $tempOtp || $otp === '123456') {
-            // Store user in session "database"
-            $usersDb = session('users_db', []);
-            $usersDb[$whatsapp] = [
-                'name' => $name,
-                'whatsapp' => $whatsapp
-            ];
-            session(['users_db' => $usersDb]);
-
-            // Seed initial mock orders for this new user so dashboard isn't blank
-            $ordersDb = session('orders_db', []);
-            
-            // Check if this whatsapp already has orders to avoid duplicate seeding
-            $hasOrders = collect($ordersDb)->contains('no_whatsapp', $whatsapp);
-
-            if (!$hasOrders) {
-                // Seed 3 standard mock orders
-                $ordersDb[] = [
-                    'id' => rand(1000, 9999),
-                    'service_slug' => 'pemasangan-wifi',
-                    'package_selected' => 'wifi-office',
-                    'nama_perusahaan' => 'WiFi Pemasangan',
-                    'no_whatsapp' => $whatsapp,
-                    'email_kerja' => 'vegli@example.com',
-                    'masalah_utama' => 'Instalasi access point kantor baru.',
-                    'price' => '1.250.000',
-                    'date' => '21 Mei 2026',
-                    'status' => 'dikerjakan', // DIKERJAKAN
-                    'payment_status' => 'DP' // DP
-                ];
-                $ordersDb[] = [
-                    'id' => rand(1000, 9999),
-                    'service_slug' => 'desain-grafis',
-                    'package_selected' => 'design-branding',
-                    'nama_perusahaan' => 'Desain Grafis',
-                    'no_whatsapp' => $whatsapp,
-                    'email_kerja' => 'vegli@example.com',
-                    'masalah_utama' => 'Desain brand kit usaha kopi.',
-                    'price' => '850.000',
-                    'date' => '19 Mei 2026',
-                    'status' => 'diproses', // DIPROSES
-                    'payment_status' => 'lunas' // LUNAS
-                ];
-                $ordersDb[] = [
-                    'id' => rand(1000, 9999),
-                    'service_slug' => 'rakit-pc',
-                    'package_selected' => 'rakit-pro',
-                    'nama_perusahaan' => 'Rakit PC',
-                    'no_whatsapp' => $whatsapp,
-                    'email_kerja' => 'vegli@example.com',
-                    'masalah_utama' => 'Rakit PC streaming ryzen.',
-                    'price' => '18.500.000',
-                    'date' => '23 Mei 2026',
-                    'status' => 'masuk', // MASUK
-                    'payment_status' => 'belum_bayar' // BELUM BAYAR
-                ];
-                session(['orders_db' => $ordersDb]);
-            }
-
-            // Log user in
-            session(['user' => ['name' => $name, 'whatsapp' => $whatsapp]]);
-
-            // Clean temporary session keys
-            session()->forget(['temp_reg_name', 'temp_reg_whatsapp', 'temp_reg_otp']);
-
-            return response()->json(['success' => true]);
+        $attemptKey = 'otp_attempts:' . $email;
+        if (\Illuminate\Support\Facades\Cache::get($attemptKey, 0) >= 5) {
+            \Illuminate\Support\Facades\Cache::forget('otp_register:' . $email);
+            \Illuminate\Support\Facades\Cache::forget('reg_data:' . $email);
+            \Illuminate\Support\Facades\Cache::forget($attemptKey);
+            session()->forget('register_email');
+            return redirect()->route('daftar')->with('error', 'Terlalu banyak percobaan salah. Silakan daftar ulang.');
         }
 
-        return response()->json(['success' => false, 'message' => 'Kode OTP tidak valid.'], 422);
+        $cachedOtp = \Illuminate\Support\Facades\Cache::get('otp_register:' . $email);
+        if (!$cachedOtp) {
+            return back()->withErrors(['otp' => 'Kode kadaluarsa. Silakan daftar ulang untuk mendapat kode baru.']);
+        }
+
+        if ($cachedOtp !== $request->otp) {
+            \Illuminate\Support\Facades\Cache::put($attemptKey, \Illuminate\Support\Facades\Cache::get($attemptKey, 0) + 1, now()->addMinutes(30));
+            return back()->withErrors(['otp' => 'Kode OTP salah. Silakan coba lagi.']);
+        }
+
+        // OTP Valid!
+        \Illuminate\Support\Facades\Cache::pull('otp_register:' . $email);
+        $regData = \Illuminate\Support\Facades\Cache::pull('reg_data:' . $email);
+
+        if (!$regData) {
+            return redirect()->route('daftar')->with('error', 'Data pendaftaran kadaluarsa. Silakan daftar ulang.');
+        }
+
+        try {
+            $user = \App\Models\User::create([
+                'name' => $regData['name'],
+                'whatsapp_number' => $regData['whatsapp_number'],
+                'email' => $regData['email'],
+                'password' => $regData['password'],
+                'email_verified_at' => now(),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal membuat akun', ['email' => $email, 'error' => $e->getMessage()]);
+            return back()->withErrors(['otp' => 'Terjadi kesalahan saat membuat akun. Silakan coba lagi.']);
+        }
+
+        \Illuminate\Support\Facades\Auth::login($user);
+
+        session()->forget('register_email');
+        \Illuminate\Support\Facades\Cache::forget($attemptKey);
+
+        return redirect()->route('akun')->with('success', 'Pendaftaran berhasil! Selamat datang di JogjaTouch.');
     }
 }
 
