@@ -1,9 +1,9 @@
 <x-layouts.app>
     <x-slot:title>
-        Buat Akun Pelanggan — JogjaTouch
+        Masuk ke Akun Pelanggan — JogjaTouch
     </x-slot:title>
 
-    <main id="daftar-bg" class="min-h-[80vh] flex items-center justify-center py-16 relative overflow-hidden" style="background: #ffffff;">
+    <main id="login-bg" class="min-h-[80vh] flex items-center justify-center py-16 relative overflow-hidden" style="background: #ffffff;">
         <!-- Soft blur overlay -->
         <div class="absolute inset-0 backdrop-blur-[2px] bg-white/5 pointer-events-none"></div>
 
@@ -11,7 +11,7 @@
         <canvas id="bg-canvas" class="absolute inset-0 w-full h-full" style="pointer-events:none;"></canvas>
 
         <div class="relative w-full max-w-md px-6" style="z-index:10;">
-            <!-- Main Registration Card -->
+            <!-- Main Login Card -->
             <div class="relative bg-white rounded-[2.5rem] p-8 md:p-10 shadow-xl border border-[#1E1B19]/5">
                 
                 <!-- Close Button -->
@@ -28,85 +28,43 @@
                     </div>
                 </div>
 
-                <!-- STEP 1: FILL REGISTRATION DETAILS -->
-                <div id="step-registration-form">
+                <!-- LOGIN FORM -->
+                <div>
                     <div class="text-center mb-8">
                         <h3 class="font-serif-display text-3xl font-extrabold tracking-tight text-[#1E1B19]">
-                            Buat <span class="text-[#E35D25] italic font-semibold">akun baru</span>
+                            Masuk ke <span class="text-[#E35D25] italic font-semibold">JogjaTouch</span>
                         </h3>
                         <p class="text-sm text-[#1E1B19]/60 mt-3 leading-relaxed">
-                            Daftar untuk memantau pesanan dan riwayat layanan Anda.
+                            Pantau pesanan Anda, lihat riwayat, dan akses dashboard pelanggan.
                         </p>
                     </div>
 
-                    @if(session('error'))
-                        <div class="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-medium text-center">
-                            {{ session('error') }}
-                        </div>
-                    @endif
-                    <form method="POST" action="{{ route('register.send-otp') }}">
+                    <form method="POST" action="{{ route('login.submit') }}">
                         @csrf
-                        <!-- Nama Input -->
-                        <div class="mb-4">
-                            <label for="reg-name" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
-                                Nama Lengkap
-                            </label>
-                            <input type="text" id="reg-name" name="name" value="{{ old('name') }}" required placeholder="Nama lengkap Anda" 
-                                class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
-                            @error('name')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
-                        </div>
-
                         <!-- Email Input -->
                         <div class="mb-4">
-                            <label for="reg-email" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
+                            <label for="login-email" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 Email
                             </label>
-                            <input type="email" id="reg-email" name="email" value="{{ old('email') }}" required placeholder="nama@email.com" 
+                            <input type="email" id="login-email" name="email" required placeholder="nama@email.com" value="{{ old('email') }}"
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
-                            @error('email')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
-                        </div>
-
-                        <!-- Telepon Input -->
-                        <div class="mb-4">
-                            <label for="reg-whatsapp" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
-                                No. Telepon
-                            </label>
-                            <input type="text" id="reg-whatsapp" name="whatsapp_number" value="{{ old('whatsapp_number') }}" required placeholder="+62 8xx" 
-                                class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
-                            @error('whatsapp_number')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
+                            @error('email')
+                                <p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <!-- Password Input -->
-                        <div class="mb-4">
-                            <label for="reg-password" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
-                                Password
-                            </label>
-                            <div class="relative">
-                                <input type="password" id="reg-password" name="password" required placeholder="Minimal 8 karakter"
-                                    class="w-full px-5 py-4 pr-12 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
-                                <button type="button" data-toggle-target="reg-password" tabindex="-1" aria-label="Tampilkan password"
-                                    class="absolute inset-y-0 right-0 pr-4 flex items-center text-[#1E1B19]/40 hover:text-[#1E1B19]/70 transition-colors">
-                                    <svg class="icon-eye-open w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    </svg>
-                                    <svg class="icon-eye-closed hidden w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
-                                    </svg>
-                                </button>
-                            </div>
-                            @error('password')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
-                        </div>
-
-                        <!-- Konfirmasi Password Input -->
                         <div class="mb-6">
-                            <label for="reg-password-confirm" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
-                                Konfirmasi Password
-                            </label>
+                            <div class="flex items-center justify-between mb-2">
+                                <label for="login-password" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase">
+                                    Password
+                                </label>
+                                <a href="{{ route('lupa-password') }}" class="text-[11px] font-bold text-[#E35D25] hover:underline" tabindex="-1">Lupa Password?</a>
+                            </div>
                             <div class="relative">
-                                <input type="password" id="reg-password-confirm" name="password_confirmation" required placeholder="Ulangi password"
+                                <input type="password" id="login-password" name="password" required placeholder="Masukkan password"
                                     class="w-full px-5 py-4 pr-12 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
-                                <button type="button" data-toggle-target="reg-password-confirm" tabindex="-1" aria-label="Tampilkan password"
+                                <button type="button" data-toggle-target="login-password" tabindex="-1" aria-label="Tampilkan password"
                                     class="absolute inset-y-0 right-0 pr-4 flex items-center text-[#1E1B19]/40 hover:text-[#1E1B19]/70 transition-colors">
                                     <svg class="icon-eye-open w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
@@ -121,35 +79,34 @@
 
                         <!-- Submit Button -->
                         <button type="submit" class="w-full flex items-center justify-center gap-2 py-4 px-6 rounded-full bg-[#E35D25] hover:bg-[#c74c1a] text-white text-sm font-semibold transition-all duration-300 shadow-lg shadow-[#E35D25]/15 active:scale-[0.98]">
-                            <span>Daftar & Masuk</span>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                            <span>Masuk</span>
+                            <!-- Sign In Icon -->
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"></path>
                             </svg>
                         </button>
                     </form>
 
-                    <!-- Sudah punya akun link -->
+                    <!-- Belum punya akun link -->
                     <div class="text-center mt-6">
-                        <span class="text-xs text-[#1E1B19]/60 font-medium">Sudah punya akun? </span>
-                        <a href="{{ route('login') }}" class="text-xs text-[#E35D25] hover:underline font-bold inline-flex items-center gap-1">
-                            Masuk di sini &rarr;
+                        <span class="text-xs text-[#1E1B19]/60 font-medium">Belum punya akun? </span>
+                        <a href="{{ route('daftar') }}" class="text-xs text-[#E35D25] hover:underline font-bold inline-flex items-center gap-1">
+                            Daftar sekarang &rarr;
                         </a>
                     </div>
                 </div>
-
-
 
             </div>
         </div>
     </main>
 
     @push('scripts')
+    <!-- Background Canvas and Ripple Script (same as registration page) -->
     <script>
-        // ── Interactive background: floating silhouettes + water ripple ──
         (function () {
             const canvas = document.getElementById('bg-canvas');
             const ctx    = canvas.getContext('2d');
-            const bg     = document.getElementById('daftar-bg');
+            const bg     = document.getElementById('login-bg');
             const mouse  = { x: -999, y: -999 };
             const ripples    = [];
             const particles  = [];
@@ -162,7 +119,6 @@
             resize();
             window.addEventListener('resize', () => { resize(); initOrbs(); });
 
-            // ── Moving radial orbs ──
             const orbs = [];
             function initOrbs() {
                 orbs.length = 0;
@@ -180,14 +136,12 @@
             }
             initOrbs();
 
-            // Track mouse on the main background element
             bg.addEventListener('mousemove', (e) => {
                 const r = bg.getBoundingClientRect();
                 mouse.x = e.clientX - r.left;
                 mouse.y = e.clientY - r.top;
             });
 
-            // Create ripple on click or every 600ms of movement
             let lastRipple = 0;
             bg.addEventListener('mousemove', (e) => {
                 const now = Date.now();
@@ -202,7 +156,6 @@
                 ripples.push(new Ripple(e.clientX - r.left, e.clientY - r.top, 1.4));
             });
 
-            // ── Ripple ──
             function Ripple(x, y, scale = 1) {
                 this.x = x; this.y = y;
                 this.radius    = 0;
@@ -218,7 +171,6 @@
                     ctx.beginPath();
                     ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
                     ctx.stroke();
-                    // second inner ring
                     if (this.radius > 20) {
                         ctx.globalAlpha = 0.22 * (1 - progress);
                         ctx.beginPath();
@@ -233,7 +185,6 @@
                 };
             }
 
-            // ── Particle (floating silhouette) ──
             const SHAPES = ['circle', 'hex', 'ring', 'plus', 'triangle', 'diamond'];
             function Particle() {
                 this.reset = function () {
@@ -250,7 +201,6 @@
                 this.reset();
 
                 this.update = function () {
-                    // ripple push
                     ripples.forEach(rp => {
                         const dx = this.x - rp.x, dy = this.y - rp.y;
                         const d  = Math.hypot(dx, dy);
@@ -263,7 +213,6 @@
                         }
                     });
 
-                    // mouse soft repulsion
                     const dx = this.x - mouse.x, dy = this.y - mouse.y;
                     const d  = Math.hypot(dx, dy);
                     if (d < 110 && d > 0) {
@@ -272,17 +221,14 @@
                         this.vy += (dy / d) * f;
                     }
 
-                    // dampen + drift
                     this.vx *= 0.96; this.vy *= 0.96;
                     this.x  += this.vx; this.y += this.vy;
                     this.rotation += this.rotSpeed;
 
-                    // opacity pulse near mouse
                     this.opacity = d < 200
                         ? this.base + (0.25 - this.base) * (1 - d / 200)
                         : this.base;
 
-                    // wrap edges
                     const pad = 60;
                     if (this.x < -pad)              this.x = canvas.width  + pad;
                     if (this.x > canvas.width  + pad) this.x = -pad;
@@ -346,13 +292,10 @@
 
             for (let i = 0; i < NUM_PARTICLES; i++) particles.push(new Particle());
 
-            // ── Animation loop ──
             function loop() {
-                // White base
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Moving radial orbs
                 const t = Date.now() * 0.001;
                 orbs.forEach(o => {
                     o.x += o.vx; o.y += o.vy;
@@ -362,7 +305,7 @@
                     if (o.y > canvas.height + o.r) o.y = -o.r;
 
                     const pulse = 0.5 + 0.5 * Math.sin(t * o.speed + o.phase);
-                    const alpha = (0.03 + pulse * 0.17).toFixed(2); // 0.03 → 0.20
+                    const alpha = (0.03 + pulse * 0.17).toFixed(2);
 
                     const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
                     g.addColorStop(0,    `rgba(255,153,80,${alpha})`);
@@ -372,14 +315,12 @@
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 });
 
-                // update & draw ripples
                 for (let i = ripples.length - 1; i >= 0; i--) {
                     ripples[i].update();
                     ripples[i].draw();
                     if (ripples[i].done) ripples.splice(i, 1);
                 }
 
-                // update & draw particles
                 particles.forEach(p => { p.update(); p.draw(); });
 
                 requestAnimationFrame(loop);
