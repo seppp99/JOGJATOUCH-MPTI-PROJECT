@@ -1,4 +1,4 @@
-<x-layouts.app>
+﻿<x-layouts.app>
     <x-slot name="title">
         {{ $service['title_prefix'] }} {{ str_replace('.', '', $service['title_italic']) }} — Jogjatouch
     </x-slot>
@@ -434,6 +434,76 @@
                             </div>
                         @endif
 
+                                                @if($service['slug'] === 'pemasangan-wifi')
+                        <form action="{{ route('layanan.wifi.order') }}" method="POST" class="space-y-5" id="order-form">
+                            @csrf
+                            
+                            <!-- Hidden Field for selected package -->
+                            <input type="hidden" name="paket_dipilih" id="package-input" value="{{ $service['options'][0]['name'] }}">
+
+                            <!-- Package Selected Indicator Text in Form -->
+                            <div class="bg-[#F1EBE2] border border-[#e6decb]/40 rounded-2xl p-4 flex items-center justify-between">
+                                <div>
+                                    <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#1E1B19]/40 leading-none">Layanan Dipilih</p>
+                                    <p class="text-sm font-bold text-[#1E1B19] mt-1.5" id="selected-package-display">
+                                        {{ $service['options'][0]['name'] }}
+                                    </p>
+                                </div>
+                                <span class="bg-[#E35D25] text-white text-xs font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
+                                    Konsultasi Gratis
+                                </span>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Nama Pelanggan</label>
+                                <input type="text" name="nama_pelanggan" value="{{ old('nama_pelanggan', Auth::check() ? Auth::user()->name : '') }}" placeholder="Nama Anda" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200" required>
+                                @error('nama_pelanggan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">No. Whatsapp</label>
+                                    <input type="tel" name="whatsapp_number" value="{{ old('whatsapp_number', Auth::check() ? Auth::user()->whatsapp_number : '') }}" placeholder="08xx-xxxx-xxxx" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200" required>
+                                    @error('whatsapp_number')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Email</label>
+                                    <input type="email" name="email" value="{{ old('email', Auth::check() ? Auth::user()->email : '') }}" placeholder="nama@email.com" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200" required>
+                                    @error('email')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Luas Bangunan (m�)</label>
+                                    <input type="text" name="luas_bangunan" value="{{ old('luas_bangunan') }}" placeholder="e.g. 100" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200">
+                                    @error('luas_bangunan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Jumlah Lantai</label>
+                                    <input type="text" name="jumlah_lantai" value="{{ old('jumlah_lantai') }}" placeholder="e.g. 2" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200">
+                                    @error('jumlah_lantai')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Detail Kebutuhan</label>
+                                <textarea name="detail_kebutuhan" rows="4" placeholder="Ketik detail spesifikasi atau kendala yang dialami..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200 resize-none" required>{{ old('detail_kebutuhan') }}</textarea>
+                                @error('detail_kebutuhan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Alamat Lokasi</label>
+                                <input type="text" name="alamat" value="{{ old('alamat') }}" placeholder="Alamat lengkap lokasi pemasangan" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all duration-200" required>
+                                @error('alamat')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                            </div>
+
+                            <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98] mt-4">
+                                <span>{{ $service['submit_button_text'] }}</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </form>
+                        @else
                         <form action="{{ route('layanan.store', $service['slug']) }}" method="POST" class="space-y-5" id="order-form">
                             @csrf
                             
@@ -588,18 +658,7 @@
                                     </div>
                                 </div>
 
-                                @if($service['slug'] === 'pemasangan-wifi')
-                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div>
-                                            <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Luas Bangunan (m²)</label>
-                                            <input type="text" name="luas_bangunan" placeholder="e.g. 100" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] transition-all duration-200">
-                                        </div>
-                                        <div>
-                                            <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Jumlah Lantai</label>
-                                            <input type="text" name="jumlah_lantai" placeholder="e.g. 2" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] transition-all duration-200">
-                                        </div>
-                                    </div>
-                                @elseif($service['slug'] === 'rakit-pc')
+                                @if($service['slug'] === 'rakit-pc')
                                     <div>
                                         <label class="block text-[10px] font-extrabold uppercase tracking-widest text-[#1E1B19]/50 mb-2">Budget Rakit PC (Rp)</label>
                                         <input type="text" name="budget" placeholder="e.g. 15.000.000" class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3.5 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] transition-all duration-200">
@@ -648,9 +707,9 @@
                                 Konsultasi awal gratis — kami akan jadwalkan video call atau kunjungan singkat.
                             </p>
                         </form>
+                    @endif
                     </div>
                 </div>
-
             </div>
             @endif
 
@@ -829,3 +888,10 @@
         </script>
     @endpush
 </x-layouts.app>
+
+
+
+
+
+
+

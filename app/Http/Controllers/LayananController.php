@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreWifiOrderRequest;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -491,5 +492,63 @@ class LayananController extends Controller
         }
 
         return 'Hubungi kami';
+    }
+
+    public function storeWifiOrder(StoreWifiOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('WIFI');
+
+        $order = new Order();
+        $order->user_id = auth()->id();
+        $order->order_code = $orderCode;
+        $order->layanan_id = 'pemasangan-wifi';
+        $order->paket_dipilih = $validated['paket_dipilih'];
+        $order->nama_pelanggan = $validated['nama_pelanggan'];
+        $order->whatsapp_number = $validated['whatsapp_number'];
+        $order->email = $validated['email'];
+        $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+        $order->alamat = $validated['alamat'];
+        
+        $order->custom_fields = [
+            'luas_bangunan' => $validated['luas_bangunan'] ?? null,
+            'jumlah_lantai' => $validated['jumlah_lantai'] ?? null,
+        ];
+        
+        $order->save();
+
+        $whatsappUrl = $this->buildWhatsappUrl($order);
+        
+        return redirect()->away($whatsappUrl);
+    }
+
+    private function generateOrderCode($prefix)
+    {
+        return $prefix . '-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+    }
+
+    private function buildWhatsappUrl($order)
+    {
+        $adminNumber = config('services.whatsapp.admin_number', '6282158665638');
+        $message = "Halo Admin Jogjatouch,\n\n";
+        $message .= "Saya ingin memesan layanan *Pemasangan WiFi*.\n\n";
+        $message .= "*Order Code*: {" . $order->order_code . "}\n";
+        $message .= "*Paket*: {" . $order->paket_dipilih . "}\n";
+        $message .= "*Nama*: {" . $order->nama_pelanggan . "}\n";
+        $message .= "*WhatsApp*: {" . $order->whatsapp_number . "}\n";
+        $message .= "*Email*: {" . $order->email . "}\n";
+        
+        $custom = $order->custom_fields;
+        if (!empty($custom['luas_bangunan'])) {
+            $message .= "*Luas Bangunan*: {" . $custom['luas_bangunan'] . "} m2\n";
+        }
+        if (!empty($custom['jumlah_lantai'])) {
+            $message .= "*Jumlah Lantai*: {" . $custom['jumlah_lantai'] . "}\n";
+        }
+        
+        $message .= "*Detail Kebutuhan*:\n{" . $order->detail_kebutuhan . "}\n\n";
+        $message .= "*Alamat*:\n{" . $order->alamat . "}";
+
+        return "https://wa.me/" . $adminNumber . "?text=" . urlencode($message);
     }
 }
