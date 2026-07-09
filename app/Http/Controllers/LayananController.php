@@ -8,6 +8,7 @@ use App\Http\Requests\StoreWifiOrderRequest;
 use App\Http\Requests\StoreNetworkOrderRequest;
 use App\Http\Requests\StorePerawatanOrderRequest;
 use App\Http\Requests\StoreDesainOrderRequest;
+use App\Http\Requests\StoreRakitOrderRequest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -611,6 +612,38 @@ class LayananController extends Controller
             return redirect()->away($whatsappUrl);
         } catch (\Exception $e) {
             Log::error('Error saving Desain Grafis order: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan pesanan. Silakan coba lagi.')->withInput();
+        }
+    }
+
+    public function storeRakitOrder(StoreRakitOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('RKT');
+
+        try {
+            $order = new Order();
+            $order->user_id = auth()->id();
+            $order->order_code = $orderCode;
+            $order->layanan_id = 'rakit-pc';
+            $order->paket_dipilih = $validated['paket_dipilih'];
+            $order->nama_pelanggan = $validated['nama_pelanggan'];
+            $order->whatsapp_number = $validated['whatsapp_number'];
+            $order->email = $validated['email'];
+            $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+            $order->alamat = $validated['alamat'];
+            
+            $order->custom_fields = [
+                'budget_rakit' => $validated['budget_rakit'] ?? null
+            ];
+            
+            $order->save();
+
+            $whatsappUrl = $this->buildWhatsappUrl($order, 'Rakit & Service PC');
+            
+            return redirect()->away($whatsappUrl);
+        } catch (\Exception $e) {
+            Log::error('Error saving Rakit PC order: ' . $e->getMessage());
             return back()->with('error', 'Terjadi kesalahan saat menyimpan pesanan. Silakan coba lagi.')->withInput();
         }
     }
