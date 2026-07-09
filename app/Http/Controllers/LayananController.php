@@ -6,6 +6,7 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreWifiOrderRequest;
 use App\Http\Requests\StoreNetworkOrderRequest;
+use App\Http\Requests\StorePerawatanOrderRequest;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -551,6 +552,36 @@ class LayananController extends Controller
         $whatsappUrl = $this->buildWhatsappUrl($order, 'Network Analyst');
         
         return redirect()->away($whatsappUrl);
+    }
+
+    public function storePerawatanOrder(StorePerawatanOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('MNT');
+
+        try {
+            $order = new Order();
+            $order->user_id = auth()->id();
+            $order->order_code = $orderCode;
+            $order->layanan_id = 'perawatan-rutin';
+            $order->paket_dipilih = $validated['paket_dipilih'];
+            $order->nama_pelanggan = $validated['nama_pelanggan'];
+            $order->whatsapp_number = $validated['whatsapp_number'];
+            $order->email = $validated['email'];
+            $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+            $order->alamat = $validated['alamat'];
+            
+            $order->custom_fields = [];
+            
+            $order->save();
+
+            $whatsappUrl = $this->buildWhatsappUrl($order, 'Perawatan Rutin');
+            
+            return redirect()->away($whatsappUrl);
+        } catch (\Exception $e) {
+            Log::error('Error saving Perawatan Rutin order: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan pesanan. Silakan coba lagi.')->withInput();
+        }
     }
     private function generateOrderCode($prefix)
     {
