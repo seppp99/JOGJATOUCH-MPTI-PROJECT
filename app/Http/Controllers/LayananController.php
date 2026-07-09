@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreWifiOrderRequest;
+use App\Http\Requests\StoreNetworkOrderRequest;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -79,7 +81,7 @@ class LayananController extends Controller
                         'id' => 'audit-performa',
                         'name' => 'Audit Performa',
                         'price' => '850.000',
-                        'description' => 'Pemeriksaan jaringan menyeluruh — kecepatan, latency, packet loss, kualitas sinyal — disertai laporan rekomendasi.',
+                        'description' => 'Pemeriksaan jaringan menyeluruh â€” kecepatan, latency, packet loss, kualitas sinyal â€” disertai laporan rekomendasi.',
                         'features' => [
                             'Speed test multi-titik',
                             'Heatmap sinyal WiFi',
@@ -92,7 +94,7 @@ class LayananController extends Controller
                         'name' => 'Setup Mikrotik / Router',
                         'price' => '1.250.000',
                         'is_popular' => true,
-                        'description' => 'Konfigurasi router enterprise — VLAN, QoS, firewall, hotspot, voucher. Cocok untuk kantor 20+ user.',
+                        'description' => 'Konfigurasi router enterprise â€” VLAN, QoS, firewall, hotspot, voucher. Cocok untuk kantor 20+ user.',
                         'features' => [
                             'Konfigurasi VLAN & QoS',
                             'Firewall & rule keamanan',
@@ -104,7 +106,7 @@ class LayananController extends Controller
                         'id' => 'topologi-baru',
                         'name' => 'Perencanaan Topologi Baru',
                         'price' => '2.500.000',
-                        'description' => 'Desain ulang infrastruktur jaringan dari nol — denah kabel, daftar perangkat, RAB, fase implementasi.',
+                        'description' => 'Desain ulang infrastruktur jaringan dari nol â€” denah kabel, daftar perangkat, RAB, fase implementasi.',
                         'features' => [
                             'Site survey + denah lokasi',
                             'Diagram topologi profesional',
@@ -276,7 +278,7 @@ class LayananController extends Controller
                         'name' => 'Buku Custom',
                         'category_sub' => 'CETAK . DIGITAL PRINTING',
                         'price' => '25.000',
-                        'description' => 'Cetak buku, modul ajar, undangan, atau company profile langsung dari file desainmu — softcover atau hardcover dengan beragam pilihan jilid.',
+                        'description' => 'Cetak buku, modul ajar, undangan, atau company profile langsung dari file desainmu â€” softcover atau hardcover dengan beragam pilihan jilid.',
                         'features' => [
                             'Ukuran A4 & B5',
                             'Soft / hard cover',
@@ -423,7 +425,7 @@ class LayananController extends Controller
         if ($slug === 'printing-cetak') {
             $package = $validated['package_selected'];
             $lines = [
-                "Halo JogjaTouch! Saya ingin memesan cetakan. 🖨️",
+                "Halo JogjaTouch! Saya ingin memesan cetakan. ðŸ–¨ï¸",
                 "",
                 "*Produk:* {$package}",
                 "*Nama:* " . $validated['nama_perusahaan'],
@@ -494,7 +496,7 @@ class LayananController extends Controller
         return 'Hubungi kami';
     }
 
-    public function storeWifiOrder(StoreWifiOrderRequest $request)
+        public function storeWifiOrder(StoreWifiOrderRequest $request)
     {
         $validated = $request->validated();
         $orderCode = $this->generateOrderCode('WIFI');
@@ -517,38 +519,72 @@ class LayananController extends Controller
         
         $order->save();
 
-        $whatsappUrl = $this->buildWhatsappUrl($order);
+        $whatsappUrl = $this->buildWhatsappUrl($order, 'Pemasangan WiFi');
         
         return redirect()->away($whatsappUrl);
     }
 
+    public function storeNetworkOrder(StoreNetworkOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('NET');
+
+        $order = new Order();
+        $order->user_id = auth()->id();
+        $order->order_code = $orderCode;
+        $order->layanan_id = 'network-analyst';
+        $order->paket_dipilih = $validated['paket_dipilih'];
+        $order->nama_pelanggan = $validated['nama_pelanggan'];
+        $order->whatsapp_number = $validated['whatsapp_number'];
+        $order->email = $validated['email'];
+        $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+        $order->alamat = $validated['alamat'];
+        
+        $order->custom_fields = [
+            'jumlah_karyawan' => $validated['jumlah_karyawan'] ?? null,
+            'jumlah_lokasi' => $validated['jumlah_lokasi'] ?? null,
+            'perangkat_utama' => $validated['perangkat_utama'] ?? null,
+        ];
+        
+        $order->save();
+
+        $whatsappUrl = $this->buildWhatsappUrl($order, 'Network Analyst');
+        
+        return redirect()->away($whatsappUrl);
+    }
     private function generateOrderCode($prefix)
     {
         return $prefix . '-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
     }
 
-    private function buildWhatsappUrl($order)
+        private function buildWhatsappUrl($order, $namaLayanan)
     {
         $adminNumber = config('services.whatsapp.admin_number', '6282158665638');
         $message = "Halo Admin Jogjatouch,\n\n";
-        $message .= "Saya ingin memesan layanan *Pemasangan WiFi*.\n\n";
+        $message .= "Saya ingin memesan layanan *{$namaLayanan}*.\n\n";
         $message .= "*Order Code*: {" . $order->order_code . "}\n";
         $message .= "*Paket*: {" . $order->paket_dipilih . "}\n";
         $message .= "*Nama*: {" . $order->nama_pelanggan . "}\n";
         $message .= "*WhatsApp*: {" . $order->whatsapp_number . "}\n";
         $message .= "*Email*: {" . $order->email . "}\n";
         
-        $custom = $order->custom_fields;
-        if (!empty($custom['luas_bangunan'])) {
-            $message .= "*Luas Bangunan*: {" . $custom['luas_bangunan'] . "} m2\n";
-        }
-        if (!empty($custom['jumlah_lantai'])) {
-            $message .= "*Jumlah Lantai*: {" . $custom['jumlah_lantai'] . "}\n";
+        $custom = $order->custom_fields ?? [];
+        foreach ($custom as $key => $val) {
+            if (!empty($val)) {
+                $label = Str::title(str_replace('_', ' ', $key));
+                // Optional override logic could be here, e.g. $overrides = ['budget_rakit' => 'Budget Rakit PC']
+                if ($key === 'luas_bangunan') {
+                    $message .= "*{$label}*: {$val} m2\n";
+                } else {
+                    $message .= "*{$label}*: {$val}\n";
+                }
+            }
         }
         
         $message .= "*Detail Kebutuhan*:\n{" . $order->detail_kebutuhan . "}\n\n";
         $message .= "*Alamat*:\n{" . $order->alamat . "}";
 
-        return "https://wa.me/" . $adminNumber . "?text=" . urlencode($message);
+        return "https://wa.me/" . $adminNumber . "?text=" . rawurlencode($message);
     }
 }
+

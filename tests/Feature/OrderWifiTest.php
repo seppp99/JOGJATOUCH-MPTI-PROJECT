@@ -10,7 +10,7 @@ use App\Models\Order;
 
 class OrderWifiTest extends TestCase
 {
-    // We won't use RefreshDatabase to avoid wiping their manual data, just test normal operations
+    use RefreshDatabase; // We won't use RefreshDatabase to avoid wiping their manual data, just test normal operations
     
     public function test_wifi_order_flow()
     {
@@ -78,3 +78,4 @@ class OrderWifiTest extends TestCase
         $unauthResponse->assertRedirectContains('login');
     }
 }
+

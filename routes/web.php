@@ -11,6 +11,7 @@ Route::get('/', function () {
 
 Route::get('/layanan/{slug}', [LayananController::class, 'show'])->name('layanan.show');
 Route::post('/layanan/pemasangan-wifi/order', [LayananController::class, 'storeWifiOrder'])->name('layanan.wifi.order')->middleware('auth');
+Route::post('/layanan/network-analyst/order', [LayananController::class, 'storeNetworkOrder'])->name('layanan.network.order')->middleware('auth');
 Route::post('/layanan/{slug}/order', [LayananController::class, 'store'])->name('layanan.store');
 
 // Account and Auth Routes
@@ -34,4 +35,5 @@ Route::get('/akun', function () {
 })->middleware('auth')->name('akun');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
 
