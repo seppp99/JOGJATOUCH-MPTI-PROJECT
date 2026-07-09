@@ -45,7 +45,7 @@ class OrderNetworkAnalystTest extends TestCase
         $postResponse = $this->post(route('layanan.network.order'), $postData);
         
         // Assert redirect to wa.me with correct texts
-        $postResponse->assertRedirectContains('wa.me/6282158665638');
+        $postResponse->assertRedirectContains('wa.me/' . config('services.whatsapp.admin_number', '6282158665638'));
         $postResponse->assertRedirectContains(rawurlencode('Network Analyst'));
         $postResponse->assertRedirectContains(rawurlencode('Setup Mikrotik / Router'));
         $postResponse->assertRedirectContains(rawurlencode('Jumlah Karyawan'));

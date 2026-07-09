@@ -48,7 +48,7 @@ class OrderWifiTest extends TestCase
         $postResponse = $this->post(route('layanan.wifi.order'), $postData);
         
         // Assert redirect to wa.me
-        $postResponse->assertRedirectContains('wa.me/6282158665638');
+        $postResponse->assertRedirectContains('wa.me/' . config('services.whatsapp.admin_number', '6282158665638'));
         
         // Assert DB
         $order = Order::latest()->first();

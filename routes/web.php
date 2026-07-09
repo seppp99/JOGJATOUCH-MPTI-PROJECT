@@ -13,6 +13,7 @@ Route::get('/layanan/{slug}', [LayananController::class, 'show'])->name('layanan
 Route::post('/layanan/pemasangan-wifi/order', [LayananController::class, 'storeWifiOrder'])->name('layanan.wifi.order')->middleware('auth');
 Route::post('/layanan/network-analyst/order', [LayananController::class, 'storeNetworkOrder'])->name('layanan.network.order')->middleware('auth');
 Route::post('/layanan/perawatan-rutin/order', [LayananController::class, 'storePerawatanOrder'])->name('layanan.perawatan.order')->middleware('auth');
+Route::post('/layanan/desain-grafis/order', [LayananController::class, 'storeDesainOrder'])->name('layanan.desain.order')->middleware('auth');
 Route::post('/layanan/{slug}/order', [LayananController::class, 'store'])->name('layanan.store');
 
 // Account and Auth Routes
