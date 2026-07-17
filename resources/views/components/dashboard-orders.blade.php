@@ -1,3 +1,7 @@
+@props(['orders' => []])
+
+{{-- Ilustrasi empty-state memakai kelas .ac-* dari resources/css/app.css
+     (dipakai bersama dengan dashboard-history). --}}
 <div class="flex-grow space-y-6">
     <!-- Header Title -->
     <div>
@@ -12,15 +16,6 @@
     <!-- Active Orders List -->
     <div class="space-y-4">
         @php
-            // Get current user's WhatsApp for filtering orders
-            $userWhatsapp = \Illuminate\Support\Facades\Auth::user()->whatsapp_number;
-            $ordersDb = session('orders_db', []);
-            
-            // Filter orders for current user
-            $userOrders = array_filter($ordersDb, function($order) use ($userWhatsapp) {
-                return isset($order['no_whatsapp']) && $order['no_whatsapp'] === $userWhatsapp;
-            });
-            
             // Helper function to get status badge color
             $getStatusColor = function($status) {
                 return match($status) {
@@ -30,7 +25,7 @@
                     default => ['bg' => 'gray-50', 'text' => 'gray-600'],
                 };
             };
-            
+
             $getPaymentColor = function($status) {
                 return match($status) {
                     'lunas' => ['bg' => 'emerald-50', 'text' => 'emerald-600'],
@@ -40,8 +35,8 @@
                 };
             };
         @endphp
-        
-        @forelse($userOrders as $order)
+
+        @forelse($orders as $order)
             @php
                 $statusColor = $getStatusColor(strtolower($order['status'] ?? 'masuk'));
                 $paymentColor = $getPaymentColor(strtolower($order['payment_status'] ?? 'belum_bayar'));
@@ -80,7 +75,7 @@
                         <span class="font-medium text-[#1E1B19]/50">{{ $order['date'] ?? 'Tanpa tanggal' }}</span>
                     </div>
                 </div>
-                
+
                 <!-- Link Arrow Button -->
                 <a href="#" class="w-12 h-12 rounded-full border border-[#1E1B19]/10 bg-white hover:bg-[#E35D25] hover:border-[#E35D25] hover:text-white flex items-center justify-center text-[#1E1B19] shrink-0 transition-all duration-300 group-hover:scale-105 active:scale-95 shadow-sm">
                     <!-- Arrow Right Icon -->
@@ -91,20 +86,38 @@
             </div>
         @empty
             <!-- Empty State -->
-            <div class="bg-gradient-to-br from-[#FBF9F6] to-[#F5EFEA] rounded-3xl border border-[#1E1B19]/5 p-12 text-center">
-                <div class="w-16 h-16 bg-[#E35D25]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 text-[#E35D25]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
-                    </svg>
+            <div class="bg-white rounded-3xl border border-[#1E1B19]/5 p-12 text-center">
+                <!-- Ilustrasi: gugus ikon PC + router di atas awan glow melayang.
+                     Ikon statis (tanpa hover); interaksi hover ada di awan (.ac-figure:hover). -->
+                <div class="ac-figure relative w-44 h-40 mx-auto mb-6 flex items-center justify-center cursor-default">
+                    <div class="ac-clouds absolute inset-0" aria-hidden="true">
+                        <span class="ac-cloud ac-cloud-a"></span>
+                        <span class="ac-cloud ac-cloud-b"></span>
+                        <span class="ac-cloud ac-cloud-c"></span>
+                    </div>
+
+                    <div class="relative z-10" aria-hidden="true">
+                        <!-- Monitor / PC (stroke ditipiskan agar setebal router secara visual) -->
+                        <svg class="w-16 h-16 text-[#E35D25]" fill="none" stroke="currentColor" stroke-width="1.1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25"></path>
+                        </svg>
+                        <!-- Router (tanpa lingkaran) -->
+                        <svg class="w-11 h-11 text-[#E35D25] absolute -bottom-[10px] -right-[14px]" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Badan router -->
+                            <rect x="3" y="13.5" width="18" height="6" rx="1.5"></rect>
+                            <!-- Antena -->
+                            <path d="M7.5 13.5l-1.5-5"></path>
+                            <path d="M16.5 13.5l1.5-5"></path>
+                            <!-- Lampu indikator -->
+                            <path d="M6.5 16.5h.01"></path>
+                            <path d="M9.5 16.5h.01"></path>
+                            <path d="M15.5 16.5h2.5"></path>
+                        </svg>
+                    </div>
                 </div>
-                <h3 class="font-serif-display text-xl font-semibold text-[#1E1B19] mb-2">Belum ada pesanan</h3>
-                <p class="text-sm text-[#1E1B19]/60 mb-6">Mulai pesan layanan kami sekarang untuk melihat pesanan Anda di sini.</p>
-                <a href="/#layanan" class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#E35D25] text-white text-sm font-semibold hover:bg-[#c74c1a] transition-colors">
-                    <span>Jelajahi Layanan</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </a>
+
+                <h3 class="font-serif-display text-2xl font-bold text-[#1E1B19] mb-2">Belum ada pesanan</h3>
+                <p class="text-sm text-[#1E1B19]/60 max-w-sm mx-auto leading-relaxed">Mulai pesan layanan kami sekarang untuk melihat pesanan kamu di sini.</p>
             </div>
         @endforelse
 

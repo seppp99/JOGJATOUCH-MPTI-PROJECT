@@ -37,6 +37,10 @@ Route::get('/akun', function () {
     return view('pages.akun');
 })->middleware('auth')->name('akun');
 
+Route::get('/akun/riwayat', function () {
+    return view('pages.akun-riwayat');
+})->middleware('auth')->name('akun.riwayat');
+
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 
