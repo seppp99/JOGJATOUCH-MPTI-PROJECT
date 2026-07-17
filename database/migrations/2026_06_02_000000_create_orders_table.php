@@ -13,19 +13,24 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('service_slug');
-            $table->string('package_selected');
-            $table->string('nama_perusahaan');
-            $table->string('no_whatsapp');
-            $table->string('email_kerja');
-            $table->string('jumlah_karyawan')->nullable();
-            $table->string('jumlah_lokasi')->nullable();
-            $table->string('perangkat_utama')->nullable();
-            $table->text('masalah_utama')->nullable();
-            $table->text('alamat_lokasi')->nullable();
-            $table->json('custom_fields')->nullable(); // For custom/dynamic fields per service
-            $table->string('status')->default('pending'); // pending, active, completed, cancelled
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->string('order_code')->unique();
+            $table->string('layanan_id');          // slug/identifier layanan, mis. 'pemasangan-wifi'
+            $table->string('paket_dipilih');       // nama paket, mis. 'Instalasi Rumah Standard'
+            $table->string('nama_pelanggan');      // snapshot
+            $table->string('whatsapp_number');     // snapshot
+            $table->string('email');               // snapshot
+            $table->text('detail_kebutuhan');      // detail permintaan / masalah utama
+            $table->text('alamat');                // alamat / lokasi
+            $table->json('custom_fields')->nullable();   // field khusus per layanan (bisa kosong)
+            $table->enum('status', ['pending','deal','canceled','completed'])->default('pending');
+            $table->unsignedBigInteger('harga_fix')->nullable();      // diisi admin setelah deal
+            $table->date('tanggal_pelaksanaan')->nullable();          // diisi admin setelah deal
             $table->timestamps();
+
+            $table->index('layanan_id');
+            $table->index('status');
+            $table->index('order_code');
         });
     }
 
