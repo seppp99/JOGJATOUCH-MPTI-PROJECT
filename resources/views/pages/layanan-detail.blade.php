@@ -190,35 +190,79 @@
                 <div class="print-form-panel" data-index="0">
                     <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
                         <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Buku Custom</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Cetak buku dan file desainmu — atur ukuran, cover, dan jilid.</p></div>
-                        <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
+                               <form action="{{ route('layanan.printing.buku.order') }}" method="POST" class="space-y-4">
                             @csrf
-                            <input type="hidden" name="package_selected" value="Buku Custom">
-                            <input type="hidden" name="email_kerja" value="{{ $userWa ?: 'info@jogjatouch.com' }}">
-                            <div><label class="{{ $labelCls }}">Nama / Brand</label><input type="text" name="nama_perusahaan" value="{{ old('nama_perusahaan', $userName) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required></div>
+                            <input type="hidden" name="paket_dipilih" value="Buku Custom">
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Nama / Brand</label>
+                                <input type="text" name="nama_pelanggan" value="{{ old('nama_pelanggan', auth()->user()?->name) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required>
+                                @error('nama_pelanggan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                            </div>
+                            
                             <div class="grid grid-cols-2 gap-4">
-                                <div><label class="{{ $labelCls }}">No. WhatsApp</label><input type="tel" name="no_whatsapp" value="{{ old('no_whatsapp', $userWa) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required></div>
+                                <div>
+                                    <label class="{{ $labelCls }}">No. WhatsApp</label>
+                                    <input type="tel" name="whatsapp_number" value="{{ old('whatsapp_number', auth()->user()?->whatsapp_number) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required>
+                                    @error('whatsapp_number')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                                </div>
                                 <div><label class="{{ $labelCls }}">Jumlah</label>
                                     <div class="flex items-center gap-2">
-                                        <button type="button" onclick="this.nextElementSibling.stepDown()" class="{{ $qtyBtnCls }}">−</button>
-                                        <input type="number" name="jumlah" min="1" value="1" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
+                                        <button type="button" onclick="this.nextElementSibling.stepDown()" class="{{ $qtyBtnCls }}">^'</button>
+                                        <input type="number" name="jumlah" min="1" value="{{ old('jumlah', 1) }}" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
                                         <button type="button" onclick="this.previousElementSibling.stepUp()" class="{{ $qtyBtnCls }}">+</button>
                                     </div>
+                                    @error('jumlah')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                                 </div>
                             </div>
-                            <div><label class="{{ $labelCls }}">Ukuran</label>
-                                <select name="ukuran" class="{{ $selectCls }}"><option>A4 - 21 × 29.7 cm</option><option>B5 - 18.2 × 25.7 cm</option><option>A5 - 14.8 × 21 cm</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Ukuran</label>
+                                <select name="ukuran" class="{{ $selectCls }}">
+                                    <option value="A4 - 21 × 29.7 cm" {{ old('ukuran') == 'A4 - 21 × 29.7 cm' ? 'selected' : '' }}>A4 - 21 × 29.7 cm</option>
+                                    <option value="B5 - 18.2 × 25.7 cm" {{ old('ukuran') == 'B5 - 18.2 × 25.7 cm' ? 'selected' : '' }}>B5 - 18.2 × 25.7 cm</option>
+                                    <option value="A5 - 14.8 × 21 cm" {{ old('ukuran') == 'A5 - 14.8 × 21 cm' ? 'selected' : '' }}>A5 - 14.8 × 21 cm</option>
+                                </select>
+                                @error('ukuran')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Jenis Cover</label>
-                                <select name="jenis_cover" class="{{ $selectCls }}"><option>Softcover art carton 260gsm</option><option>Hardcover laminasi doff</option><option>Hardcover laminasi glossy</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Jenis Cover</label>
+                                <select name="jenis_cover" class="{{ $selectCls }}">
+                                    <option value="Softcover art carton 260gsm" {{ old('jenis_cover') == 'Softcover art carton 260gsm' ? 'selected' : '' }}>Softcover art carton 260gsm</option>
+                                    <option value="Hardcover laminasi doff" {{ old('jenis_cover') == 'Hardcover laminasi doff' ? 'selected' : '' }}>Hardcover laminasi doff</option>
+                                    <option value="Hardcover laminasi glossy" {{ old('jenis_cover') == 'Hardcover laminasi glossy' ? 'selected' : '' }}>Hardcover laminasi glossy</option>
+                                </select>
+                                @error('jenis_cover')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Penjilidan</label>
-                                <select name="penjilidan" class="{{ $selectCls }}"><option>Lem panas / perfect bind</option><option>Jahit benang</option><option>Spiral</option><option>Staples saddle stitch</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Penjilidan</label>
+                                <select name="penjilidan" class="{{ $selectCls }}">
+                                    <option value="Lem panas / perfect bind" {{ old('penjilidan') == 'Lem panas / perfect bind' ? 'selected' : '' }}>Lem panas / perfect bind</option>
+                                    <option value="Jahit benang" {{ old('penjilidan') == 'Jahit benang' ? 'selected' : '' }}>Jahit benang</option>
+                                    <option value="Spiral" {{ old('penjilidan') == 'Spiral' ? 'selected' : '' }}>Spiral</option>
+                                    <option value="Staples saddle stitch" {{ old('penjilidan') == 'Staples saddle stitch' ? 'selected' : '' }}>Staples saddle stitch</option>
+                                </select>
+                                @error('penjilidan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Jumlah Halaman</label>
-                                <select name="jumlah_halaman" class="{{ $selectCls }}"><option>s/d 40 halaman</option><option>41–80 halaman</option><option>81–120 halaman</option><option>121–200 halaman</option><option>&gt; 200 halaman</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Jumlah Halaman</label>
+                                <select name="jumlah_halaman" class="{{ $selectCls }}">
+                                    <option value="s/d 40 halaman" {{ old('jumlah_halaman') == 's/d 40 halaman' ? 'selected' : '' }}>s/d 40 halaman</option>
+                                    <option value="41–80 halaman" {{ old('jumlah_halaman') == '41–80 halaman' ? 'selected' : '' }}>41–80 halaman</option>
+                                    <option value="81–120 halaman" {{ old('jumlah_halaman') == '81–120 halaman' ? 'selected' : '' }}>81–120 halaman</option>
+                                    <option value="121–200 halaman" {{ old('jumlah_halaman') == '121–200 halaman' ? 'selected' : '' }}>121–200 halaman</option>
+                                    <option value="> 200 halaman" {{ old('jumlah_halaman') == '> 200 halaman' ? 'selected' : '' }}>&gt; 200 halaman</option>
+                                </select>
+                                @error('jumlah_halaman')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
-                                <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
+                                <textarea name="detail_kebutuhan" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('detail_kebutuhan') }}</textarea>
+                                @error('detail_kebutuhan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
                             <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
                                 <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>

@@ -652,7 +652,37 @@ class LayananController extends Controller
         return $prefix . '-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
     }
 
-        private function buildWhatsappUrl($order, $namaLayanan)
+        public function storePrintingBukuOrder(\App\Http\Requests\StorePrintingBukuRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $order = \App\Models\Order::create([
+                'user_id'          => auth()->id(),
+                'order_code'       => $this->generateOrderCode('PRN'),
+                'layanan_id'       => 'printing-cetak',
+                'paket_dipilih'    => $data['paket_dipilih'],          // "Buku Custom"
+                'nama_pelanggan'   => $data['nama_pelanggan'],          // snapshot
+                'whatsapp_number'  => $data['whatsapp_number'],         // snapshot
+                'email'            => auth()->user()->email,            // dari AKUN
+                'detail_kebutuhan' => $data['detail_kebutuhan'],        // dari Catatan
+                // alamat sengaja TIDAK diisi -> NULL (Printing tak punya alamat)
+                'custom_fields'    => [
+                    'ukuran'         => $data['ukuran'],
+                    'jenis_cover'    => $data['jenis_cover'],
+                    'penjilidan'     => $data['penjilidan'],
+                    'jumlah_halaman' => $data['jumlah_halaman'],
+                    'jumlah'         => $data['jumlah'],
+                ],
+                'status'           => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal simpan order Printing Buku Custom', ['error'=>$e->getMessage()]);
+            return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
+        return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Buku Custom'));
+    }
+
+    private function buildWhatsappUrl($order, $namaLayanan)
     {
         $adminNumber = config('services.whatsapp.admin_number', '6282158665638');
         $message = "Halo Admin Jogjatouch,\n\n";
