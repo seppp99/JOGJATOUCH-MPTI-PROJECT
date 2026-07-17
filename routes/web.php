@@ -15,6 +15,7 @@ Route::post('/layanan/network-analyst/order', [LayananController::class, 'storeN
 Route::post('/layanan/perawatan-rutin/order', [LayananController::class, 'storePerawatanOrder'])->name('layanan.perawatan.order')->middleware('auth');
 Route::post('/layanan/desain-grafis/order', [LayananController::class, 'storeDesainOrder'])->name('layanan.desain.order')->middleware('auth');
 Route::post('/layanan/rakit-pc/order', [LayananController::class, 'storeRakitOrder'])->name('layanan.rakit.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/buku-custom/order', [LayananController::class, 'storePrintingBukuOrder'])->name('layanan.printing.buku.order')->middleware('auth');
 Route::post('/layanan/{slug}/order', [LayananController::class, 'store'])->name('layanan.store');
 
 // Account and Auth Routes
