@@ -5,15 +5,18 @@
         <div class="flex flex-col items-center text-center pb-6 border-b border-[#1E1B19]/5">
             <!-- Large Avatar -->
             <div class="w-20 h-20 rounded-full bg-[#E35D25] text-white flex items-center justify-center text-3xl font-extrabold shadow-lg shadow-[#E35D25]/20 mb-4 select-none">
-                {{ substr(session('user.name', 'V'), 0, 1) }}
+                {{ substr(Auth::user()->name, 0, 1) }}
             </div>
             
             <!-- User Info -->
             <h4 class="font-serif-display text-xl font-bold text-[#1E1B19]">
-                {{ session('user.name', 'Vegli Raif') }}
+                {{ Auth::user()->name }}
             </h4>
             <p class="text-xs font-semibold text-[#1E1B19]/50 mt-1">
-                {{ session('user.whatsapp', '+62 856-7890-544332') }}
+                {{ Auth::user()->whatsapp_number }}
+            </p>
+            <p class="text-xs font-semibold text-[#1E1B19]/50 mt-0.5">
+                {{ Auth::user()->email }}
             </p>
         </div>
 

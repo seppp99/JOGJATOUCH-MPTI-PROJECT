@@ -265,46 +265,49 @@ class LayananController extends Controller
                 'category_label' => 'LAYANAN 06 . PRINT',
                 'title_prefix' => 'Printing &',
                 'title_italic' => 'Cetak.',
-                'description' => 'Cetak dokumen, banner, stiker, brosur, foto dengan kualitas tinta tajam, warna akurat, dan pilihan bahan premium.',
-                'form_title' => 'Data Pemesanan Cetak',
-                'form_subtitle' => 'Kirim file desain Anda dan pilih detail material.',
-                'submit_button_text' => 'Kirim Order Cetak',
+                'description' => 'Buku Custom, Photobook, dan Cetak Foto hingga ukuran A0.',
+                'form_title' => 'Atur & pesan cetakanmu',
+                'form_subtitle' => 'Tim JogjaTouch konfirmasi total final & link upload via WhatsApp',
+                'submit_button_text' => 'Pesan Cetakan',
                 'options' => [
                     [
-                        'id' => 'print-banner',
-                        'name' => 'Cetak Banner / Spanduk',
+                        'id' => 'buku-custom',
+                        'name' => 'Buku Custom',
+                        'category_sub' => 'CETAK . DIGITAL PRINTING',
                         'price' => '25.000',
-                        'description' => 'Cetak banner luar ruangan (outdoor) atau dalam ruangan dengan ketebalan bahan bervariasi sesuai budget.',
+                        'description' => 'Cetak buku, modul ajar, undangan, atau company profile langsung dari file desainmu — softcover atau hardcover dengan beragam pilihan jilid.',
                         'features' => [
-                            'Bahan Flexi Standard 280gsm',
-                            'Cetak resolusi tinggi',
-                            'Finishing mata ayam pojok-pojok',
-                            'Harga terhitung per meter persegi'
+                            'Ukuran A4 & B5',
+                            'Soft / hard cover',
+                            'Lem, jahit, spiral',
+                            'Dari file Drive / Canva'
                         ]
                     ],
                     [
-                        'id' => 'print-stiker',
-                        'name' => 'Cetak Stiker Label',
-                        'price' => '15.000',
+                        'id' => 'photobook',
+                        'name' => 'Photobook',
+                        'category_sub' => 'CETAK . DIGITAL PRINTING',
+                        'price' => '299.000',
                         'is_popular' => true,
-                        'description' => 'Cetak label kemasan produk per lembar A3. Bahan stiker tahan air (Vinyl) atau ekonomis (Cromo).',
+                        'description' => 'Album foto hardcover premium untuk wisuda, pernikahan, atau kenangan keluarga. Cukup kumpulkan semua foto dalam satu folder Google Drive atau Canva dan kirim linknya, tim desain kami yang menyusun layout-nya dengan rapi dan estetis. Pilih cover laminasi doff, kertas art paper atau glossy, dengan jumlah halaman fleksibel mulai 20 hingga 40 halaman.',
                         'features' => [
-                            'Cetak lembaran kertas A3+',
-                            'Bahan Vinyl Glossy/Doff/Cromo',
-                            'Kiss-Cut (setengah putus) bebas pola',
-                            'Tinta anti luntur & tahan air'
+                            'A4 landscape premium',
+                            'Hardcover premium',
+                            'Art / glossy paper',
+                            'Layout dibuatkan tim'
                         ]
                     ],
                     [
-                        'id' => 'print-brosur',
-                        'name' => 'Cetak Brosur / Leaflet',
-                        'price' => '120.000',
-                        'description' => 'Cetak brosur full color 2 sisi lipat 3 atau standard. Sangat pas untuk menu makanan dan promosi event.',
+                        'id' => 'cetak-foto',
+                        'name' => 'Cetak Foto',
+                        'category_sub' => 'CETAK . FOTO & POSTER',
+                        'price' => '500',
+                        'description' => 'Cetak foto favoritmu dalam berbagai ukuran, dari 4R untuk album sampai poster raksasa A0 untuk pameran atau dekorasi dinding. Tersedia finishing glossy, matte/doff.',
                         'features' => [
-                            '1 Rim (isi ±500 lembar)',
-                            'Bahan premium Art Paper 150gsm',
-                            'Cetak full color offset laser',
-                            'Finishing potong rapi'
+                            '4R hingga A0',
+                            'Glossy / matte / luster',
+                            'Koreksi warna gratis',
+                            'Bisa selesai hari ini'
                         ]
                     ],
                 ]
@@ -413,6 +416,47 @@ class LayananController extends Controller
             
             $ordersDb[] = $newOrder;
             session(['orders_db' => $ordersDb]);
+        }
+
+        // For printing-cetak, redirect to WhatsApp with order details
+        if ($slug === 'printing-cetak') {
+            $package = $validated['package_selected'];
+            $lines = [
+                "Halo JogjaTouch! Saya ingin memesan cetakan. 🖨️",
+                "",
+                "*Produk:* {$package}",
+                "*Nama:* " . $validated['nama_perusahaan'],
+                "*No. WhatsApp:* " . $validated['no_whatsapp'],
+            ];
+
+            // Append product-specific custom fields with readable labels
+            $fieldLabels = [
+                'jumlah'          => 'Jumlah',
+                'ukuran'          => 'Ukuran',
+                'ukuran_cetak'    => 'Ukuran Cetak',
+                'jenis_cover'     => 'Jenis Cover',
+                'penjilidan'      => 'Penjilidan',
+                'jumlah_halaman'  => 'Jumlah Halaman',
+                'cover'           => 'Cover',
+                'kertas_isi'      => 'Kertas Isi',
+                'link_folder_foto'=> 'Link Folder Foto',
+                'finishing_kertas'=> 'Finishing Kertas',
+                'laminasi'        => 'Laminasi',
+            ];
+            foreach ($fieldLabels as $field => $label) {
+                $val = $request->input($field);
+                if ($val !== null && $val !== '') {
+                    $lines[] = "*{$label}:* {$val}";
+                }
+            }
+
+            $lines[] = "*Catatan:* " . $validated['masalah_utama'];
+
+            $message = implode("\n", $lines);
+            $waNumber = env('WHATSAPP_NUMBER', '6281234567890');
+            $waUrl = 'https://wa.me/' . $waNumber . '?text=' . rawurlencode($message);
+
+            return redirect($waUrl);
         }
 
         // Store standard preview in session for user visual confirmation without active DB
