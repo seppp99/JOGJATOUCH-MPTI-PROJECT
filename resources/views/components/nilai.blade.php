@@ -9,7 +9,7 @@
         <div class="max-w-3xl mb-16">
             <span class="text-xs font-bold text-[#E35D25] tracking-widest uppercase block mb-4">NILAI UTAMA</span>
             <h2 class="font-serif-display text-4xl md:text-5xl font-semibold tracking-tight leading-tight">
-                Bukan tentang <span class="italic text-[#E35D25] font-serif-display">angka besar</span> —<br>tentang pekerjaan yang <span class="italic text-[#E35D25] font-serif-display">dikerjakan dengan benar</span>
+                Bukan tentang <span class="italic text-[#E35D25] font-serif-display">angka besar,</span><br>tentang pekerjaan yang <span class="italic text-[#E35D25] font-serif-display">dikerjakan dengan benar</span>
             </h2>
         </div>
 

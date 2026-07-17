@@ -1,12 +1,13 @@
 <x-layouts.app>
     <x-slot:title>
-        Dashboard Pelanggan — JogjaTouch
+        Riwayat Pesanan — JogjaTouch
     </x-slot:title>
 
     @php
-        // Sumber data pesanan dihitung sekali di sini lalu dioper ke sidebar
-        // (angka statistik) dan panel pesanan (daftar kartu) agar keduanya
-        // selalu konsisten. Status riwayat = pesanan yang sudah tidak berjalan.
+        // Sumber data sama dengan dashboard /akun: session orders_db difilter
+        // per user, lalu dipisah aktif vs riwayat (selesai/dibatalkan). Angka di
+        // sidebar & isi panel diturunkan dari sini agar konsisten. Siap disambung
+        // ke query database sungguhan tanpa mengubah struktur view ini.
         $user = Illuminate\Support\Facades\Auth::user();
         $historyStatuses = ['selesai', 'dibatalkan'];
 
@@ -35,8 +36,8 @@
                 <!-- Left Sidebar Component -->
                 <x-dashboard-sidebar :active-count="count($activeOrders)" :history-count="count($historyOrders)" />
 
-                <!-- Right Content / Active Orders Component -->
-                <x-dashboard-orders :orders="$activeOrders" />
+                <!-- Right Content / History Component -->
+                <x-dashboard-history :orders="$historyOrders" />
 
             </div>
 

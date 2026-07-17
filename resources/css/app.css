@@ -9,3 +9,44 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* ── Ilustrasi empty-state dashboard (/akun & /akun/riwayat) ──────────────
+   Awan glow oranye melayang pelan + interaksi hover. Dipakai bersama oleh
+   komponen dashboard-orders & dashboard-history agar tidak duplikasi.
+   Kelas ac-* (akun) sengaja TERPISAH dari .tg-cloud galeri Tentang Kami:
+   warna/gradient dasar sama, tapi perilaku di sini idle-float + hover,
+   sedangkan .tg-cloud dipicu arah swipe — memisah kelas mencegah bentrok. */
+.ac-clouds { animation: ac-drift 7s ease-in-out infinite; will-change: transform; }
+@keyframes ac-drift {
+    0%, 100% { transform: translate3d(0, 0, 0); }
+    50%      { transform: translate3d(4px, -7px, 0); }
+}
+
+.ac-cloud { position: absolute; pointer-events: none; transition: transform 0.5s ease, filter 0.5s ease; }
+.ac-cloud-a {
+    inset: 0;
+    border-radius: 58% 42% 55% 45% / 52% 58% 42% 48%;
+    background: radial-gradient(closest-side, rgba(227, 93, 37, 0.40), rgba(244, 115, 62, 0.20) 55%, transparent 100%);
+    filter: blur(26px);
+}
+.ac-cloud-b {
+    width: 6rem; height: 5rem; left: -0.5rem; bottom: 0.5rem;
+    border-radius: 45% 55% 60% 40% / 55% 45% 55% 45%;
+    background: radial-gradient(closest-side, rgba(244, 115, 62, 0.35), rgba(30, 27, 25, 0.10) 68%, transparent 100%);
+    filter: blur(22px);
+}
+.ac-cloud-c {
+    width: 5rem; height: 4rem; right: -0.25rem; top: 0.5rem;
+    border-radius: 52% 48% 45% 55% / 48% 52% 58% 42%;
+    background: radial-gradient(closest-side, rgba(227, 93, 37, 0.28), transparent 100%);
+    filter: blur(20px);
+}
+
+/* Hover di area ilustrasi: glow membesar & lebih terang. */
+.ac-figure:hover .ac-cloud-a { transform: scale(1.1); filter: blur(28px) brightness(1.18); }
+.ac-figure:hover .ac-cloud-b { transform: scale(1.1); filter: blur(24px) brightness(1.18); }
+.ac-figure:hover .ac-cloud-c { transform: scale(1.1); filter: blur(22px) brightness(1.18); }
+
+@media (prefers-reduced-motion: reduce) {
+    .ac-clouds { animation: none; }
+}
