@@ -190,12 +190,18 @@
 @php
     // Nama file sengaja ditulis eksplisit: 1-4 berekstensi .jpeg, 5-6 berekstensi .jpg
     $tentangImages = [
-        ['file' => 'assets/tentang/1.jpeg', 'alt' => 'Dokumentasi pekerjaan Jogjatouch 1'],
-        ['file' => 'assets/tentang/2.jpeg', 'alt' => 'Dokumentasi pekerjaan Jogjatouch 2'],
-        ['file' => 'assets/tentang/3.jpeg', 'alt' => 'Dokumentasi pekerjaan Jogjatouch 3'],
-        ['file' => 'assets/tentang/4.jpeg', 'alt' => 'Dokumentasi pekerjaan Jogjatouch 4'],
-        ['file' => 'assets/tentang/5.jpg',  'alt' => 'Dokumentasi pekerjaan Jogjatouch 5'],
-        ['file' => 'assets/tentang/6.jpg',  'alt' => 'Dokumentasi pekerjaan Jogjatouch 6'],
+        ['file' => 'assets/tentang/1.jpeg', 'alt' => 'Servis kartu grafis GeForce GTX di meja kerja Jogjatouch',
+         'title' => 'Servis Kartu Grafis',        'caption' => 'Pembersihan menyeluruh & perawatan VGA GeForce GTX, suhu kembali dingin, performa stabil.'],
+        ['file' => 'assets/tentang/2.jpeg', 'alt' => 'Instalasi router MikroTik hAP lite untuk jaringan WiFi',
+         'title' => 'Instalasi Jaringan MikroTik', 'caption' => 'Setup router MikroTik hAP lite untuk jaringan WiFi rumah, kantor, dan usaha.'],
+        ['file' => 'assets/tentang/3.jpeg', 'alt' => 'Maintenance dan optimasi laptop ThinkPad',
+         'title' => 'Maintenance Laptop',          'caption' => 'Tune-up sistem, pengecekan disk, dan optimasi performa laptop kerja.'],
+        ['file' => 'assets/tentang/4.jpeg', 'alt' => 'Perbaikan hardware kartu grafis dengan obeng',
+         'title' => 'Perbaikan Hardware',          'caption' => 'Bongkar-pasang kartu grafis: penggantian pasta termal & perbaikan pendingin.'],
+        ['file' => 'assets/tentang/5.jpg',  'alt' => 'Pemasangan antenna tuner ICOM AT-130 di atas kapal',
+         'title' => 'Instalasi Perangkat Komunikasi', 'caption' => 'Pemasangan antenna tuner ICOM AT-130 di kapal, komunikasi laut tetap andal.'],
+        ['file' => 'assets/tentang/6.jpg',  'alt' => 'Kapal tunda ETI 102 lokasi proyek instalasi Jogjatouch',
+         'title' => 'Proyek Lapangan Maritim',     'caption' => 'Instalasi & pengecekan sistem komunikasi di armada kapal tunda.'],
     ];
     $tentangImages = array_values(array_filter(
         $tentangImages,
@@ -257,10 +263,18 @@
         backface-visibility: hidden;
     }
 
+    /* Pembungkus frame: pemilik lebar & konteks posisi untuk awan dekoratif
+       yang menjorok keluar frame (frame sendiri overflow:hidden). */
+    .tg-figure {
+        position: relative;
+        width: min(var(--tg-active-w), calc((100vh - var(--tg-cap)) * 16 / 9));
+    }
+
     /* Frame identik untuk SEMUA slide: 16:9 persis, ukuran sama, tidak distorsi. */
     .tg-frame {
         position: relative;
-        width: min(var(--tg-active-w), calc((100vh - var(--tg-cap)) * 16 / 9));
+        z-index: 1;
+        width: 100%;
         aspect-ratio: 16 / 9;
         overflow: hidden;
         border-radius: 24px;
@@ -288,6 +302,104 @@
         background: #FBF9F6;
         opacity: var(--tg-scrim, 0);
         pointer-events: none;
+    }
+
+    /* ── Awan dekoratif & caption per-slide ────────────────────────────────
+       Awan: blob gradient blur (glow lembut) memakai palet situs — oranye
+       #E35D25 / #f4733e dan cokelat tua #1E1B19 — di belakang/sekitar frame.
+       Caption: overlay di tepi bawah gambar dengan scrim gradasi gelap.
+       Keduanya hanya tampil di slide aktif; transisi masuk = naik dari bawah
+       + fade in, transisi keluar = tertarik turun + fade out (sesuai arah
+       navigasi: maju memunculkan, mundur menariknya turun). */
+    .tg-cloud {
+        position: absolute;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22, 0.9, 0.3, 1);
+        will-change: transform, opacity;
+    }
+
+    .tg-cloud-a {
+        width: 46%;
+        aspect-ratio: 1.15;
+        left: -9%;
+        bottom: -16%;
+        border-radius: 58% 42% 55% 45% / 52% 58% 42% 48%;
+        background: radial-gradient(closest-side, rgba(227, 93, 37, 0.65), rgba(244, 115, 62, 0.30) 55%, transparent 100%);
+        filter: blur(46px);
+    }
+
+    .tg-cloud-b {
+        width: 34%;
+        aspect-ratio: 1;
+        left: -11%;
+        top: 4%;
+        border-radius: 45% 55% 60% 40% / 55% 45% 55% 45%;
+        background: radial-gradient(closest-side, rgba(244, 115, 62, 0.50), rgba(30, 27, 25, 0.22) 68%, transparent 100%);
+        filter: blur(54px);
+    }
+
+    .tg-cloud-c {
+        width: 30%;
+        aspect-ratio: 1.2;
+        right: -8%;
+        bottom: -14%;
+        border-radius: 52% 48% 45% 55% / 48% 52% 58% 42%;
+        background: radial-gradient(closest-side, rgba(30, 27, 25, 0.45), rgba(227, 93, 37, 0.20) 60%, transparent 100%);
+        filter: blur(42px);
+    }
+
+    .tg-caption {
+        position: absolute;
+        z-index: 2;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding: 3.25rem 1.75rem 1.5rem;
+        background: linear-gradient(to top, rgba(30, 27, 25, 0.86) 0%, rgba(30, 27, 25, 0.55) 55%, rgba(30, 27, 25, 0) 100%);
+        text-align: left;
+        opacity: 0;
+        transform: translateY(28px);
+        transition: opacity 0.55s ease, transform 0.55s cubic-bezier(0.22, 0.9, 0.3, 1);
+        will-change: transform, opacity;
+    }
+
+    .tg-caption-title {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: #FBF9F6;
+        line-height: 1.3;
+        margin-bottom: 0.25rem;
+    }
+
+    .tg-caption-text {
+        font-size: 0.8125rem;
+        line-height: 1.55;
+        color: rgba(251, 249, 246, 0.78);
+        max-width: 60ch;
+    }
+
+    /* Slide aktif: elemen naik ke posisinya. Delay bertingkat memberi kesan
+       awan "tumbuh" satu per satu lalu caption menyusul. Delay hanya di state
+       aktif — saat keluar semua turun serempak tanpa menunggu. */
+    .tg-slide.is-active .tg-cloud,
+    .tg-slide.is-active .tg-caption {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .tg-slide.is-active .tg-cloud-b { transition-delay: 0.07s; }
+    .tg-slide.is-active .tg-cloud-c { transition-delay: 0.14s; }
+    .tg-slide.is-active .tg-caption { transition-delay: 0.1s; }
+
+    @media (prefers-reduced-motion: reduce) {
+        .tg-cloud,
+        .tg-caption {
+            transition: opacity 0.4s ease;
+            transform: none;
+        }
     }
 
     /* Gradasi + blur di tepi atas/bawah -> menyatu ke background halaman */
@@ -380,6 +492,24 @@
             border-radius: 16px;
         }
 
+        /* Blur lebih ringan di layar kecil agar komposit tetap enteng. */
+        .tg-cloud-a { filter: blur(30px); }
+        .tg-cloud-b { filter: blur(36px); }
+        .tg-cloud-c { filter: blur(28px); }
+
+        .tg-caption {
+            padding: 2.25rem 1rem 0.875rem;
+        }
+
+        .tg-caption-title {
+            font-size: 0.9375rem;
+        }
+
+        .tg-caption-text {
+            font-size: 0.6875rem;
+            line-height: 1.45;
+        }
+
         .tg-fade {
             height: 14vh;
         }
@@ -404,12 +534,27 @@
             <div class="tg-track" data-tg-track>
                 @foreach($tentangImages as $index => $img)
                     <div class="tg-slide">
-                        <div class="tg-frame">
-                            <img src="{{ asset($img['file']) }}"
-                                 alt="{{ $img['alt'] }}"
-                                 loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
-                                 decoding="async"
-                                 draggable="false">
+                        <div class="tg-figure">
+                            <div class="tg-cloud tg-cloud-a" aria-hidden="true"></div>
+                            <div class="tg-cloud tg-cloud-b" aria-hidden="true"></div>
+                            <div class="tg-cloud tg-cloud-c" aria-hidden="true"></div>
+                            <div class="tg-frame">
+                                <img src="{{ asset($img['file']) }}"
+                                     alt="{{ $img['alt'] }}"
+                                     loading="{{ $index === 0 ? 'eager' : 'lazy' }}"
+                                     decoding="async"
+                                     draggable="false">
+                                @if(!empty($img['title']) || !empty($img['caption']))
+                                    <div class="tg-caption">
+                                        @if(!empty($img['title']))
+                                            <h3 class="tg-caption-title font-serif-display">{{ $img['title'] }}</h3>
+                                        @endif
+                                        @if(!empty($img['caption']))
+                                            <p class="tg-caption-text">{{ $img['caption'] }}</p>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
                 @endforeach
@@ -494,6 +639,11 @@
 
         const idx = Math.round(active);
         if (idx !== lastIdx) {
+            // Ganti slide aktif: caption & awan slide lama tertarik turun
+            // (transisi keluar), milik slide baru naik dari bawah (transisi
+            // masuk). Perilaku dua arah ini murni dari state CSS .is-active.
+            if (lastIdx >= 0 && slides[lastIdx]) slides[lastIdx].classList.remove('is-active');
+            if (slides[idx]) slides[idx].classList.add('is-active');
             lastIdx = idx;
             label.textContent = `${String(idx + 1).padStart(2, '0')} / ${total}`;
         }
