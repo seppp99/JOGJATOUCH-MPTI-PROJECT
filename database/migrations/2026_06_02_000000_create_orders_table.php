@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('whatsapp_number');     // snapshot
             $table->string('email');               // snapshot
             $table->text('detail_kebutuhan');      // detail permintaan / masalah utama
-            $table->text('alamat');                // alamat / lokasi
+            $table->text('alamat')->nullable();                // alamat / lokasi
             $table->json('custom_fields')->nullable();   // field khusus per layanan (bisa kosong)
             $table->enum('status', ['pending','deal','canceled','completed'])->default('pending');
             $table->unsignedBigInteger('harga_fix')->nullable();      // diisi admin setelah deal
