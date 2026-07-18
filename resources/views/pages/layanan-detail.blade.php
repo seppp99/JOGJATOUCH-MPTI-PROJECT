@@ -276,33 +276,78 @@
                 <div class="print-form-panel hidden" data-index="1">
                     <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
                         <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Photobook</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Album hardcover A4 — cukup kirim folder fotonya, layout dibantu tim.</p></div>
-                        <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
+                        <form action="{{ route('layanan.printing.photobook.order') }}" method="POST" class="space-y-4">
                             @csrf
-                            <input type="hidden" name="package_selected" value="Photobook">
-                            <input type="hidden" name="email_kerja" value="{{ $userWa ?: 'info@jogjatouch.com' }}">
-                            <div><label class="{{ $labelCls }}">Nama / Brand</label><input type="text" name="nama_perusahaan" value="{{ old('nama_perusahaan', $userName) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required></div>
+                            @if(session('error') && old('paket_dipilih') === 'Photobook')
+                                <div class="bg-rose-50 text-rose-600 p-3 rounded-lg text-sm font-medium border border-rose-200">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+                            <input type="hidden" name="paket_dipilih" value="Photobook">
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Nama / Brand</label>
+                                <input type="text" name="nama_pelanggan" value="{{ old('nama_pelanggan', auth()->user()?->name) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required>
+                                @error('nama_pelanggan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                            </div>
+                            
                             <div class="grid grid-cols-2 gap-4">
-                                <div><label class="{{ $labelCls }}">No. WhatsApp</label><input type="tel" name="no_whatsapp" value="{{ old('no_whatsapp', $userWa) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required></div>
+                                <div>
+                                    <label class="{{ $labelCls }}">No. WhatsApp</label>
+                                    <input type="tel" name="whatsapp_number" value="{{ old('whatsapp_number', auth()->user()?->whatsapp_number) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required>
+                                    @error('whatsapp_number')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                                </div>
                                 <div><label class="{{ $labelCls }}">Jumlah</label>
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="this.nextElementSibling.stepDown()" class="{{ $qtyBtnCls }}">−</button>
-                                        <input type="number" name="jumlah" min="1" value="1" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
+                                        <input type="number" name="jumlah" min="1" value="{{ old('jumlah', 1) }}" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
                                         <button type="button" onclick="this.previousElementSibling.stepUp()" class="{{ $qtyBtnCls }}">+</button>
                                     </div>
+                                    @error('jumlah')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                                 </div>
                             </div>
-                            <div><label class="{{ $labelCls }}">Ukuran</label>
-                                <select name="ukuran" class="{{ $selectCls }}"><option>A4 landscape - 29.7 × 21 cm</option><option>A4 portrait - 21 × 29.7 cm</option><option>Square 20 × 20 cm</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Ukuran</label>
+                                <select name="ukuran" class="{{ $selectCls }}">
+                                    <option value="A4 landscape - 29.7 × 21 cm" {{ old('ukuran') == 'A4 landscape - 29.7 × 21 cm' ? 'selected' : '' }}>A4 landscape - 29.7 × 21 cm</option>
+                                    <option value="A4 portrait - 21 × 29.7 cm" {{ old('ukuran') == 'A4 portrait - 21 × 29.7 cm' ? 'selected' : '' }}>A4 portrait - 21 × 29.7 cm</option>
+                                    <option value="Square 20 × 20 cm" {{ old('ukuran') == 'Square 20 × 20 cm' ? 'selected' : '' }}>Square 20 × 20 cm</option>
+                                </select>
+                                @error('ukuran')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Cover</label>
-                                <select name="cover" class="{{ $selectCls }}"><option>Hardcover laminasi doff</option><option>Hardcover laminasi glossy</option><option>Leather cover premium</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Cover</label>
+                                <select name="cover" class="{{ $selectCls }}">
+                                    <option value="Hardcover laminasi doff" {{ old('cover') == 'Hardcover laminasi doff' ? 'selected' : '' }}>Hardcover laminasi doff</option>
+                                    <option value="Hardcover laminasi glossy" {{ old('cover') == 'Hardcover laminasi glossy' ? 'selected' : '' }}>Hardcover laminasi glossy</option>
+                                    <option value="Leather cover premium" {{ old('cover') == 'Leather cover premium' ? 'selected' : '' }}>Leather cover premium</option>
+                                </select>
+                                @error('cover')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Kertas Isi</label>
-                                <select name="kertas_isi" class="{{ $selectCls }}"><option>Art paper 110gsm</option><option>Art paper 150gsm</option><option>Glossy photo paper</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Kertas Isi</label>
+                                <select name="kertas_isi" class="{{ $selectCls }}">
+                                    <option value="Art paper 110gsm" {{ old('kertas_isi') == 'Art paper 110gsm' ? 'selected' : '' }}>Art paper 110gsm</option>
+                                    <option value="Art paper 150gsm" {{ old('kertas_isi') == 'Art paper 150gsm' ? 'selected' : '' }}>Art paper 150gsm</option>
+                                    <option value="Glossy photo paper" {{ old('kertas_isi') == 'Glossy photo paper' ? 'selected' : '' }}>Glossy photo paper</option>
+                                </select>
+                                @error('kertas_isi')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Jumlah Halaman</label>
-                                <select name="jumlah_halaman" class="{{ $selectCls }}"><option>20 halaman / 10 spread</option><option>28 halaman / 14 spread</option><option>36 halaman / 18 spread</option><option>40 halaman / 20 spread</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Jumlah Halaman</label>
+                                <select name="jumlah_halaman" class="{{ $selectCls }}">
+                                    <option value="20 halaman / 10 spread" {{ old('jumlah_halaman') == '20 halaman / 10 spread' ? 'selected' : '' }}>20 halaman / 10 spread</option>
+                                    <option value="28 halaman / 14 spread" {{ old('jumlah_halaman') == '28 halaman / 14 spread' ? 'selected' : '' }}>28 halaman / 14 spread</option>
+                                    <option value="36 halaman / 18 spread" {{ old('jumlah_halaman') == '36 halaman / 18 spread' ? 'selected' : '' }}>36 halaman / 18 spread</option>
+                                    <option value="40 halaman / 20 spread" {{ old('jumlah_halaman') == '40 halaman / 20 spread' ? 'selected' : '' }}>40 halaman / 20 spread</option>
+                                </select>
+                                @error('jumlah_halaman')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
+                            
                             <div>
                                 <label class="{{ $labelCls }}">☁ Link folder foto (Google Drive / Canva) <span class="text-[#E35D25]">?</span></label>
                                 <p class="text-[10px] text-[#1E1B19]/50 mb-2 leading-relaxed">Kumpulkan semua foto dalam satu folder, lalu tempel linknya. Set akses ke "siapa saja yang memiliki link".</p>
@@ -311,11 +356,16 @@
                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-[#1E1B19]/5 text-[#1E1B19]/60 cursor-pointer hover:bg-[#E35D25]/10 hover:text-[#E35D25] transition-colors">Canva</span>
                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-[#1E1B19]/5 text-[#1E1B19]/60 cursor-pointer hover:bg-[#E35D25]/10 hover:text-[#E35D25] transition-colors">Dropbox</span>
                                 </div>
-                                <input type="url" name="link_folder_foto" placeholder="https://drive.google.com/... atau https://canva.com/..." class="{{ $inputCls }}">
+                                <input type="url" name="link_folder_foto" value="{{ old('link_folder_foto') }}" placeholder="https://drive.google.com/... atau https://canva.com/..." class="{{ $inputCls }}" required>
+                                @error('link_folder_foto')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
-                                <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
+                                <textarea name="detail_kebutuhan" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('detail_kebutuhan') }}</textarea>
+                                @error('detail_kebutuhan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
+                            
                             <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
                                 <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
@@ -328,33 +378,80 @@
                 <div class="print-form-panel hidden" data-index="2">
                     <div class="bg-[#FAF5EE]/70 rounded-[32px] border border-[#f3eee7] p-6 md:p-8 shadow-sm max-w-2xl mx-auto">
                         <div class="mb-5"><h3 class="font-serif text-2xl font-bold text-[#1E1B19]">Pesan Cetak Foto</h3><p class="text-xs font-semibold text-[#1E1B19]/60 mt-1">Cetak foto satuan dari 4R sampai poster raksasa A0.</p></div>
-                        <form action="{{ route('layanan.store', 'printing-cetak') }}" method="POST" class="space-y-4">
+                        <form action="{{ route('layanan.printing.cetakfoto.order') }}" method="POST" class="space-y-4">
                             @csrf
-                            <input type="hidden" name="package_selected" value="Cetak Foto">
-                            <input type="hidden" name="email_kerja" value="{{ $userWa ?: 'info@jogjatouch.com' }}">
-                            <div><label class="{{ $labelCls }}">Nama / Brand</label><input type="text" name="nama_perusahaan" value="{{ old('nama_perusahaan', $userName) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required></div>
+                            @if(session('error') && old('paket_dipilih') === 'Cetak Foto')
+                                <div class="bg-rose-50 text-rose-600 p-3 rounded-lg text-sm font-medium border border-rose-200">
+                                    {{ session('error') }}
+                                </div>
+                            @endif
+                            <input type="hidden" name="paket_dipilih" value="Cetak Foto">
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Nama / Brand</label>
+                                <input type="text" name="nama_pelanggan" value="{{ old('nama_pelanggan', auth()->user()?->name) }}" placeholder="Nama Anda" class="{{ $inputCls }}" required>
+                                @error('nama_pelanggan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                            </div>
+                            
                             <div class="grid grid-cols-2 gap-4">
-                                <div><label class="{{ $labelCls }}">No. WhatsApp</label><input type="tel" name="no_whatsapp" value="{{ old('no_whatsapp', $userWa) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required></div>
-                                <div><label class="{{ $labelCls }}">Jumlah</label>
+                                <div>
+                                    <label class="{{ $labelCls }}">No. WhatsApp</label>
+                                    <input type="tel" name="whatsapp_number" value="{{ old('whatsapp_number', auth()->user()?->whatsapp_number) }}" placeholder="08xx-xxxx-xxxx" class="{{ $inputCls }}" required>
+                                    @error('whatsapp_number')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
+                                </div>
+                                <div>
+                                    <label class="{{ $labelCls }}">Jumlah</label>
                                     <div class="flex items-center gap-2">
                                         <button type="button" onclick="this.nextElementSibling.stepDown()" class="{{ $qtyBtnCls }}">−</button>
-                                        <input type="number" name="jumlah" min="1" value="1" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
+                                        <input type="number" name="jumlah" min="1" value="{{ old('jumlah', 1) }}" class="flex-1 bg-white border border-[#e8dfd3] rounded-xl px-3 py-3.5 text-sm font-bold text-center focus:outline-none focus:border-[#E35D25] transition-all">
                                         <button type="button" onclick="this.previousElementSibling.stepUp()" class="{{ $qtyBtnCls }}">+</button>
                                     </div>
+                                    @error('jumlah')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                                 </div>
                             </div>
-                            <div><label class="{{ $labelCls }}">Ukuran Cetak</label>
-                                <select name="ukuran_cetak" class="{{ $selectCls }}"><option>4R - 10 × 15 cm</option><option>5R - 12.7 × 17.8 cm</option><option>6R - 15 × 20 cm</option><option>8R - 20 × 25 cm</option><option>A4 - 21 × 29.7 cm</option><option>A3 - 29.7 × 42 cm</option><option>A2 - 42 × 59.4 cm</option><option>A1 - 59.4 × 84.1 cm</option><option>A0 - 84.1 × 118.9 cm</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Ukuran Cetak</label>
+                                <select name="ukuran_cetak" class="{{ $selectCls }}">
+                                    <option value="4R - 10 × 15 cm" {{ old('ukuran_cetak') == '4R - 10 × 15 cm' ? 'selected' : '' }}>4R - 10 × 15 cm</option>
+                                    <option value="5R - 12.7 × 17.8 cm" {{ old('ukuran_cetak') == '5R - 12.7 × 17.8 cm' ? 'selected' : '' }}>5R - 12.7 × 17.8 cm</option>
+                                    <option value="6R - 15 × 20 cm" {{ old('ukuran_cetak') == '6R - 15 × 20 cm' ? 'selected' : '' }}>6R - 15 × 20 cm</option>
+                                    <option value="8R - 20 × 25 cm" {{ old('ukuran_cetak') == '8R - 20 × 25 cm' ? 'selected' : '' }}>8R - 20 × 25 cm</option>
+                                    <option value="A4 - 21 × 29.7 cm" {{ old('ukuran_cetak') == 'A4 - 21 × 29.7 cm' ? 'selected' : '' }}>A4 - 21 × 29.7 cm</option>
+                                    <option value="A3 - 29.7 × 42 cm" {{ old('ukuran_cetak') == 'A3 - 29.7 × 42 cm' ? 'selected' : '' }}>A3 - 29.7 × 42 cm</option>
+                                    <option value="A2 - 42 × 59.4 cm" {{ old('ukuran_cetak') == 'A2 - 42 × 59.4 cm' ? 'selected' : '' }}>A2 - 42 × 59.4 cm</option>
+                                    <option value="A1 - 59.4 × 84.1 cm" {{ old('ukuran_cetak') == 'A1 - 59.4 × 84.1 cm' ? 'selected' : '' }}>A1 - 59.4 × 84.1 cm</option>
+                                    <option value="A0 - 84.1 × 118.9 cm" {{ old('ukuran_cetak') == 'A0 - 84.1 × 118.9 cm' ? 'selected' : '' }}>A0 - 84.1 × 118.9 cm</option>
+                                </select>
+                                @error('ukuran_cetak')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Finishing Kertas</label>
-                                <select name="finishing_kertas" class="{{ $selectCls }}"><option>Glossy</option><option>Matte / Doff</option><option>Luster / Semi-gloss</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Finishing Kertas</label>
+                                <select name="finishing_kertas" class="{{ $selectCls }}">
+                                    <option value="Glossy" {{ old('finishing_kertas') == 'Glossy' ? 'selected' : '' }}>Glossy</option>
+                                    <option value="Matte / Doff" {{ old('finishing_kertas') == 'Matte / Doff' ? 'selected' : '' }}>Matte / Doff</option>
+                                    <option value="Luster / Semi-gloss" {{ old('finishing_kertas') == 'Luster / Semi-gloss' ? 'selected' : '' }}>Luster / Semi-gloss</option>
+                                </select>
+                                @error('finishing_kertas')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Laminasi</label>
-                                <select name="laminasi" class="{{ $selectCls }}"><option>Tanpa laminasi</option><option>Laminasi glossy</option><option>Laminasi doff</option></select>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Laminasi</label>
+                                <select name="laminasi" class="{{ $selectCls }}">
+                                    <option value="Tanpa laminasi" {{ old('laminasi') == 'Tanpa laminasi' ? 'selected' : '' }}>Tanpa laminasi</option>
+                                    <option value="Laminasi glossy" {{ old('laminasi') == 'Laminasi glossy' ? 'selected' : '' }}>Laminasi glossy</option>
+                                    <option value="Laminasi doff" {{ old('laminasi') == 'Laminasi doff' ? 'selected' : '' }}>Laminasi doff</option>
+                                </select>
+                                @error('laminasi')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
-                            <div><label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
-                                <textarea name="masalah_utama" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('masalah_utama') }}</textarea>
+                            
+                            <div>
+                                <label class="{{ $labelCls }}">Catatan / Detail Tambahan</label>
+                                <textarea name="detail_kebutuhan" rows="3" placeholder="Deadline, warna dominan, permintaan khusus..." class="w-full bg-white border border-[#e8dfd3] rounded-xl px-4 py-3 text-sm font-medium placeholder-[#1E1B19]/35 focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all resize-none" required>{{ old('detail_kebutuhan') }}</textarea>
+                                @error('detail_kebutuhan')<p class="text-xs text-rose-500 mt-1 font-medium">{{ $message }}</p>@enderror
                             </div>
+                            
                             <button type="submit" class="w-full bg-[#1E1B19] hover:bg-[#E35D25] text-white text-sm font-bold uppercase tracking-wider py-4 px-6 rounded-full flex items-center justify-center gap-2 transition-all duration-300 shadow-md active:scale-[0.98]">
                                 <span>Pesan Cetakan</span><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                             </button>
@@ -1239,8 +1336,8 @@
 
             // ── Confirmation overlay logic ──
             const _printFieldLabels = {
-                nama_perusahaan:  'Nama / Brand',
-                no_whatsapp:      'No. WhatsApp',
+                nama_pelanggan:   'Nama / Brand',
+                whatsapp_number:  'No. WhatsApp',
                 jumlah:           'Jumlah',
                 ukuran:           'Ukuran',
                 ukuran_cetak:     'Ukuran Cetak',
@@ -1252,14 +1349,19 @@
                 link_folder_foto: 'Link Folder Foto',
                 finishing_kertas: 'Finishing Kertas',
                 laminasi:         'Laminasi',
-                masalah_utama:    'Catatan',
+                detail_kebutuhan: 'Catatan',
             };
             const _printFieldOrder = Object.keys(_printFieldLabels);
             let _activePrintForm = null;
 
             function showPrintConfirm(form) {
                 _activePrintForm = form;
-                const product = form.querySelector('[name="package_selected"]').value;
+                const packageInput = form.querySelector('[name="paket_dipilih"]');
+                if (!packageInput) {
+                    console.warn('paket_dipilih tidak ditemukan');
+                    return;
+                }
+                const product = packageInput.value;
                 document.getElementById('print-confirm-product').textContent = product;
 
                 let html = '';
@@ -1293,7 +1395,7 @@
 
             document.addEventListener('DOMContentLoaded', () => {
                 updatePrintCarousel();
-                // Intercept all 3 print form submissions
+                // Modal konfirmasi berlaku untuk semua panel Printing.
                 document.querySelectorAll('.print-form-panel form').forEach(form => {
                     form.addEventListener('submit', function(e) {
                         e.preventDefault();
