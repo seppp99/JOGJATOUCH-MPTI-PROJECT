@@ -17,6 +17,7 @@ Route::post('/layanan/desain-grafis/order', [LayananController::class, 'storeDes
 Route::post('/layanan/rakit-pc/order', [LayananController::class, 'storeRakitOrder'])->name('layanan.rakit.order')->middleware('auth');
 Route::post('/layanan/printing-cetak/buku-custom/order', [LayananController::class, 'storePrintingBukuOrder'])->name('layanan.printing.buku.order')->middleware('auth');
 Route::post('/layanan/printing-cetak/photobook/order', [LayananController::class, 'storePrintingPhotobookOrder'])->name('layanan.printing.photobook.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/cetak-foto/order', [LayananController::class, 'storePrintingCetakFotoOrder'])->name('layanan.printing.cetakfoto.order')->middleware('auth');
 Route::post('/layanan/{slug}/order', [LayananController::class, 'store'])->name('layanan.store');
 
 // Account and Auth Routes

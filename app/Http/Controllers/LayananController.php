@@ -713,6 +713,35 @@ class LayananController extends Controller
         return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Photobook'));
     }
 
+    public function storePrintingCetakFotoOrder(\App\Http\Requests\StorePrintingCetakFotoRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $order = \App\Models\Order::create([
+                'user_id'          => auth()->id(),
+                'order_code'       => $this->generateOrderCode('PRN'),
+                'layanan_id'       => 'printing-cetak',
+                'paket_dipilih'    => $data['paket_dipilih'],          // "Cetak Foto"
+                'nama_pelanggan'   => $data['nama_pelanggan'],          // snapshot
+                'whatsapp_number'  => $data['whatsapp_number'],         // snapshot
+                'email'            => auth()->user()->email,            // dari AKUN
+                'detail_kebutuhan' => $data['detail_kebutuhan'],        // dari Catatan
+                // alamat sengaja TIDAK diisi -> NULL
+                'custom_fields'    => [
+                    'ukuran_cetak'     => $data['ukuran_cetak'],
+                    'finishing_kertas' => $data['finishing_kertas'],
+                    'laminasi'         => $data['laminasi'],
+                    'jumlah'           => $data['jumlah'],
+                ],
+                'status'           => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal simpan order Printing Cetak Foto', ['error'=>$e->getMessage()]);
+            return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
+        return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Cetak Foto'));
+    }
+
     private function buildWhatsappUrl($order, $namaLayanan)
     {
         $adminNumber = config('services.whatsapp.admin_number', '6282158665638');
