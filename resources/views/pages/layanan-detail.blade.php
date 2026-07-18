@@ -1336,8 +1336,8 @@
 
             // ── Confirmation overlay logic ──
             const _printFieldLabels = {
-                nama_perusahaan:  'Nama / Brand',
-                no_whatsapp:      'No. WhatsApp',
+                nama_pelanggan:   'Nama / Brand',
+                whatsapp_number:  'No. WhatsApp',
                 jumlah:           'Jumlah',
                 ukuran:           'Ukuran',
                 ukuran_cetak:     'Ukuran Cetak',
@@ -1349,14 +1349,19 @@
                 link_folder_foto: 'Link Folder Foto',
                 finishing_kertas: 'Finishing Kertas',
                 laminasi:         'Laminasi',
-                masalah_utama:    'Catatan',
+                detail_kebutuhan: 'Catatan',
             };
             const _printFieldOrder = Object.keys(_printFieldLabels);
             let _activePrintForm = null;
 
             function showPrintConfirm(form) {
                 _activePrintForm = form;
-                const product = form.querySelector('[name="package_selected"]').value;
+                const packageInput = form.querySelector('[name="paket_dipilih"]');
+                if (!packageInput) {
+                    console.warn('paket_dipilih tidak ditemukan');
+                    return;
+                }
+                const product = packageInput.value;
                 document.getElementById('print-confirm-product').textContent = product;
 
                 let html = '';
@@ -1390,9 +1395,8 @@
 
             document.addEventListener('DOMContentLoaded', () => {
                 updatePrintCarousel();
-                // SEMENTARA (O4-E): SEMUA panel (Buku Custom, Photobook, Cetak Foto) kini dikecualikan dari modal (modal nonaktif sementara).
-                // TODO O4-F: modal akan dipulihkan untuk ketiga panel dengan memperbaiki nama field di JS (_printFieldLabels + querySelector paket_dipilih) lalu MENGHAPUS semua :not().
-                document.querySelectorAll('.print-form-panel:not([data-index="0"]):not([data-index="1"]):not([data-index="2"]) form').forEach(form => {
+                // Modal konfirmasi berlaku untuk semua panel Printing.
+                document.querySelectorAll('.print-form-panel form').forEach(form => {
                     form.addEventListener('submit', function(e) {
                         e.preventDefault();
                         showPrintConfirm(this);
