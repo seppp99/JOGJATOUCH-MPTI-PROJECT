@@ -424,47 +424,6 @@ class LayananController extends Controller
             session(['orders_db' => $ordersDb]);
         }
 
-        // For printing-cetak, redirect to WhatsApp with order details
-        if ($slug === 'printing-cetak') {
-            $package = $validated['package_selected'];
-            $lines = [
-                "Halo JogjaTouch! Saya ingin memesan cetakan. ðŸ–¨ï¸",
-                "",
-                "*Produk:* {$package}",
-                "*Nama:* " . $validated['nama_perusahaan'],
-                "*No. WhatsApp:* " . $validated['no_whatsapp'],
-            ];
-
-            // Append product-specific custom fields with readable labels
-            $fieldLabels = [
-                'jumlah'          => 'Jumlah',
-                'ukuran'          => 'Ukuran',
-                'ukuran_cetak'    => 'Ukuran Cetak',
-                'jenis_cover'     => 'Jenis Cover',
-                'penjilidan'      => 'Penjilidan',
-                'jumlah_halaman'  => 'Jumlah Halaman',
-                'cover'           => 'Cover',
-                'kertas_isi'      => 'Kertas Isi',
-                'link_folder_foto'=> 'Link Folder Foto',
-                'finishing_kertas'=> 'Finishing Kertas',
-                'laminasi'        => 'Laminasi',
-            ];
-            foreach ($fieldLabels as $field => $label) {
-                $val = $request->input($field);
-                if ($val !== null && $val !== '') {
-                    $lines[] = "*{$label}:* {$val}";
-                }
-            }
-
-            $lines[] = "*Catatan:* " . $validated['masalah_utama'];
-
-            $message = implode("\n", $lines);
-            $waNumber = config('services.whatsapp.admin_number', '6282158665638');
-            $waUrl = 'https://wa.me/' . $waNumber . '?text=' . rawurlencode($message);
-
-            return redirect($waUrl);
-        }
-
         // Store standard preview in session for user visual confirmation without active DB
         session()->flash('success_order', [
             'service_title' => $service['title_prefix'] . ' ' . str_replace('.', '', $service['title_italic']),
