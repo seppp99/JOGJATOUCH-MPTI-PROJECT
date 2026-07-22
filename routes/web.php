@@ -10,6 +10,14 @@ Route::get('/', function () {
 });
 
 Route::get('/layanan/{slug}', [LayananController::class, 'show'])->name('layanan.show');
+Route::post('/layanan/pemasangan-wifi/order', [LayananController::class, 'storeWifiOrder'])->name('layanan.wifi.order')->middleware('auth');
+Route::post('/layanan/network-analyst/order', [LayananController::class, 'storeNetworkOrder'])->name('layanan.network.order')->middleware('auth');
+Route::post('/layanan/perawatan-rutin/order', [LayananController::class, 'storePerawatanOrder'])->name('layanan.perawatan.order')->middleware('auth');
+Route::post('/layanan/desain-grafis/order', [LayananController::class, 'storeDesainOrder'])->name('layanan.desain.order')->middleware('auth');
+Route::post('/layanan/rakit-pc/order', [LayananController::class, 'storeRakitOrder'])->name('layanan.rakit.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/buku-custom/order', [LayananController::class, 'storePrintingBukuOrder'])->name('layanan.printing.buku.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/photobook/order', [LayananController::class, 'storePrintingPhotobookOrder'])->name('layanan.printing.photobook.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/cetak-foto/order', [LayananController::class, 'storePrintingCetakFotoOrder'])->name('layanan.printing.cetakfoto.order')->middleware('auth');
 Route::post('/layanan/{slug}/order', [LayananController::class, 'store'])->name('layanan.store');
 
 // Account and Auth Routes
@@ -32,4 +40,10 @@ Route::get('/akun', function () {
     return view('pages.akun');
 })->middleware('auth')->name('akun');
 
+Route::get('/akun/riwayat', function () {
+    return view('pages.akun-riwayat');
+})->middleware('auth')->name('akun.riwayat');
+
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+

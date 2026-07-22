@@ -4,6 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use App\Http\Requests\StoreWifiOrderRequest;
+use App\Http\Requests\StoreNetworkOrderRequest;
+use App\Http\Requests\StorePerawatanOrderRequest;
+use App\Http\Requests\StoreDesainOrderRequest;
+use App\Http\Requests\StoreRakitOrderRequest;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 
@@ -78,7 +84,7 @@ class LayananController extends Controller
                         'id' => 'audit-performa',
                         'name' => 'Audit Performa',
                         'price' => '850.000',
-                        'description' => 'Pemeriksaan jaringan menyeluruh — kecepatan, latency, packet loss, kualitas sinyal — disertai laporan rekomendasi.',
+                        'description' => 'Pemeriksaan jaringan menyeluruh â€” kecepatan, latency, packet loss, kualitas sinyal â€” disertai laporan rekomendasi.',
                         'features' => [
                             'Speed test multi-titik',
                             'Heatmap sinyal WiFi',
@@ -91,7 +97,7 @@ class LayananController extends Controller
                         'name' => 'Setup Mikrotik / Router',
                         'price' => '1.250.000',
                         'is_popular' => true,
-                        'description' => 'Konfigurasi router enterprise — VLAN, QoS, firewall, hotspot, voucher. Cocok untuk kantor 20+ user.',
+                        'description' => 'Konfigurasi router enterprise â€” VLAN, QoS, firewall, hotspot, voucher. Cocok untuk kantor 20+ user.',
                         'features' => [
                             'Konfigurasi VLAN & QoS',
                             'Firewall & rule keamanan',
@@ -103,7 +109,7 @@ class LayananController extends Controller
                         'id' => 'topologi-baru',
                         'name' => 'Perencanaan Topologi Baru',
                         'price' => '2.500.000',
-                        'description' => 'Desain ulang infrastruktur jaringan dari nol — denah kabel, daftar perangkat, RAB, fase implementasi.',
+                        'description' => 'Desain ulang infrastruktur jaringan dari nol â€” denah kabel, daftar perangkat, RAB, fase implementasi.',
                         'features' => [
                             'Site survey + denah lokasi',
                             'Diagram topologi profesional',
@@ -275,7 +281,7 @@ class LayananController extends Controller
                         'name' => 'Buku Custom',
                         'category_sub' => 'CETAK . DIGITAL PRINTING',
                         'price' => '25.000',
-                        'description' => 'Cetak buku, modul ajar, undangan, atau company profile langsung dari file desainmu — softcover atau hardcover dengan beragam pilihan jilid.',
+                        'description' => 'Cetak buku, modul ajar, undangan, atau company profile langsung dari file desainmu â€” softcover atau hardcover dengan beragam pilihan jilid.',
                         'features' => [
                             'Ukuran A4 & B5',
                             'Soft / hard cover',
@@ -418,47 +424,6 @@ class LayananController extends Controller
             session(['orders_db' => $ordersDb]);
         }
 
-        // For printing-cetak, redirect to WhatsApp with order details
-        if ($slug === 'printing-cetak') {
-            $package = $validated['package_selected'];
-            $lines = [
-                "Halo JogjaTouch! Saya ingin memesan cetakan. 🖨️",
-                "",
-                "*Produk:* {$package}",
-                "*Nama:* " . $validated['nama_perusahaan'],
-                "*No. WhatsApp:* " . $validated['no_whatsapp'],
-            ];
-
-            // Append product-specific custom fields with readable labels
-            $fieldLabels = [
-                'jumlah'          => 'Jumlah',
-                'ukuran'          => 'Ukuran',
-                'ukuran_cetak'    => 'Ukuran Cetak',
-                'jenis_cover'     => 'Jenis Cover',
-                'penjilidan'      => 'Penjilidan',
-                'jumlah_halaman'  => 'Jumlah Halaman',
-                'cover'           => 'Cover',
-                'kertas_isi'      => 'Kertas Isi',
-                'link_folder_foto'=> 'Link Folder Foto',
-                'finishing_kertas'=> 'Finishing Kertas',
-                'laminasi'        => 'Laminasi',
-            ];
-            foreach ($fieldLabels as $field => $label) {
-                $val = $request->input($field);
-                if ($val !== null && $val !== '') {
-                    $lines[] = "*{$label}:* {$val}";
-                }
-            }
-
-            $lines[] = "*Catatan:* " . $validated['masalah_utama'];
-
-            $message = implode("\n", $lines);
-            $waNumber = env('WHATSAPP_NUMBER', '6281234567890');
-            $waUrl = 'https://wa.me/' . $waNumber . '?text=' . rawurlencode($message);
-
-            return redirect($waUrl);
-        }
-
         // Store standard preview in session for user visual confirmation without active DB
         session()->flash('success_order', [
             'service_title' => $service['title_prefix'] . ' ' . str_replace('.', '', $service['title_italic']),
@@ -492,4 +457,278 @@ class LayananController extends Controller
 
         return 'Hubungi kami';
     }
+
+        public function storeWifiOrder(StoreWifiOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('WIFI');
+
+        $order = new Order();
+        $order->user_id = auth()->id();
+        $order->order_code = $orderCode;
+        $order->layanan_id = 'pemasangan-wifi';
+        $order->paket_dipilih = $validated['paket_dipilih'];
+        $order->nama_pelanggan = $validated['nama_pelanggan'];
+        $order->whatsapp_number = $validated['whatsapp_number'];
+        $order->email = $validated['email'];
+        $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+        $order->alamat = $validated['alamat'];
+        
+        $order->custom_fields = [
+            'luas_bangunan' => $validated['luas_bangunan'] ?? null,
+            'jumlah_lantai' => $validated['jumlah_lantai'] ?? null,
+        ];
+        
+        $order->save();
+
+        $whatsappUrl = $this->buildWhatsappUrl($order, 'Pemasangan WiFi');
+        
+        return redirect()->away($whatsappUrl);
+    }
+
+    public function storeNetworkOrder(StoreNetworkOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('NET');
+
+        $order = new Order();
+        $order->user_id = auth()->id();
+        $order->order_code = $orderCode;
+        $order->layanan_id = 'network-analyst';
+        $order->paket_dipilih = $validated['paket_dipilih'];
+        $order->nama_pelanggan = $validated['nama_pelanggan'];
+        $order->whatsapp_number = $validated['whatsapp_number'];
+        $order->email = $validated['email'];
+        $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+        $order->alamat = $validated['alamat'];
+        
+        $order->custom_fields = [
+            'jumlah_karyawan' => $validated['jumlah_karyawan'] ?? null,
+            'jumlah_lokasi' => $validated['jumlah_lokasi'] ?? null,
+            'perangkat_utama' => $validated['perangkat_utama'] ?? null,
+        ];
+        
+        $order->save();
+
+        $whatsappUrl = $this->buildWhatsappUrl($order, 'Network Analyst');
+        
+        return redirect()->away($whatsappUrl);
+    }
+
+    public function storePerawatanOrder(StorePerawatanOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('MNT');
+
+        try {
+            $order = new Order();
+            $order->user_id = auth()->id();
+            $order->order_code = $orderCode;
+            $order->layanan_id = 'perawatan-rutin';
+            $order->paket_dipilih = $validated['paket_dipilih'];
+            $order->nama_pelanggan = $validated['nama_pelanggan'];
+            $order->whatsapp_number = $validated['whatsapp_number'];
+            $order->email = $validated['email'];
+            $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+            $order->alamat = $validated['alamat'];
+            
+            $order->custom_fields = [];
+            
+            $order->save();
+
+            $whatsappUrl = $this->buildWhatsappUrl($order, 'Perawatan Rutin');
+            
+            return redirect()->away($whatsappUrl);
+        } catch (\Exception $e) {
+            Log::error('Error saving Perawatan Rutin order: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan pesanan. Silakan coba lagi.')->withInput();
+        }
+    }
+
+    public function storeDesainOrder(StoreDesainOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('DSN');
+
+        try {
+            $order = new Order();
+            $order->user_id = auth()->id();
+            $order->order_code = $orderCode;
+            $order->layanan_id = 'desain-grafis';
+            $order->paket_dipilih = $validated['paket_dipilih'];
+            $order->nama_pelanggan = $validated['nama_pelanggan'];
+            $order->whatsapp_number = $validated['whatsapp_number'];
+            $order->email = $validated['email'];
+            $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+            $order->alamat = $validated['alamat'];
+            
+            $order->custom_fields = [];
+            
+            $order->save();
+
+            $whatsappUrl = $this->buildWhatsappUrl($order, 'Desain Grafis');
+            
+            return redirect()->away($whatsappUrl);
+        } catch (\Exception $e) {
+            Log::error('Error saving Desain Grafis order: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan pesanan. Silakan coba lagi.')->withInput();
+        }
+    }
+
+    public function storeRakitOrder(StoreRakitOrderRequest $request)
+    {
+        $validated = $request->validated();
+        $orderCode = $this->generateOrderCode('RKT');
+
+        try {
+            $order = new Order();
+            $order->user_id = auth()->id();
+            $order->order_code = $orderCode;
+            $order->layanan_id = 'rakit-pc';
+            $order->paket_dipilih = $validated['paket_dipilih'];
+            $order->nama_pelanggan = $validated['nama_pelanggan'];
+            $order->whatsapp_number = $validated['whatsapp_number'];
+            $order->email = $validated['email'];
+            $order->detail_kebutuhan = $validated['detail_kebutuhan'];
+            $order->alamat = $validated['alamat'];
+            
+            $order->custom_fields = [
+                'budget_rakit' => $validated['budget_rakit'] ?? null
+            ];
+            
+            $order->save();
+
+            $whatsappUrl = $this->buildWhatsappUrl($order, 'Rakit & Service PC');
+            
+            return redirect()->away($whatsappUrl);
+        } catch (\Exception $e) {
+            Log::error('Error saving Rakit PC order: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat menyimpan pesanan. Silakan coba lagi.')->withInput();
+        }
+    }
+    private function generateOrderCode($prefix)
+    {
+        return $prefix . '-' . date('Ymd') . '-' . strtoupper(substr(uniqid(), -5));
+    }
+
+        public function storePrintingBukuOrder(\App\Http\Requests\StorePrintingBukuRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $order = \App\Models\Order::create([
+                'user_id'          => auth()->id(),
+                'order_code'       => $this->generateOrderCode('PRN'),
+                'layanan_id'       => 'printing-cetak',
+                'paket_dipilih'    => $data['paket_dipilih'],          // "Buku Custom"
+                'nama_pelanggan'   => $data['nama_pelanggan'],          // snapshot
+                'whatsapp_number'  => $data['whatsapp_number'],         // snapshot
+                'email'            => auth()->user()->email,            // dari AKUN
+                'detail_kebutuhan' => $data['detail_kebutuhan'],        // dari Catatan
+                // alamat sengaja TIDAK diisi -> NULL (Printing tak punya alamat)
+                'custom_fields'    => [
+                    'ukuran'         => $data['ukuran'],
+                    'jenis_cover'    => $data['jenis_cover'],
+                    'penjilidan'     => $data['penjilidan'],
+                    'jumlah_halaman' => $data['jumlah_halaman'],
+                    'jumlah'         => $data['jumlah'],
+                ],
+                'status'           => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal simpan order Printing Buku Custom', ['error'=>$e->getMessage()]);
+            return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
+        return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Buku Custom'));
+    }
+
+    public function storePrintingPhotobookOrder(\App\Http\Requests\StorePrintingPhotobookRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $order = \App\Models\Order::create([
+                'user_id'          => auth()->id(),
+                'order_code'       => $this->generateOrderCode('PRN'),
+                'layanan_id'       => 'printing-cetak',
+                'paket_dipilih'    => $data['paket_dipilih'],          // "Photobook"
+                'nama_pelanggan'   => $data['nama_pelanggan'],          // snapshot
+                'whatsapp_number'  => $data['whatsapp_number'],         // snapshot
+                'email'            => auth()->user()->email,            // dari AKUN
+                'detail_kebutuhan' => $data['detail_kebutuhan'],        // dari Catatan
+                // alamat sengaja TIDAK diisi -> NULL
+                'custom_fields'    => [
+                    'ukuran'           => $data['ukuran'],
+                    'cover'            => $data['cover'],
+                    'kertas_isi'       => $data['kertas_isi'],
+                    'jumlah_halaman'   => $data['jumlah_halaman'],
+                    'link_folder_foto' => $data['link_folder_foto'],
+                    'jumlah'           => $data['jumlah'],
+                ],
+                'status'           => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal simpan order Printing Photobook', ['error'=>$e->getMessage()]);
+            return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
+        return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Photobook'));
+    }
+
+    public function storePrintingCetakFotoOrder(\App\Http\Requests\StorePrintingCetakFotoRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $order = \App\Models\Order::create([
+                'user_id'          => auth()->id(),
+                'order_code'       => $this->generateOrderCode('PRN'),
+                'layanan_id'       => 'printing-cetak',
+                'paket_dipilih'    => $data['paket_dipilih'],          // "Cetak Foto"
+                'nama_pelanggan'   => $data['nama_pelanggan'],          // snapshot
+                'whatsapp_number'  => $data['whatsapp_number'],         // snapshot
+                'email'            => auth()->user()->email,            // dari AKUN
+                'detail_kebutuhan' => $data['detail_kebutuhan'],        // dari Catatan
+                // alamat sengaja TIDAK diisi -> NULL
+                'custom_fields'    => [
+                    'ukuran_cetak'     => $data['ukuran_cetak'],
+                    'finishing_kertas' => $data['finishing_kertas'],
+                    'laminasi'         => $data['laminasi'],
+                    'jumlah'           => $data['jumlah'],
+                ],
+                'status'           => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal simpan order Printing Cetak Foto', ['error'=>$e->getMessage()]);
+            return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
+        return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Cetak Foto'));
+    }
+
+    private function buildWhatsappUrl($order, $namaLayanan)
+    {
+        $adminNumber = config('services.whatsapp.admin_number', '6282158665638');
+        $message = "Halo Admin Jogjatouch,\n\n";
+        $message .= "Saya ingin memesan layanan *{$namaLayanan}*.\n\n";
+        $message .= "*Order Code*: {" . $order->order_code . "}\n";
+        $message .= "*Paket*: {" . $order->paket_dipilih . "}\n";
+        $message .= "*Nama*: {" . $order->nama_pelanggan . "}\n";
+        $message .= "*WhatsApp*: {" . $order->whatsapp_number . "}\n";
+        $message .= "*Email*: {" . $order->email . "}\n";
+        
+        $custom = $order->custom_fields ?? [];
+        foreach ($custom as $key => $val) {
+            if (!empty($val)) {
+                $label = Str::title(str_replace('_', ' ', $key));
+                // Optional override logic could be here, e.g. $overrides = ['budget_rakit' => 'Budget Rakit PC']
+                if ($key === 'luas_bangunan') {
+                    $message .= "*{$label}*: {$val} m2\n";
+                } else {
+                    $message .= "*{$label}*: {$val}\n";
+                }
+            }
+        }
+        
+        $message .= "*Detail Kebutuhan*:\n{" . $order->detail_kebutuhan . "}\n\n";
+        $message .= "*Alamat*:\n{" . $order->alamat . "}";
+
+        return "https://wa.me/" . $adminNumber . "?text=" . rawurlencode($message);
+    }
 }
+
