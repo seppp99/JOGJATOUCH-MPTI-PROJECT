@@ -20,11 +20,14 @@ class Order extends Model
         'detail_kebutuhan',
         'alamat',
         'custom_fields',
-        'status'
+        'status',
+        'harga_fix',
+        'tanggal_pelaksanaan'
     ];
 
     protected $casts = [
         'custom_fields' => 'array',
+        'tanggal_pelaksanaan' => 'date',
     ];
 
     public function user()
