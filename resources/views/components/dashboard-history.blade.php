@@ -17,11 +17,11 @@
             // Pill status akhir: selesai = hijau, dibatalkan = merah lembut.
             // Class ditulis sebagai string literal utuh (bukan dirangkai dengan
             // {{ }}) agar terbaca oleh scanner Tailwind & ikut ke CSS build.
-            $historyPill = function ($status) {
+            $historyPill = function ($status, $label) {
                 return match (strtolower($status)) {
-                    'selesai'    => ['class' => 'bg-emerald-50 text-emerald-600', 'label' => 'Selesai'],
-                    'dibatalkan' => ['class' => 'bg-rose-50 text-rose-600',       'label' => 'Dibatalkan'],
-                    default      => ['class' => 'bg-gray-100 text-gray-600',      'label' => ucfirst($status ?: 'Selesai')],
+                    'completed', 'selesai'    => ['class' => 'bg-emerald-50 text-emerald-600', 'label' => $label],
+                    'canceled', 'dibatalkan' => ['class' => 'bg-rose-50 text-rose-600',       'label' => $label],
+                    default      => ['class' => 'bg-gray-100 text-gray-600',      'label' => $label],
                 };
             };
 
@@ -39,23 +39,23 @@
         @endphp
 
         @forelse($orders as $order)
-            @php $pill = $historyPill($order['status'] ?? 'selesai'); @endphp
+            @php $pill = $historyPill($order->status ?? 'completed', $order->status_label); @endphp
             <!-- History Row Card -->
             <div class="group bg-white rounded-3xl border border-[#1E1B19]/5 p-4 md:p-5 flex items-center gap-4 hover:shadow-xl hover:shadow-neutral-500/5 hover:-translate-y-0.5 transition-all duration-300">
                 <!-- Orange Icon Chip -->
                 <div class="w-12 h-12 rounded-2xl bg-[#E35D25] text-white flex items-center justify-center shrink-0 shadow-sm shadow-[#E35D25]/20">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $iconFor($order['service_slug'] ?? '') }}"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" d="{{ $iconFor($order->layanan_id ?? '') }}"></path>
                     </svg>
                 </div>
 
                 <!-- Title + Meta -->
                 <div class="min-w-0 flex-grow">
                     <h3 class="font-serif-display text-lg font-bold text-[#1E1B19] truncate group-hover:text-[#E35D25] transition-colors">
-                        {{ $order['title'] ?? ucfirst(str_replace('-', ' ', $order['service_slug'] ?? 'Pesanan')) }}
+                        {{ ucwords(str_replace('-', ' ', $order->layanan_id ?? 'Pesanan')) }}{{ $order->paket_dipilih ? ' — ' . $order->paket_dipilih : '' }}
                     </h3>
                     <p class="text-xs font-medium text-[#1E1B19]/50 mt-0.5">
-                        {{ $pill['label'] }} &middot; {{ $order['date'] ?? 'Tanpa tanggal' }}
+                        {{ $pill['label'] }} &middot; {{ $order->created_at ? $order->created_at->translatedFormat('d M Y') : 'Tanpa tanggal' }}
                     </p>
                 </div>
 
@@ -63,6 +63,14 @@
                 <span class="px-3 py-1 rounded-full {{ $pill['class'] }} text-xs font-bold shrink-0">
                     {{ $pill['label'] }}
                 </span>
+
+                <!-- Link Arrow Button -->
+                <a href="{{ route('akun.pesanan.detail', $order->order_code) }}" class="w-10 h-10 rounded-full border border-[#1E1B19]/10 bg-white hover:bg-[#E35D25] hover:border-[#E35D25] hover:text-white flex items-center justify-center text-[#1E1B19] shrink-0 transition-all duration-300 group-hover:scale-105 active:scale-95 shadow-sm" title="Lihat Detail Pesanan">
+                    <!-- Arrow Right Icon -->
+                    <svg class="w-4 h-4 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                    </svg>
+                </a>
             </div>
         @empty
             <!-- Empty State -->
