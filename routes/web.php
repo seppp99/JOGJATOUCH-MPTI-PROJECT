@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AkunController;
 
 Route::get('/', function () {
     return view('pages.home');
@@ -16,6 +17,8 @@ Route::post('/layanan/perawatan-rutin/order', [LayananController::class, 'storeP
 Route::post('/layanan/desain-grafis/order', [LayananController::class, 'storeDesainOrder'])->name('layanan.desain.order')->middleware('auth');
 Route::post('/layanan/rakit-pc/order', [LayananController::class, 'storeRakitOrder'])->name('layanan.rakit.order')->middleware('auth');
 Route::post('/layanan/printing-cetak/buku-custom/order', [LayananController::class, 'storePrintingBukuOrder'])->name('layanan.printing.buku.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/photobook/order', [LayananController::class, 'storePrintingPhotobookOrder'])->name('layanan.printing.photobook.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/cetak-foto/order', [LayananController::class, 'storePrintingCetakFotoOrder'])->name('layanan.printing.cetakfoto.order')->middleware('auth');
 Route::post('/layanan/{slug}/order', [LayananController::class, 'store'])->name('layanan.store');
 
 // Account and Auth Routes
@@ -34,13 +37,9 @@ Route::post('/lupa-password/verify-otp', [App\Http\Controllers\PasswordResetCont
 Route::get('/lupa-password/baru', [App\Http\Controllers\PasswordResetController::class, 'newPassPage'])->name('lupa-password.baru');
 Route::post('/lupa-password/reset', [App\Http\Controllers\PasswordResetController::class, 'reset'])->name('lupa-password.reset');
 
-Route::get('/akun', function () {
-    return view('pages.akun');
-})->middleware('auth')->name('akun');
-
-Route::get('/akun/riwayat', function () {
-    return view('pages.akun-riwayat');
-})->middleware('auth')->name('akun.riwayat');
+Route::get('/akun', [AkunController::class, 'index'])->middleware('auth')->name('akun');
+Route::get('/akun/riwayat', [AkunController::class, 'riwayat'])->middleware('auth')->name('akun.riwayat');
+Route::get('/akun/pesanan/{order_code}', [AkunController::class, 'detail'])->middleware('auth')->name('akun.pesanan.detail');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 

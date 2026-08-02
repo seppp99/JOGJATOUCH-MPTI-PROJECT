@@ -20,15 +20,29 @@ class Order extends Model
         'detail_kebutuhan',
         'alamat',
         'custom_fields',
-        'status'
+        'status',
+        'harga_fix',
+        'tanggal_pelaksanaan'
     ];
 
     protected $casts = [
         'custom_fields' => 'array',
+        'tanggal_pelaksanaan' => 'date',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Menunggu Konfirmasi',
+            'deal' => 'Diproses',
+            'completed' => 'Selesai',
+            'canceled' => 'Dibatalkan',
+            default => ucfirst($this->status),
+        };
     }
 }

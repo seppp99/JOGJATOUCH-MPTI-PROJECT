@@ -5,10 +5,10 @@
     <div class="absolute -top-40 right-0 w-[600px] h-[600px] bg-glow-orange pointer-events-none rounded-full"></div>
     
     <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
             <!-- Left Hero Content -->
-            <div class="lg:col-span-7 flex flex-col items-start text-left">
+            <div class="lg:col-span-6 flex flex-col items-start text-left">
                 <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider text-[#E35D25] bg-[#E35D25]/10 border border-[#E35D25]/20 mb-6 uppercase">
                     ✨ Kreativitas Tanpa Batas
                 </span>
@@ -34,51 +34,28 @@
                 </div>
             </div>
 
-            <!-- Right Hero Mockup Image (Matches target illustration) -->
-            <div class="lg:col-span-5 relative w-full flex items-center justify-center">
-                <div class="relative w-80 h-80 md:w-112 md:h-112 flex items-center justify-center">
-                    
-                    <!-- Main Solid Orange Circle Background -->
-                    <div class="absolute w-64 h-64 md:w-88 md:h-88 bg-gradient-to-tr from-[#E35D25] to-[#f4733e] rounded-full shadow-2xl flex items-center justify-center overflow-hidden animate-pulse" style="animation-duration: 6s;">
-                        
-                        <!-- Curved decorative overlay lines inside circle -->
-                        <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-                    </div>
-                    
-                    <!-- Smartphone Mockup Overlay -->
-                    <div class="absolute w-36 h-64 md:w-48 md:h-88 bg-[#FBF9F6] rounded-3xl shadow-2xl border-4 border-[#1E1B19] flex flex-col justify-between p-3 rotate-12 transform hover:rotate-6 transition-all duration-500 z-10">
-                        <!-- Phone Notch -->
-                        <div class="w-16 h-3 bg-[#1E1B19] rounded-full mx-auto mb-4"></div>
-                        
-                        <!-- Content Screen (Jogjatouch Graphic) -->
-                        <div class="flex-1 rounded-xl bg-gradient-to-b from-[#FFF2EC] to-[#FFE6DA] flex flex-col items-center justify-center p-3 relative overflow-hidden">
-                            <!-- Inner Orange "J" Logo in phone -->
-                            <div class="w-12 h-12 rounded-xl bg-[#FFFFFF] flex items-center justify-center text-white font-bold text-xl shadow-md shadow-[#E35D25]/20 group-hover:scale-105 transition-transform duration-300">
-                                <img src="{{ asset('assets/logo jogja touch border white.png') }}" alt="Jogja Touch Logo" class="w-10 h-10">
-                            </div>
-                            <!-- Vertical text inside smartphone mockup -->
-                            <div class="text-[12px] md:text-xs font-bold tracking-widest text-[#1E1B19]/70 uppercase z-10 flex flex-col items-center gap-1 font-serif-display italic mt-3">
-                                <span>J</span>
-                                <span>O</span>
-                                <span>G</span>
-                                <span>J</span>
-                                <span>A</span>
-                            </div>
-                            <div class="text-[9px] md:text-[10px] font-semibold text-[#E35D25] tracking-widest uppercase mt-2 z-10">
-                                TOUCH
-                            </div>
-                        </div>
-                        
-                        <!-- Phone Home Indicator -->
-                        <div class="w-12 h-1 bg-[#1E1B19]/30 rounded-full mx-auto mt-3"></div>
-                    </div>
+            <!-- Right Hero Image — Hardware Photo -->
+            <div class="lg:col-span-6 relative w-full flex items-center justify-center overflow-visible">
+                <!-- Image overflows column to fill visual space equal to text block -->
+                <div class="relative w-[130%] -ml-[10%] flex items-center justify-center">
 
-                    <!-- White Overlay Circles (Depth and Mockup feel) -->
-                    <div class="absolute top-2 left-6 w-16 h-16 md:w-20 md:h-20 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/40 z-20 flex items-center justify-center animate-bounce" style="animation-duration: 4s;">
+                    <!-- Soft orange glow -->
+                    <div class="absolute inset-0 m-auto w-3/4 h-3/4 bg-gradient-to-tr from-[#E35D25]/30 to-[#f4733e]/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-duration: 6s;"></div>
+
+                    <!-- Hardware Image -->
+                    <img
+                        src="{{ asset('assets/hardware.png') }}"
+                        alt="Perangkat hardware MikroTik dan transceiver Jogjatouch"
+                        class="relative z-10 w-full drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                        draggable="false"
+                    >
+
+                    <!-- Decorative white circles -->
+                    <div class="absolute top-0 left-4 w-12 h-12 md:w-16 md:h-16 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/40 z-20 flex items-center justify-center animate-bounce" style="animation-duration: 4s;">
                         <div class="w-3 h-3 bg-[#E35D25] rounded-full"></div>
                     </div>
-                    
-                    <div class="absolute bottom-6 left-80 w-16 h-16 md:w-24 md:h-24 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/40 z-20 flex items-center justify-center animate-bounce" style="animation-duration: 4.5s;">
+
+                    <div class="absolute bottom-0 right-4 w-12 h-12 md:w-16 md:h-16 bg-white/90 backdrop-blur-md rounded-full shadow-lg border border-white/40 z-20 flex items-center justify-center animate-bounce" style="animation-duration: 4.5s;">
                         <div class="w-3 h-3 bg-[#E35D25] rounded-full"></div>
                     </div>
 

@@ -3,29 +3,6 @@
         Dashboard Pelanggan — JogjaTouch
     </x-slot:title>
 
-    @php
-        // Sumber data pesanan dihitung sekali di sini lalu dioper ke sidebar
-        // (angka statistik) dan panel pesanan (daftar kartu) agar keduanya
-        // selalu konsisten. Status riwayat = pesanan yang sudah tidak berjalan.
-        $user = Illuminate\Support\Facades\Auth::user();
-        $historyStatuses = ['selesai', 'dibatalkan'];
-
-        $userOrders = array_values(array_filter(
-            session('orders_db', []),
-            fn ($order) => isset($order['no_whatsapp']) && $order['no_whatsapp'] === $user->whatsapp_number
-        ));
-
-        $activeOrders = array_values(array_filter(
-            $userOrders,
-            fn ($order) => !in_array(strtolower($order['status'] ?? 'masuk'), $historyStatuses)
-        ));
-
-        $historyOrders = array_values(array_filter(
-            $userOrders,
-            fn ($order) => in_array(strtolower($order['status'] ?? ''), $historyStatuses)
-        ));
-    @endphp
-
     <main class="min-h-screen bg-[#FBF9F6] py-12 md:py-16">
         <div class="max-w-7xl mx-auto px-6">
 
@@ -33,10 +10,10 @@
             <div class="flex flex-col md:flex-row gap-8 lg:gap-12 items-start">
 
                 <!-- Left Sidebar Component -->
-                <x-dashboard-sidebar :active-count="count($activeOrders)" :history-count="count($historyOrders)" />
+                <x-dashboard-sidebar :active-count="$activeCount" :history-count="$historyCount" />
 
                 <!-- Right Content / Active Orders Component -->
-                <x-dashboard-orders :orders="$activeOrders" />
+                <x-dashboard-orders :orders="$orders" />
 
             </div>
 

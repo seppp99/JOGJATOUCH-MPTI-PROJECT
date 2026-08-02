@@ -18,19 +18,11 @@
         @php
             // Helper function to get status badge color
             $getStatusColor = function($status) {
-                return match($status) {
-                    'dikerjakan' => ['bg' => 'indigo-50', 'text' => 'indigo-600'],
-                    'diproses' => ['bg' => 'amber-50', 'text' => 'amber-600'],
-                    'masuk' => ['bg' => 'blue-50', 'text' => 'blue-600'],
-                    default => ['bg' => 'gray-50', 'text' => 'gray-600'],
-                };
-            };
-
-            $getPaymentColor = function($status) {
-                return match($status) {
-                    'lunas' => ['bg' => 'emerald-50', 'text' => 'emerald-600'],
-                    'dp' => ['bg' => 'orange-50', 'text' => 'orange-600'],
-                    'belum_bayar' => ['bg' => 'rose-50', 'text' => 'rose-600'],
+                return match(strtolower($status)) {
+                    'pending' => ['bg' => 'blue-50', 'text' => 'blue-600'],
+                    'deal' => ['bg' => 'amber-50', 'text' => 'amber-600'],
+                    'completed' => ['bg' => 'emerald-50', 'text' => 'emerald-600'],
+                    'canceled' => ['bg' => 'rose-50', 'text' => 'rose-600'],
                     default => ['bg' => 'gray-50', 'text' => 'gray-600'],
                 };
             };
@@ -38,46 +30,46 @@
 
         @forelse($orders as $order)
             @php
-                $statusColor = $getStatusColor(strtolower($order['status'] ?? 'masuk'));
-                $paymentColor = $getPaymentColor(strtolower($order['payment_status'] ?? 'belum_bayar'));
+                $statusColor = $getStatusColor($order->status ?? 'pending');
             @endphp
             <!-- Dynamic Order Card -->
             <div class="group bg-white rounded-3xl border border-[#1E1B19]/5 p-6 md:p-8 flex items-center justify-between hover:shadow-xl hover:shadow-neutral-500/5 hover:-translate-y-0.5 transition-all duration-300">
                 <div class="space-y-4 pr-4">
                     <!-- Meta Info / Badges -->
                     <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
-                        <span class="text-[#1E1B19]/50">JT-2026-{{ str_pad($order['id'], 4, '0', STR_PAD_LEFT) }}</span>
+                        <span class="text-[#1E1B19]/50">{{ $order->order_code }}</span>
                         <span class="w-1.5 h-1.5 rounded-full bg-[#1E1B19]/20"></span>
                         <!-- Status Badge -->
                         <span class="px-2.5 py-0.5 rounded-full bg-{{ $statusColor['bg'] }} text-{{ $statusColor['text'] }} text-[10px] font-bold tracking-wide uppercase">
-                            {{ strtoupper($order['status'] ?? 'MASUK') }}
-                        </span>
-                        <!-- Payment Status Badge -->
-                        <span class="px-2.5 py-0.5 rounded-full bg-{{ $paymentColor['bg'] }} text-{{ $paymentColor['text'] }} text-[10px] font-bold tracking-wide uppercase">
-                            {{ strtoupper(str_replace('_', ' ', $order['payment_status'] ?? 'BELUM BAYAR')) }}
+                            {{ $order->status_label }}
                         </span>
                     </div>
 
                     <!-- Order Content -->
                     <div class="space-y-1.5">
                         <h3 class="font-serif-display text-2xl font-bold text-[#1E1B19] group-hover:text-[#E35D25] transition-colors">
-                            {{ ucfirst(str_replace('-', ' ', $order['service_slug'])) }}
+                            {{ ucwords(str_replace('-', ' ', $order->layanan_id)) }}
                         </h3>
+                        @if($order->paket_dipilih)
+                            <p class="text-xs font-semibold text-[#E35D25]">
+                                {{ $order->paket_dipilih }}
+                            </p>
+                        @endif
                         <p class="text-sm text-[#1E1B19]/60 leading-relaxed max-w-2xl">
-                            {{ $order['masalah_utama'] ?? 'Tidak ada deskripsi' }}
+                            {{ $order->detail_kebutuhan ?? 'Tidak ada deskripsi' }}
                         </p>
                     </div>
 
                     <!-- Footer details (Price & Date) -->
                     <div class="flex items-center gap-3 text-sm text-[#1E1B19]/80">
-                        <span class="font-bold text-[#1E1B19]">Rp {{ $order['price'] ?? 'Hubungi kami' }}</span>
+                        <span class="font-bold text-[#1E1B19]">{{ $order->harga_fix ? 'Rp ' . number_format($order->harga_fix, 0, ',', '.') : 'Menunggu penawaran' }}</span>
                         <span class="text-[#1E1B19]/30">|</span>
-                        <span class="font-medium text-[#1E1B19]/50">{{ $order['date'] ?? 'Tanpa tanggal' }}</span>
+                        <span class="font-medium text-[#1E1B19]/50">{{ $order->created_at ? $order->created_at->translatedFormat('d M Y') : 'Tanpa tanggal' }}@if($order->tanggal_pelaksanaan) &middot; <span class="text-[#E35D25] font-semibold">Jadwal: {{ $order->tanggal_pelaksanaan->translatedFormat('d M Y') }}</span>@endif</span>
                     </div>
                 </div>
 
                 <!-- Link Arrow Button -->
-                <a href="#" class="w-12 h-12 rounded-full border border-[#1E1B19]/10 bg-white hover:bg-[#E35D25] hover:border-[#E35D25] hover:text-white flex items-center justify-center text-[#1E1B19] shrink-0 transition-all duration-300 group-hover:scale-105 active:scale-95 shadow-sm">
+                <a href="{{ route('akun.pesanan.detail', $order->order_code) }}" class="w-12 h-12 rounded-full border border-[#1E1B19]/10 bg-white hover:bg-[#E35D25] hover:border-[#E35D25] hover:text-white flex items-center justify-center text-[#1E1B19] shrink-0 transition-all duration-300 group-hover:scale-105 active:scale-95 shadow-sm" title="Lihat Detail Pesanan">
                     <!-- Arrow Right Icon -->
                     <svg class="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>

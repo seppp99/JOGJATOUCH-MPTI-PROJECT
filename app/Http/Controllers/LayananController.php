@@ -424,47 +424,6 @@ class LayananController extends Controller
             session(['orders_db' => $ordersDb]);
         }
 
-        // For printing-cetak, redirect to WhatsApp with order details
-        if ($slug === 'printing-cetak') {
-            $package = $validated['package_selected'];
-            $lines = [
-                "Halo JogjaTouch! Saya ingin memesan cetakan. ðŸ–¨ï¸",
-                "",
-                "*Produk:* {$package}",
-                "*Nama:* " . $validated['nama_perusahaan'],
-                "*No. WhatsApp:* " . $validated['no_whatsapp'],
-            ];
-
-            // Append product-specific custom fields with readable labels
-            $fieldLabels = [
-                'jumlah'          => 'Jumlah',
-                'ukuran'          => 'Ukuran',
-                'ukuran_cetak'    => 'Ukuran Cetak',
-                'jenis_cover'     => 'Jenis Cover',
-                'penjilidan'      => 'Penjilidan',
-                'jumlah_halaman'  => 'Jumlah Halaman',
-                'cover'           => 'Cover',
-                'kertas_isi'      => 'Kertas Isi',
-                'link_folder_foto'=> 'Link Folder Foto',
-                'finishing_kertas'=> 'Finishing Kertas',
-                'laminasi'        => 'Laminasi',
-            ];
-            foreach ($fieldLabels as $field => $label) {
-                $val = $request->input($field);
-                if ($val !== null && $val !== '') {
-                    $lines[] = "*{$label}:* {$val}";
-                }
-            }
-
-            $lines[] = "*Catatan:* " . $validated['masalah_utama'];
-
-            $message = implode("\n", $lines);
-            $waNumber = config('services.whatsapp.admin_number', '6282158665638');
-            $waUrl = 'https://wa.me/' . $waNumber . '?text=' . rawurlencode($message);
-
-            return redirect($waUrl);
-        }
-
         // Store standard preview in session for user visual confirmation without active DB
         session()->flash('success_order', [
             'service_title' => $service['title_prefix'] . ' ' . str_replace('.', '', $service['title_italic']),
@@ -680,6 +639,66 @@ class LayananController extends Controller
             return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
         }
         return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Buku Custom'));
+    }
+
+    public function storePrintingPhotobookOrder(\App\Http\Requests\StorePrintingPhotobookRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $order = \App\Models\Order::create([
+                'user_id'          => auth()->id(),
+                'order_code'       => $this->generateOrderCode('PRN'),
+                'layanan_id'       => 'printing-cetak',
+                'paket_dipilih'    => $data['paket_dipilih'],          // "Photobook"
+                'nama_pelanggan'   => $data['nama_pelanggan'],          // snapshot
+                'whatsapp_number'  => $data['whatsapp_number'],         // snapshot
+                'email'            => auth()->user()->email,            // dari AKUN
+                'detail_kebutuhan' => $data['detail_kebutuhan'],        // dari Catatan
+                // alamat sengaja TIDAK diisi -> NULL
+                'custom_fields'    => [
+                    'ukuran'           => $data['ukuran'],
+                    'cover'            => $data['cover'],
+                    'kertas_isi'       => $data['kertas_isi'],
+                    'jumlah_halaman'   => $data['jumlah_halaman'],
+                    'link_folder_foto' => $data['link_folder_foto'],
+                    'jumlah'           => $data['jumlah'],
+                ],
+                'status'           => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal simpan order Printing Photobook', ['error'=>$e->getMessage()]);
+            return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
+        return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Photobook'));
+    }
+
+    public function storePrintingCetakFotoOrder(\App\Http\Requests\StorePrintingCetakFotoRequest $request)
+    {
+        $data = $request->validated();
+        try {
+            $order = \App\Models\Order::create([
+                'user_id'          => auth()->id(),
+                'order_code'       => $this->generateOrderCode('PRN'),
+                'layanan_id'       => 'printing-cetak',
+                'paket_dipilih'    => $data['paket_dipilih'],          // "Cetak Foto"
+                'nama_pelanggan'   => $data['nama_pelanggan'],          // snapshot
+                'whatsapp_number'  => $data['whatsapp_number'],         // snapshot
+                'email'            => auth()->user()->email,            // dari AKUN
+                'detail_kebutuhan' => $data['detail_kebutuhan'],        // dari Catatan
+                // alamat sengaja TIDAK diisi -> NULL
+                'custom_fields'    => [
+                    'ukuran_cetak'     => $data['ukuran_cetak'],
+                    'finishing_kertas' => $data['finishing_kertas'],
+                    'laminasi'         => $data['laminasi'],
+                    'jumlah'           => $data['jumlah'],
+                ],
+                'status'           => 'pending',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Gagal simpan order Printing Cetak Foto', ['error'=>$e->getMessage()]);
+            return back()->withInput()->with('error','Gagal menyimpan pesanan. Silakan coba lagi.');
+        }
+        return redirect()->away($this->buildWhatsappUrl($order, 'Printing - Cetak Foto'));
     }
 
     private function buildWhatsappUrl($order, $namaLayanan)
