@@ -34,4 +34,15 @@ class Order extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return match ($this->status) {
+            'pending' => 'Menunggu Konfirmasi',
+            'deal' => 'Diproses',
+            'completed' => 'Selesai',
+            'canceled' => 'Dibatalkan',
+            default => ucfirst($this->status),
+        };
+    }
 }
