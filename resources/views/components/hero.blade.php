@@ -163,7 +163,7 @@
 </script>
 @endpush
 
-<!-- SECTION 3: TENTANG KAMI — Galeri horizontal scroll-hijack (section terpisah agar scroll spy bekerja) -->
+<!-- SECTION 3: TENTANG KAMI — Galeri coverflow mandiri (section terpisah agar scroll spy bekerja) -->
 @php
     // Nama file sengaja ditulis eksplisit: 1-4 berekstensi .jpeg, 5-6 berekstensi .jpg
     $tentangImages = [
@@ -188,13 +188,13 @@
 
 <style>
     /* ── Galeri #tentang — coverflow/cascade ───────────────────────────────────
-       Teknik: spacer tinggi (N x 100vh) + stage sticky. Scroll native tidak
-       diblokir; posisi scroll di dalam spacer jadi "indeks aktif" pecahan, lalu
-       tiap slide diposisikan dari jaraknya ke indeks itu (translateX/scale/
-       opacity/z-index). Scroll balik ke atas otomatis memutar mundur. */
+       Section setinggi SATU layar saja: scroll halaman ke bawah langsung
+       melewatinya, tidak lagi dipakai untuk menggeser galeri (scroll-hijack).
+       Galeri digerakkan sendiri lewat tombol panah, drag/swipe, tombol panah
+       keyboard, dan autoplay saat section terlihat. Indeks aktif pecahan
+       tetap menentukan posisi tiap slide (translateX/scale/opacity/z-index). */
     .tg-root {
-        --tg-count: {{ max(count($tentangImages), 1) }};
-        --tg-nav: 5.5rem;      /* navbar sticky terukur 81px di semua ukuran layar */
+        --tg-nav: 5.5rem;     /* navbar sticky terukur 81px di semua ukuran layar */
         --tg-gap: 2.5rem;      /* jarak judul <-> gambar */
         --tg-prog: 4rem;       /* ruang indikator progress di bawah */
         /* Cap tinggi gambar = seluruh ruang non-gambar:
@@ -203,14 +203,20 @@
         --tg-cap: 18rem;
         --tg-active-w: 58vw;   /* lebar gambar aktif (target 55–60% viewport) */
         position: relative;
-        height: calc(var(--tg-count) * 100vh);
+        /* WAJIB: z-index eksplisit -> section jadi stacking context sendiri,
+           sehingga z-index besar milik slide (sampai 1000, di-set JS) dan
+           tombol nav terkurung di dalamnya dan tidak pernah menimpa navbar
+           sticky (z-50). Dulu peran ini dipegang .tg-stage yang position:
+           sticky (sticky selalu bikin stacking context); sejak stage jadi
+           relative, section-lah yang harus memegangnya. */
+        z-index: 0;
     }
 
     /* Kolom: judul (alur normal, di atas) lalu galeri mengisi sisa ruang. */
     .tg-stage {
-        position: sticky;
-        top: 0;
+        position: relative;
         height: 100vh;
+        min-height: 34rem;
         overflow: hidden;
         display: flex;
         flex-direction: column;
@@ -225,7 +231,58 @@
     .tg-track {
         position: absolute;
         inset: 0 0 var(--tg-prog) 0;
+        cursor: grab;
+        touch-action: pan-y;   /* geser vertikal tetap men-scroll halaman */
     }
+
+    .tg-track.is-dragging {
+        cursor: grabbing;
+    }
+
+    /* Tombol navigasi galeri — pengganti scroll sebagai penggerak utama. */
+    .tg-nav-btn {
+        position: absolute;
+        top: 50%;
+        /* Harus di atas SEMUA slide: JS memberi slide z-index hingga 1000
+           ((10 - dist) * 100), dan .tg-track tidak membuat stacking context
+           sendiri, jadi angka itu bersaing langsung dengan tombol ini.
+           Nilai < 1000 membuat slide menutupi tombol -> klik tertelan. */
+        z-index: 1200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        margin-top: calc(var(--tg-prog) / -2);
+        border: 1px solid rgba(30, 27, 25, 0.1);
+        border-radius: 999px;
+        background: rgba(251, 249, 246, 0.92);
+        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(6px);
+        color: #1E1B19;
+        box-shadow: 0 10px 24px -8px rgba(30, 27, 25, 0.35);
+        cursor: pointer;
+        transform: translateY(-50%);
+        transition: background 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .tg-nav-btn:hover:not(:disabled) {
+        background: #fff;
+        transform: translateY(-50%) scale(1.06);
+    }
+
+    .tg-nav-btn:active:not(:disabled) {
+        transform: translateY(-50%) scale(0.96);
+    }
+
+    /* Sudah mentok di ujung galeri. */
+    .tg-nav-btn:disabled {
+        opacity: 0.25;
+        cursor: default;
+    }
+
+    .tg-nav-prev { left: 1.25rem; }
+    .tg-nav-next { right: 1.25rem; }
 
     /* Tiap slide menutupi seluruh track & menengahkan frame-nya.
        Transform di-set JS: translate3d(px) leftmost -> geser dlm piksel asli
@@ -494,6 +551,14 @@
         .tg-progress {
             bottom: 1.25rem;
         }
+
+        .tg-nav-btn {
+            width: 2.25rem;
+            height: 2.25rem;
+        }
+
+        .tg-nav-prev { left: 0.5rem; }
+        .tg-nav-next { right: 0.5rem; }
     }
 </style>
 
@@ -536,6 +601,19 @@
                     </div>
                 @endforeach
             </div>
+
+            @if(count($tentangImages) > 1)
+            <button type="button" class="tg-nav-btn tg-nav-prev" data-tg-prev aria-label="Gambar sebelumnya">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+            <button type="button" class="tg-nav-btn tg-nav-next" data-tg-next aria-label="Gambar berikutnya">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+            @endif
         </div>
 
         <div class="tg-fade tg-fade-top"></div>
@@ -572,8 +650,14 @@
     const SCALE_DROP    = 0.22;  // tetangga -> skala 0.78
     const SCRIM_MAX     = 0.5;   // tetangga -> seredup opacity 0.5, tanpa tembus pandang
 
+    const AUTOPLAY_MS = 4500;
+
+    const prevBtn = root.querySelector('[data-tg-prev]');
+    const nextBtn = root.querySelector('[data-tg-next]');
+
     let spacing = 0;   // piksel, diturunkan dari lebar frame (offsetWidth, bebas transform)
-    let target  = 0;   // progress 0..1 sesuai posisi scroll
+    let index   = 0;   // slide aktif (integer)
+    let target  = 0;   // progress 0..1 tujuan
     let current = 0;   // progress ter-render (di-lerp agar halus)
     let rafId   = null;
     let lastIdx = -1;
@@ -583,12 +667,29 @@
         spacing = frame ? frame.offsetWidth * SPACING_RATIO : 0;
     }
 
-    // Progress scroll di dalam spacer -> 0..1
-    function readProgress() {
-        const max = root.offsetHeight - window.innerHeight;
-        if (max <= 0) return 0;
-        const scrolled = -root.getBoundingClientRect().top;
-        return Math.min(Math.max(scrolled / max, 0), 1);
+    function clamp(v, lo, hi) {
+        return Math.min(Math.max(v, lo), hi);
+    }
+
+    // Galeri tidak lagi digerakkan scroll halaman; indeks -> progress 0..1.
+    function goTo(i, { user = true } = {}) {
+        index  = clamp(Math.round(i), 0, count - 1);
+        target = index / (count - 1);
+        if (user) restartAutoplay();
+        syncButtons();
+        schedule();
+    }
+
+    // Mentok di ujung (tidak melingkar): di gambar 1 tidak bisa mundur lagi,
+    // di gambar terakhir tidak bisa maju lagi. goTo() sudah meng-clamp;
+    // syncButtons() memberi tanda visual tombol yang sudah mentok.
+    function step(dir) {
+        goTo(index + dir);
+    }
+
+    function syncButtons() {
+        if (prevBtn) prevBtn.disabled = index === 0;
+        if (nextBtn) nextBtn.disabled = index === count - 1;
     }
 
     function render(p) {
@@ -645,10 +746,97 @@
         if (rafId === null) rafId = requestAnimationFrame(tick);
     }
 
-    function onScroll() {
-        target = readProgress();
-        schedule();
+    // ── Autoplay ──────────────────────────────────────────────────────────
+    // Hanya berjalan saat galeri terlihat; berhenti saat hover/drag/tab lain,
+    // dan menghormati prefers-reduced-motion.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let autoplayId = null;
+    let inView     = false;
+    let paused     = false;
+
+    function stopAutoplay() {
+        if (autoplayId !== null) {
+            clearInterval(autoplayId);
+            autoplayId = null;
+        }
     }
+
+    function restartAutoplay() {
+        stopAutoplay();
+        if (!inView || paused || reduceMotion.matches || document.hidden) return;
+        autoplayId = setInterval(function () {
+            // Ikut aturan "mentok": berhenti di gambar terakhir, tidak memutar
+            // balik ke gambar pertama.
+            if (index >= count - 1) { stopAutoplay(); return; }
+            goTo(index + 1, { user: false });
+        }, AUTOPLAY_MS);
+    }
+
+    function setPaused(v) {
+        paused = v;
+        restartAutoplay();
+    }
+
+    if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (entries) {
+            inView = entries[0].isIntersecting;
+            restartAutoplay();
+        }, { threshold: 0.35 }).observe(root);
+    } else {
+        inView = true;
+    }
+
+    document.addEventListener('visibilitychange', restartAutoplay);
+    root.addEventListener('mouseenter', function () { setPaused(true); });
+    root.addEventListener('mouseleave', function () { setPaused(false); });
+    root.addEventListener('focusin',    function () { setPaused(true); });
+    root.addEventListener('focusout',   function () { setPaused(false); });
+
+    // ── Kontrol ───────────────────────────────────────────────────────────
+    if (prevBtn) prevBtn.addEventListener('click', function () { step(-1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { step(1); });
+
+    root.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowRight')     { step(1);  e.preventDefault(); }
+        else if (e.key === 'ArrowLeft') { step(-1); e.preventDefault(); }
+    });
+
+    // Drag/swipe horizontal. touch-action: pan-y menjaga gerakan vertikal
+    // tetap men-scroll halaman, jadi jari ke bawah tidak pernah tertahan.
+    let dragId = null, dragX = 0, dragStart = 0, dragged = false;
+
+    track.addEventListener('pointerdown', function (e) {
+        if (e.button !== undefined && e.button !== 0) return;
+        dragId    = e.pointerId;
+        dragX     = e.clientX;
+        dragStart = target;
+        dragged   = false;
+        setPaused(true);
+        track.classList.add('is-dragging');
+        track.setPointerCapture(dragId);
+    });
+
+    track.addEventListener('pointermove', function (e) {
+        if (dragId !== e.pointerId || spacing <= 0) return;
+        const dx = e.clientX - dragX;
+        if (Math.abs(dx) > 4) dragged = true;
+        target = clamp(dragStart - dx / (spacing * (count - 1)), 0, 1);
+        schedule();
+    });
+
+    function endDrag(e) {
+        if (dragId !== e.pointerId) return;
+        track.releasePointerCapture(dragId);
+        track.classList.remove('is-dragging');
+        dragId = null;
+        // Snap ke slide terdekat; kalau cuma klik (tanpa geser) posisi tetap.
+        if (dragged) goTo(target * (count - 1));
+        setPaused(false);
+    }
+
+    track.addEventListener('pointerup', endDrag);
+    track.addEventListener('pointercancel', endDrag);
+    track.addEventListener('dragstart', function (e) { e.preventDefault(); });
 
     // Coverflow aktif di semua ukuran layar; resize hanya mengukur ulang spacing.
     function reset() {
@@ -658,11 +846,11 @@
         }
 
         measure();
-        target = current = readProgress();
+        target = current = index / (count - 1);
+        syncButtons();
         render(current);
     }
 
-    window.addEventListener('scroll', onScroll, { passive: true });
     window.addEventListener('resize', reset, { passive: true });
 
     // Lebar frame ikut font/gambar yang baru selesai dimuat -> ukur ulang.
