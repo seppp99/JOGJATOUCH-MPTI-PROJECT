@@ -13,7 +13,6 @@ class AkunController
         $user = Auth::user();
         $activeCount = $user->orders()->whereIn('status', ['pending', 'deal'])->count();
         $historyCount = $user->orders()->whereIn('status', ['completed', 'canceled'])->count();
-
         return [$activeCount, $historyCount];
     }
 
