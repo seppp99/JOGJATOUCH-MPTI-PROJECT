@@ -18,16 +18,12 @@
         $backRoute = $isHistory ? route('akun.riwayat') : route('akun');
         $backLabel = $isHistory ? 'Kembali ke Riwayat Pesanan' : 'Kembali ke Pesanan Aktif';
 
-        $progressWidth = match(strtolower($order->status)) {
-            'deal', 'diproses' => '50%',
-            'completed', 'selesai' => '100%',
-            default => '0%',
+        $statusOrder = match(strtolower($order->status)) {
+            'pending' => 1,
+            'deal', 'diproses' => 2,
+            'completed', 'selesai' => 3,
+            default => 1,
         };
-
-        $step1Completed = in_array(strtolower($order->status), ['deal', 'diproses', 'completed', 'selesai']);
-        $step2Completed = in_array(strtolower($order->status), ['completed', 'selesai']);
-        $step2Active = in_array(strtolower($order->status), ['deal', 'diproses']);
-        $step3Active = in_array(strtolower($order->status), ['completed', 'selesai']);
 
         $adminWa = config('services.whatsapp.admin_number');
         $waText = urlencode("Halo Admin JogjaTouch, saya ingin bertanya tentang pesanan saya dengan kode " . $order->order_code);
@@ -71,10 +67,9 @@
                         <!-- Order Title & Status Badge Header -->
                         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-6 border-b border-[#1E1B19]/5">
                             <div class="space-y-1">
-                                <div class="flex items-center gap-2 text-xs font-semibold text-[#1E1B19]/50">
-                                    <span>KODE PESANAN</span>
-                                    <span class="w-1.5 h-1.5 rounded-full bg-[#1E1B19]/20"></span>
-                                    <span class="font-mono text-[#1E1B19]">{{ $order->order_code }}</span>
+                                <div class="flex flex-wrap items-baseline gap-2">
+                                    <span class="text-[11px] font-semibold text-[#1E1B19]/40 uppercase tracking-wider">KODE PESANAN</span>
+                                    <span class="text-xs font-semibold text-[#1E1B19] tracking-wide">{{ $order->order_code }}</span>
                                 </div>
                                 <h1 class="font-serif-display text-2xl md:text-3xl font-extrabold text-[#1E1B19]">
                                     {{ ucwords(str_replace('-', ' ', $order->layanan_id)) }}
@@ -111,38 +106,37 @@
                                 </div>
                             @else
                                 <!-- 3-Step Normal Flow Tracker (Menunggu Konfirmasi -> Diproses -> Selesai) -->
-                                <div class="relative py-8 px-4 sm:px-8">
-                                    <!-- Background Line -->
-                                    <div class="absolute top-[49px] left-12 right-12 h-1 bg-[#1E1B19]/5 rounded-full z-0"></div>
-
-                                    <!-- Active Fill Line -->
-                                    <div class="absolute top-[49px] left-12 h-1 bg-[#E35D25] rounded-full z-0 transition-all duration-700" style="width: {{ $progressWidth }};"></div>
-
-                                    <!-- Stepper Step Elements -->
-                                    <div class="relative z-10 flex justify-between">
+                                <div class="py-8 px-2 sm:px-6">
+                                    <div class="flex items-start justify-between">
 
                                         <!-- Step 1: Menunggu Konfirmasi -->
-                                        <div class="flex flex-col items-center text-center max-w-[100px]">
-                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs bg-[#E35D25] text-white shadow-md border-2 border-white transition-all duration-500">
-                                                {{ $step1Completed ? '✓' : '1' }}
+                                        <div class="flex flex-col items-center text-center w-20 sm:w-28 shrink-0">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs {{ $statusOrder >= 1 ? 'bg-[#E35D25] text-white shadow-md' : 'bg-[#1E1B19]/10 text-[#1E1B19]/40' }} border-2 border-white transition-all duration-500">
+                                                {{ $statusOrder > 1 ? '✓' : '1' }}
                                             </div>
-                                            <span class="text-[11px] font-bold text-[#1E1B19] mt-3">Menunggu Konfirmasi</span>
+                                            <span class="text-[11px] {{ $statusOrder >= 1 ? 'font-bold text-[#1E1B19]' : 'font-semibold text-[#1E1B19]/40' }} mt-3">Menunggu Konfirmasi</span>
                                         </div>
+
+                                        <!-- Segment 1: Tahap 1-2 -->
+                                        <div class="flex-1 h-1 mx-2 sm:mx-4 rounded-full mt-3.5 transition-colors duration-500 {{ $statusOrder >= 2 ? 'bg-[#E35D25]' : 'bg-[#1E1B19]/10' }}"></div>
 
                                         <!-- Step 2: Diproses -->
-                                        <div class="flex flex-col items-center text-center max-w-[100px]">
-                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs {{ $step2Active ? 'bg-[#E35D25] text-white shadow-md' : 'bg-[#1E1B19]/10 text-[#1E1B19]/40' }} border-2 border-white transition-all duration-500">
-                                                {{ $step2Completed ? '✓' : '2' }}
+                                        <div class="flex flex-col items-center text-center w-20 sm:w-28 shrink-0">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs {{ $statusOrder >= 2 ? 'bg-[#E35D25] text-white shadow-md' : 'bg-[#1E1B19]/10 text-[#1E1B19]/40' }} border-2 border-white transition-all duration-500">
+                                                {{ $statusOrder > 2 ? '✓' : '2' }}
                                             </div>
-                                            <span class="text-[11px] {{ $step2Active ? 'font-bold text-[#1E1B19]' : 'font-semibold text-[#1E1B19]/40' }} mt-3">Diproses</span>
+                                            <span class="text-[11px] {{ $statusOrder >= 2 ? 'font-bold text-[#1E1B19]' : 'font-semibold text-[#1E1B19]/40' }} mt-3">Diproses</span>
                                         </div>
 
+                                        <!-- Segment 2: Tahap 2-3 -->
+                                        <div class="flex-1 h-1 mx-2 sm:mx-4 rounded-full mt-3.5 transition-colors duration-500 {{ $statusOrder >= 3 ? 'bg-[#E35D25]' : 'bg-[#1E1B19]/10' }}"></div>
+
                                         <!-- Step 3: Selesai -->
-                                        <div class="flex flex-col items-center text-center max-w-[100px]">
-                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs {{ $step3Active ? 'bg-[#E35D25] text-white shadow-md' : 'bg-[#1E1B19]/10 text-[#1E1B19]/40' }} border-2 border-white transition-all duration-500">
-                                                {{ $step3Active ? '✓' : '3' }}
+                                        <div class="flex flex-col items-center text-center w-20 sm:w-28 shrink-0">
+                                            <div class="w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs {{ $statusOrder >= 3 ? 'bg-[#E35D25] text-white shadow-md' : 'bg-[#1E1B19]/10 text-[#1E1B19]/40' }} border-2 border-white transition-all duration-500">
+                                                {{ $statusOrder >= 3 ? '✓' : '3' }}
                                             </div>
-                                            <span class="text-[11px] {{ $step3Active ? 'font-bold text-[#1E1B19]' : 'font-semibold text-[#1E1B19]/40' }} mt-3">Selesai</span>
+                                            <span class="text-[11px] {{ $statusOrder >= 3 ? 'font-bold text-[#1E1B19]' : 'font-semibold text-[#1E1B19]/40' }} mt-3">Selesai</span>
                                         </div>
 
                                     </div>
