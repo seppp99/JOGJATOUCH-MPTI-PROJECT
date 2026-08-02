@@ -166,7 +166,7 @@
           Logo, banner, katalog
         </p>
         <p class="text-[12px] leading-6 text-[#7a746f]">
-          Desain visual untuk kebutuhan branding, promosi, and media cetak — siap produksi.
+          Desain visual untuk kebutuhan branding, promosi, and media cetak siap produksi.
         </p>
       </div>
     </a>

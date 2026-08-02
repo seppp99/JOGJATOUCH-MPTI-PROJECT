@@ -29,11 +29,16 @@ class OrdersTable
                     ->label('WhatsApp'),
                 TextColumn::make('status')
                     ->badge()
+                    // Dipetakan ke warna yang sama dengan badge status di situs
+                    // customer (dashboard-orders.blade.php baris 22-25):
+                    // pending=blue, deal=amber, completed=emerald, canceled=rose.
+                    // Sebelumnya pending memakai warning (amber) dan deal memakai
+                    // success (emerald), sehingga tidak cocok dengan customer.
                     ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'deal' => 'success',
-                        'canceled' => 'danger',
-                        'completed' => 'success',
+                        'pending' => 'info',      // blue
+                        'deal' => 'warning',      // amber
+                        'completed' => 'success', // emerald
+                        'canceled' => 'danger',   // rose
                         default => 'gray',
                     }),
                 TextColumn::make('harga_fix')
