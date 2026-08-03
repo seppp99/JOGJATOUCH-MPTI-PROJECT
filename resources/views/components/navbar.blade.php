@@ -23,7 +23,6 @@
                 <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Tentang kami</a>
                 <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
                 <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Fitur</a>
-                <a href="{{ request()->is('/') ? '#tracking' : '/#tracking' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Cek Pesanan</a>
             @endauth
         </nav>
 
@@ -99,7 +98,6 @@
                 <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Tentang kami</a>
                 <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
                 <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Fitur</a>
-                <a href="{{ request()->is('/') ? '#tracking' : '/#tracking' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Cek Pesanan</a>
             @endauth
         </nav>
         <div class="pt-4 border-t border-[#1E1B19]/5">

@@ -15,10 +15,7 @@
     {{-- SECTION 7: Fitur Website --}}
     <x-fitur />
 
-    {{-- SECTION 8: Tracking Order --}}
-    <x-tracking />
-
-    {{-- SECTION 9: Call to Action --}}
+    {{-- SECTION 8: Call to Action --}}
     <x-cta />
 
 </x-layouts.app>
