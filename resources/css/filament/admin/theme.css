@@ -73,6 +73,16 @@
     --jt-d-border: rgb(251 249 246 / 0.08);
     --jt-d-border-strong: rgb(251 249 246 / 0.1);
 
+    /* Pill item nav aktif di dark mode (Dashboard / Orders / Users). Krem penuh
+       (#FBF9F6) terlalu menyilaukan di atas panel gelap, jadi dicondongkan ke
+       cokelat: krem dicampur 63% cokelat #6B4F3A. Rasio dihitung, bukan
+       dikira-kira - hasilnya menurunkan luminansi tepat 70% (0,949 -> 0,285).
+
+       Teks TETAP gelap, tidak diputihkan: kontras ink di atasnya 5,44:1 (lolos
+       WCAG AA), sedangkan teks putih justru cuma 3,15:1 alias GAGAL. Jadi di
+       warna ini teks hitam bukan yang samar - teks putih yang akan samar. */
+    --jt-d-active: #a08e80;
+
     /* Radius */
     --jt-radius-card: 1.5rem; /* rounded-3xl */
     --jt-radius-menu: 1rem; /* rounded-2xl */
@@ -84,6 +94,15 @@
 /* Padanan .font-serif-display situs customer, tersedia untuk dipakai manual. */
 .font-serif-display {
     font-family: var(--jt-serif);
+}
+
+/* Blok seleksi teks: oranye brand, bukan biru bawaan browser. Menyamakan
+   dengan situs customer yang memakai `selection:bg-[#E35D25] selection:text-white`
+   pada <body> (layouts/app.blade.php baris 59). Berlaku di kedua mode karena
+   oranye solid + teks putih sudah kontras di latar terang maupun gelap. */
+::selection {
+    background-color: var(--jt-orange);
+    color: #ffffff;
 }
 
 /* -- Sidebar --------------------------------------------------------------
@@ -646,7 +665,7 @@ html.dark .fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
 }
 
 html.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
-    background-color: var(--jt-d-text);
+    background-color: var(--jt-d-active);
     color: var(--jt-d-bg);
 }
 

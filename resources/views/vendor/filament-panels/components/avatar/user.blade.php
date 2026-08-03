@@ -17,7 +17,15 @@
 ])
 
 @php
-    $name = trim((string) filament()->getUserName($user));
+    // Sengaja memakai kolom `name`, BUKAN filament()->getUserName(): sejak User
+    // mengimplementasikan HasName, getUserName() mengembalikan email, sehingga
+    // inisialnya akan jatuh jadi satu huruf ("I") alih-alih "RA".
+    $name = trim((string) ($user?->name ?? ''));
+
+    if ($name === '') {
+        $name = trim((string) filament()->getUserName($user));
+    }
+
     $words = preg_split('/\s+/', $name, -1, PREG_SPLIT_NO_EMPTY) ?: [];
 
     // Dua huruf: awal kata pertama + awal kata terakhir ("Rusdi Admin" -> "RA").
