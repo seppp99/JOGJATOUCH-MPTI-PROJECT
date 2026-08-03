@@ -16,18 +16,23 @@
 
         <!-- Profile Card -->
         <div class="flex flex-col items-center text-center pb-6">
-            <!-- Large Avatar + edit badge (hover: hanya warna badge pena hitam -> oranye) -->
-            <div class="group relative mb-4 cursor-default" title="Edit profil — segera hadir">
-                <div class="w-20 h-20 rounded-full bg-gradient-to-tr from-[#E35D25] to-[#f4733e] ring-4 ring-[#FBF9F6] text-white flex items-center justify-center text-3xl font-extrabold font-serif-display shadow-lg shadow-[#E35D25]/20 select-none">
-                    {{ substr($user->name, 0, 1) }}
-                </div>
+            <!-- Large Avatar + edit badge. Seluruh avatar adalah tombol pemicu
+                 modal "Edit Foto Profil" (.jt-pp-trigger). Isinya .jt-avatar-slot
+                 supaya bisa diperbarui langsung oleh JS setelah foto diganti
+                 atau dihapus, tanpa memuat ulang halaman. -->
+            <button type="button" class="jt-pp-trigger group relative mb-4 cursor-pointer" title="Ubah foto profil" aria-label="Ubah foto profil">
+                <span class="jt-avatar-slot w-20 h-20 rounded-full bg-gradient-to-tr from-[#E35D25] to-[#f4733e] ring-4 ring-[#FBF9F6] text-white flex items-center justify-center shadow-lg shadow-[#E35D25]/20 select-none overflow-hidden">
+                    <img src="{{ $user->profilePhotoUrl() ?? '' }}" alt="Foto profil {{ $user->name }}"
+                         class="w-full h-full object-cover {{ $user->hasProfilePhoto() ? '' : 'hidden' }}">
+                    <span class="jt-avatar-initial text-3xl font-extrabold font-serif-display {{ $user->hasProfilePhoto() ? 'hidden' : '' }}">{{ $user->initial() }}</span>
+                </span>
                 <span class="absolute -bottom-0.5 -right-0.5 w-7 h-7 rounded-full bg-[#1E1B19] text-white flex items-center justify-center ring-2 ring-white transition-colors duration-300 group-hover:bg-[#E35D25]">
                     <!-- Pencil Icon -->
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z"></path>
                     </svg>
                 </span>
-            </div>
+            </button>
 
             <!-- User Info -->
             <h4 class="font-serif-display text-xl font-bold text-[#1E1B19]">
@@ -96,3 +101,7 @@
 
     </div>
 </div>
+
+{{-- Modal edit foto profil (utama + cropper + konfirmasi hapus). Diletakkan di
+     sini supaya ikut hadir di semua halaman yang memakai sidebar ini. --}}
+<x-profile-photo-modal :user="$user" />

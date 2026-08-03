@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AkunController;
+use App\Http\Controllers\ProfilePhotoController;
 
 Route::get('/', function () {
     return view('pages.home');
@@ -40,6 +41,12 @@ Route::post('/lupa-password/reset', [App\Http\Controllers\PasswordResetControlle
 Route::get('/akun', [AkunController::class, 'index'])->middleware('auth')->name('akun');
 Route::get('/akun/riwayat', [AkunController::class, 'riwayat'])->middleware('auth')->name('akun.riwayat');
 Route::get('/akun/pesanan/{order_code}', [AkunController::class, 'detail'])->middleware('auth')->name('akun.pesanan.detail');
+
+// Foto profil. Keduanya hanya dipanggil lewat fetch() dari modal di dashboard
+// akun, dan selalu bekerja pada pengguna yang SEDANG login - tidak menerima
+// id pengguna dari input, sehingga tidak ada celah mengubah foto orang lain.
+Route::post('/akun/foto', [ProfilePhotoController::class, 'update'])->middleware('auth')->name('akun.foto.update');
+Route::delete('/akun/foto', [ProfilePhotoController::class, 'destroy'])->middleware('auth')->name('akun.foto.destroy');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 

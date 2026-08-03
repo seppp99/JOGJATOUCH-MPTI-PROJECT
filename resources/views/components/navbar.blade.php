@@ -32,9 +32,11 @@
                 <!-- Logged In User Dropdown -->
                 <div class="relative" id="user-dropdown-container">
                     <button onclick="toggleUserDropdown()" class="flex items-center gap-2.5 px-4 py-2 rounded-full border border-[#1E1B19]/10 bg-white hover:bg-[#FBF9F6] text-sm font-semibold transition-all">
-                        <div class="w-8 h-8 rounded-full bg-[#E35D25] text-white flex items-center justify-center text-sm font-bold">
-                            {{ substr(Auth::user()->name, 0, 1) }}
-                        </div>
+                        <span class="jt-avatar-slot w-8 h-8 rounded-full bg-[#E35D25] text-white flex items-center justify-center overflow-hidden shrink-0">
+                            <img src="{{ Auth::user()->profilePhotoUrl() ?? '' }}" alt="Foto profil"
+                                 class="w-full h-full object-cover {{ Auth::user()->hasProfilePhoto() ? '' : 'hidden' }}">
+                            <span class="jt-avatar-initial text-sm font-bold {{ Auth::user()->hasProfilePhoto() ? 'hidden' : '' }}">{{ Auth::user()->initial() }}</span>
+                        </span>
                         <span class="text-[#1E1B19]">{{ Auth::user()->name }}</span>
                         <!-- Chevron Icon -->
                         <svg class="w-4 h-4 text-[#1E1B19]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

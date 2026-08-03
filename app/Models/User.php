@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements FilamentUser, HasName
 {
@@ -28,6 +29,13 @@ class User extends Authenticatable implements FilamentUser, HasName
         'password',
         'email_verified_at',
     ];
+
+    /*
+     * Catatan: 'photo_path' SENGAJA tidak dimasukkan ke $fillable. Kolom itu
+     * hanya boleh diisi oleh ProfilePhotoController setelah berkasnya lolos
+     * validasi dan benar-benar tersimpan, jadi ditulis eksplisit lewat
+     * $user->photo_path = ... - bukan lewat mass assignment dari input.
+     */
 
     /**
      * The attributes that should be hidden for serialization.
@@ -68,6 +76,46 @@ class User extends Authenticatable implements FilamentUser, HasName
     public function getFilamentName(): string
     {
         return $this->email;
+    }
+
+    /**
+     * Apakah pengguna punya foto profil yang berkasnya benar-benar ada?
+     *
+     * Kolom database saja tidak cukup dijadikan patokan: berkasnya bisa hilang
+     * (dihapus manual, storage dibersihkan, pindah server) sementara kolomnya
+     * masih terisi. Tanpa pengecekan ini, UI akan menampilkan gambar rusak dan
+     * tombol Edit/Hapus tetap aktif untuk berkas yang tidak ada.
+     */
+    public function hasProfilePhoto(): bool
+    {
+        return filled($this->photo_path) && Storage::disk('public')->exists($this->photo_path);
+    }
+
+    /**
+     * URL foto profil, atau null bila tidak punya.
+     *
+     * Memakai asset() dan BUKAN Storage::url(): Storage::url() menyusun URL dari
+     * APP_URL (di .env masih http://localhost), sehingga gambar akan gagal dimuat
+     * saat aplikasi diakses lewat 127.0.0.1:8000. asset() mengikuti host request
+     * yang sedang berjalan, jadi aman di semua kondisi.
+     */
+    public function profilePhotoUrl(): ?string
+    {
+        if (! $this->hasProfilePhoto()) {
+            return null;
+        }
+
+        // Query string versi supaya browser tidak menampilkan foto lama dari
+        // cache setelah pengguna mengganti fotonya.
+        return asset('storage/'.$this->photo_path).'?v='.($this->updated_at?->timestamp ?? time());
+    }
+
+    /**
+     * Inisial untuk avatar cadangan saat tidak ada foto.
+     */
+    public function initial(): string
+    {
+        return mb_strtoupper(mb_substr(trim((string) $this->name), 0, 1)) ?: '?';
     }
 
     public function isAdmin(): bool

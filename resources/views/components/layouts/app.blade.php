@@ -4,6 +4,11 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
+        {{-- Dibutuhkan oleh permintaan fetch() yang menembus middleware 'web'
+             (mis. unggah/hapus foto profil), karena permintaan itu tidak
+             mengirim @csrf lewat form. --}}
+        <meta name="csrf-token" content="{{ csrf_token() }}">
+
         <title>{{ $title ?? 'Jogjatouch — Teknologi & Kreativitas Tanpa Batas' }}</title>
 
         <!-- Google Fonts -->
