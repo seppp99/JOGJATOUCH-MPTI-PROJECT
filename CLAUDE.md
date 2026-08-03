@@ -84,9 +84,11 @@ Vite 7 + Tailwind v4. Entry points: [resources/css/app.css](resources/css/app.cs
 
 Layout wrapper: `<x-layouts.app>` maps to [resources/views/components/layouts/app.blade.php](resources/views/components/layouts/app.blade.php). Page-specific scripts go in `@push('scripts')`.
 
-**Scroll-spy:** [resources/js/nav-scroll.js](resources/js/nav-scroll.js) uses IntersectionObserver to highlight `.nav-pill` links. Tracked section IDs: `#home`, `#tentang`, `#layanan`, `#nilai`, `#fitur`, `#cta`, `#tracking`. Adding a new navbar-linked section requires an `id` attribute matching the `href` of a `.nav-pill` anchor.
+**Scroll-spy:** [resources/js/nav-scroll.js](resources/js/nav-scroll.js) uses IntersectionObserver to highlight `.nav-pill` links. Tracked section IDs: `#home`, `#tentang`, `#layanan`, `#nilai`, `#fitur`, `#cta`. The list is not hardcoded — it is derived from the `href` of every `.nav-pill` anchor, and missing sections are filtered out, so adding or removing a navbar link needs no JS change. Adding a new navbar-linked section requires an `id` attribute matching the `href` of a `.nav-pill` anchor.
 
-**Blade components** under [resources/views/components/](resources/views/components/): `navbar`, `hero` (contains both `#home` and `#tentang` sections), `layanan`, `nilai`, `fitur`, `cta`, `ticker`, `tracking`, `footer`.
+**Blade components** under [resources/views/components/](resources/views/components/): `navbar`, `hero` (contains both `#home` and `#tentang` sections), `layanan`, `nilai`, `fitur`, `cta`, `ticker`, `footer`.
+
+**Order tracking:** the only order tracking is the real, database-backed one in the customer dashboard — `/akun`, `/akun/riwayat`, and the `akun.pesanan.detail` route. A separate `tracking` component used to sit on the home page with a hardcoded JS lookup table of fake `TJ-…` codes (real orders use `JT-…`); it was removed along with its "Cek Pesanan" navbar links.
 
 **Optional image assets:** [resources/views/components/hero.blade.php](resources/views/components/hero.blade.php) checks for `public/assets/about/kualitas.jpg`, `waktu.jpg`, `pelayanan.jpg` and falls back to CSS gradients if absent.
 
