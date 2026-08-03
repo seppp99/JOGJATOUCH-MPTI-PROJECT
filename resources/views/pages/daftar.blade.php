@@ -71,7 +71,8 @@
                             <label for="reg-whatsapp" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 No. Telepon
                             </label>
-                            <input type="text" id="reg-whatsapp" name="whatsapp_number" value="{{ old('whatsapp_number') }}" required placeholder="+62 8xx" 
+                            <input type="text" id="reg-whatsapp" name="whatsapp_number" value="{{ old('whatsapp_number') }}" required placeholder="+628xx"
+                                inputmode="tel" autocomplete="tel"
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
                             @error('whatsapp_number')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
                         </div>
@@ -385,6 +386,63 @@
                 requestAnimationFrame(loop);
             }
             loop();
+        })();
+
+        // ── Normalisasi nomor telepon ke format +62 ──────────────────────────
+        // Aturan:
+        //   08xxxxxxxxxx  -> +628xxxxxxxxxx   (0 di depan diganti +62)
+        //   628xxxxxxxxxx -> +628xxxxxxxxxx   (cukup ditambah +)
+        //   +628xxxxxxxxx -> tidak diubah     (sudah benar)
+        // Spasi tidak bisa diketik maupun ditempel.
+        (function () {
+            const input = document.getElementById('reg-whatsapp');
+            if (!input) return;
+
+            function normalize(raw) {
+                // Sisakan hanya angka dan tanda +, lalu pastikan + hanya di paling depan.
+                let v = raw.replace(/[^\d+]/g, '').replace(/(?!^)\+/g, '');
+
+                // Saat kolom masih kosong atau baru berisi "+", biarkan apa adanya
+                // supaya pengguna tidak "dikunci" sebelum sempat mengetik.
+                if (v === '' || v === '+') return v;
+
+                if (v.startsWith('+62')) return v;         // sudah sesuai
+                if (v.startsWith('62')) return '+' + v;    // 628... -> +628...
+                if (v.startsWith('0')) return '+62' + v.slice(1); // 08... -> +628...
+
+                return v; // format lain (mis. +65...) dibiarkan, tidak dipaksa ke +62
+            }
+
+            function apply() {
+                const before = input.value;
+                const after = normalize(before);
+                if (after === before) return;
+
+                // Posisi kursor dipertahankan: tanpa ini, mengetik/menyunting di
+                // tengah teks akan melempar kursor ke ujung setiap kali nilai
+                // ditulis ulang. Perubahan panjang selalu terjadi di depan, jadi
+                // selisih panjangnya cukup untuk menggeser kursor.
+                const caret = input.selectionStart;
+                const delta = after.length - before.length;
+                input.value = after;
+
+                if (document.activeElement === input) {
+                    const pos = Math.max(0, (caret ?? after.length) + delta);
+                    input.setSelectionRange(pos, pos);
+                }
+            }
+
+            // Menutupi ketik, tempel (paste), autofill, dan drag-drop teks.
+            input.addEventListener('input', apply);
+
+            // Cegah spasi sejak tombol ditekan supaya tidak sempat berkedip muncul.
+            input.addEventListener('keydown', function (e) {
+                if (e.key === ' ' || e.code === 'Space') e.preventDefault();
+            });
+
+            // Nilai bawaan dari old('whatsapp_number') ikut dirapikan saat halaman
+            // dimuat, mis. setelah validasi server gagal.
+            apply();
         })();
     </script>
 
