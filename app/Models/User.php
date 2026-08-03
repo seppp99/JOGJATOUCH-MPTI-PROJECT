@@ -8,9 +8,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 
-class User extends Authenticatable implements FilamentUser
+class User extends Authenticatable implements FilamentUser, HasName
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
@@ -49,6 +50,24 @@ class User extends Authenticatable implements FilamentUser
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Nama yang ditampilkan panel Filament.
+     *
+     * Dikembalikan email, bukan kolom `name`, supaya pill profil di topbar dan
+     * judul di popup user menu sama-sama menampilkan identitas login. Filament
+     * memanggil ini lewat FilamentManager::getUserName() (baris 614) hanya bila
+     * model mengimplementasikan kontrak HasName - jadi satu method ini mengubah
+     * kedua tempat sekaligus, tanpa menyunting view.
+     *
+     * Catatan: inisial avatar TIDAK ikut berubah karena override
+     * resources/views/vendor/filament-panels/components/avatar/user.blade.php
+     * mengambilnya dari kolom `name`, bukan dari method ini.
+     */
+    public function getFilamentName(): string
+    {
+        return $this->email;
     }
 
     public function isAdmin(): bool

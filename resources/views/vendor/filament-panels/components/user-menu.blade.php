@@ -23,7 +23,28 @@
 
     $user = filament()->auth()->user();
 
+    // getUserName() mengembalikan EMAIL karena User mengimplementasikan kontrak
+    // HasName (lihat App\Models\User::getFilamentName()). Nilai ini dipakai
+    // Filament untuk label item "profile", yaitu header di dalam popup - dan di
+    // sana memang email yang diinginkan.
     $userName = filament()->getUserName($user);
+
+    // Teks pill di topbar memakai NAMA, bukan email. Dibaca langsung dari kolom
+    // `name` supaya tidak ikut terpengaruh getFilamentName().
+    $userDisplayName = filled($user?->name) ? $user->name : $userName;
+
+    // Sumber tooltip header popup: email utuh, tidak pernah dipotong.
+    $userEmail = $user?->email ?? $userName;
+
+    // Ekspresi x-tooltip disiapkan di PHP, BUKAN ditulis inline dengan @js().
+    // Sebabnya: pada KOMPONEN Blade (<x-filament::dropdown.header ...>), direktif
+    // di dalam nilai atribut tidak dikompilasi - `@js($userEmail)` diteruskan
+    // mentah sebagai teks sehingga Alpine mengevaluasinya jadi kosong dan
+    // tooltip muncul tanpa isi (terukur: tippy-box 18x10 px, hanya panahnya).
+    // Pada elemen HTML biasa seperti <button>, @js() dikompilasi normal.
+    // json_encode menghasilkan literal string JS yang valid; \$store.theme
+    // di-escape agar tidak diinterpolasi PHP.
+    $userEmailTooltip = '{ content: ' . json_encode($userEmail) . ', theme: $store.theme }';
 
     $items = $this->getUserMenuItems();
 
@@ -58,16 +79,19 @@
     "
 >
     <x-slot name="trigger">
-        {{-- Varian lengkap dipakai untuk SEMUA posisi (lihat catatan di atas). --}}
+        {{-- Varian lengkap dipakai untuk SEMUA posisi (lihat catatan di atas).
+
+             Pill ini menampilkan NAMA dan sengaja TIDAK memakai x-tooltip:
+             tooltip email hanya dipasang di header dalam popup. --}}
         <button
-            aria-label="{{ filled($userName) ? $userName : __('filament-panels::layout.actions.open_user_menu.label') }}"
+            aria-label="{{ filled($userDisplayName) ? $userDisplayName : __('filament-panels::layout.actions.open_user_menu.label') }}"
             type="button"
             class="fi-user-menu-trigger jt-user-pill"
         >
             <x-filament-panels::avatar.user :user="$user" />
 
             <span class="fi-user-menu-trigger-text">
-                {{ $userName }}
+                {{ $userDisplayName }}
             </span>
 
             {{
@@ -90,7 +114,22 @@
 
         {{ \Filament\Support\Facades\FilamentView::renderHook(\Filament\View\PanelsRenderHook::USER_MENU_PROFILE_BEFORE) }}
 
-        <x-filament::dropdown.header :color="$itemColor" :icon="$itemIcon">
+        {{-- Tooltip email dipasang DI SINI (header popup), memakai pola yang sama
+             persis dengan tombol pengalih tema di bawahnya
+             (vendor/filament/filament/resources/views/components/theme-switcher/
+             button.blade.php baris 14-17). `theme: $store.theme` membuat warna
+             tooltip otomatis mengikuti mode terang/gelap.
+
+             Isinya email LENGKAP, sehingga tetap terbaca utuh walau teks header
+             terpotong ellipsis karena lebar popup terbatas.
+
+             x-filament::dropdown.header meneruskan $attributes ke elemen
+             terluarnya, jadi x-tooltip di bawah menempel ke .fi-dropdown-header. --}}
+        <x-filament::dropdown.header
+            :color="$itemColor"
+            :icon="$itemIcon"
+            :x-tooltip="$userEmailTooltip"
+        >
             {{ $item->getLabel() }}
         </x-filament::dropdown.header>
 
