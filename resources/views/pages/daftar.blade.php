@@ -71,7 +71,7 @@
                             <label for="reg-whatsapp" class="block text-[11px] font-bold tracking-wider text-[#1E1B19]/50 uppercase mb-2">
                                 No. Telepon
                             </label>
-                            <input type="text" id="reg-whatsapp" name="whatsapp_number" value="{{ old('whatsapp_number') }}" required placeholder="+628xx"
+                            <input type="text" id="reg-whatsapp" name="whatsapp_number" value="{{ old('whatsapp_number') }}" required placeholder="+628xxxxxxxxxx"
                                 inputmode="tel" autocomplete="tel"
                                 class="w-full px-5 py-4 rounded-2xl bg-[#FBF9F6] border border-[#1E1B19]/10 text-sm font-medium focus:outline-none focus:border-[#E35D25] focus:ring-1 focus:ring-[#E35D25] transition-all placeholder:text-[#1E1B19]/30">
                             @error('whatsapp_number')<p class="text-xs text-red-500 mt-2 font-medium">{{ $message }}</p>@enderror
