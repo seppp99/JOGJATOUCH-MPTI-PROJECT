@@ -11,6 +11,10 @@ Route::get('/', function () {
     return view('pages.home');
 });
 
+Route::get('/team-corebyte', function () {
+    return view('pages.team-corebyte');
+})->name('team.corebyte');
+
 Route::get('/layanan/{slug}', [LayananController::class, 'show'])->name('layanan.show');
 Route::post('/layanan/pemasangan-wifi/order', [LayananController::class, 'storeWifiOrder'])->name('layanan.wifi.order')->middleware('auth');
 Route::post('/layanan/network-analyst/order', [LayananController::class, 'storeNetworkOrder'])->name('layanan.network.order')->middleware('auth');

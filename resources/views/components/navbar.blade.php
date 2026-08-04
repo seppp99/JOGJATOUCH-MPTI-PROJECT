@@ -1,4 +1,34 @@
 <!-- SECTION 1: HEADER & NAVIGATION -->
+<style>
+    .nav-cb {
+        color: #c8961e;
+        border: 1px solid rgba(200,150,30,0.3);
+        border-radius: 999px;
+        background: transparent;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .nav-cb:hover {
+        color: #F4C430 !important;
+        border-color: rgba(244,196,48,0.7);
+        background: #0D1B2A;
+        box-shadow: 0 0 16px rgba(244,196,48,0.4), 0 0 32px rgba(244,196,48,0.2);
+    }
+    /* mobile rounded-xl variant */
+    .nav-cb-mobile {
+        color: #c8961e;
+        border: 1px solid rgba(200,150,30,0.25);
+        border-radius: 12px;
+        background: transparent;
+        transition: all 0.3s ease;
+    }
+    .nav-cb-mobile:hover {
+        color: #F4C430 !important;
+        border-color: rgba(244,196,48,0.6);
+        background: #0D1B2A;
+        box-shadow: 0 0 12px rgba(244,196,48,0.3);
+    }
+</style>
 <header class="sticky top-0 z-50 w-full bg-[#FBF9F6]/85 backdrop-blur-md border-b border-[#1E1B19]/5">
     <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         
@@ -12,18 +42,12 @@
 
         <!-- Desktop Navigation Menu Pills -->
         <nav class="hidden md:flex items-center bg-[#1E1B19]/5 p-1 rounded-full border border-[#1E1B19]/5">
-            @auth
-                <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Beranda</a>
-                <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Tentang Kami</a>
-                <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
-                <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Portfolio</a>
-                <a href="{{ request()->is('/') ? '#cta' : '/#cta' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Hubungi Kami</a>
-            @else
-                <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Beranda</a>
-                <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Tentang kami</a>
-                <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
-                <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Fitur</a>
-            @endauth
+            <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Beranda</a>
+            <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Tentang Kami</a>
+            <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Layanan</a>
+            <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Portfolio</a>
+            <a href="{{ request()->is('/') ? '#cta' : '/#cta' }}" class="nav-pill px-5 py-2 rounded-full text-sm font-medium text-[#1E1B19]/70 hover:text-[#1E1B19] hover:bg-white/60 transition-all duration-300">Hubungi Kami</a>
+            <a href="{{ url('/team-corebyte') }}" class="nav-cb px-5 py-2 text-sm font-semibold">Team Corebyte</a>
         </nav>
 
         <!-- Right Side Actions (Desktop) -->
@@ -85,21 +109,17 @@
     <!-- Mobile Navigation Drawer -->
     <div id="mobile-menu" class="hidden md:hidden w-full bg-[#FBF9F6] border-t border-[#1E1B19]/5 px-6 py-6 space-y-4 absolute left-0 right-0 shadow-lg">
         <nav class="flex flex-col space-y-3">
+            <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Beranda</a>
+            <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Tentang Kami</a>
+            <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
+            <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Portfolio</a>
+            <a href="{{ request()->is('/') ? '#cta' : '/#cta' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Hubungi Kami</a>
+            <a href="{{ url('/team-corebyte') }}" class="nav-cb-mobile px-4 py-2.5 text-base font-semibold">Team Corebyte</a>
             @auth
-                <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Beranda</a>
-                <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Tentang Kami</a>
-                <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
-                <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Portfolio</a>
-                <a href="{{ request()->is('/') ? '#cta' : '/#cta' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Hubungi Kami</a>
                 @unless(request()->routeIs('akun'))
                     <a href="{{ route('akun') }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Dashboard Akun</a>
                 @endunless
                 <a href="{{ route('logout') }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-red-500 hover:bg-red-500/5 transition-all">Keluar</a>
-            @else
-                <a href="{{ request()->is('/') ? '#home' : '/#home' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Beranda</a>
-                <a href="{{ request()->is('/') ? '#tentang' : '/#tentang' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Tentang kami</a>
-                <a href="{{ request()->is('/') ? '#layanan' : '/#layanan' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Layanan</a>
-                <a href="{{ request()->is('/') ? '#fitur' : '/#fitur' }}" class="nav-pill px-4 py-2.5 rounded-xl text-base font-semibold text-[#1E1B19]/80 hover:bg-[#1E1B19]/5 transition-all">Fitur</a>
             @endauth
         </nav>
         <div class="pt-4 border-t border-[#1E1B19]/5">

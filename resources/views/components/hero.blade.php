@@ -28,25 +28,25 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                         </svg>
                     </a>
-                    <a href="#tentang" class="inline-flex items-center justify-center px-8 py-4 rounded-full text-base font-semibold border-b-2 border-transparent hover:border-[#1E1B19] text-[#1E1B19] transition-all duration-200">
+                    <a href="#layanan" class="inline-flex items-center justify-center px-8 py-4 rounded-full text-base font-semibold border-b-2 border-transparent hover:border-[#1E1B19] text-[#1E1B19] transition-all duration-200">
                         Lihat Layanan
                     </a>
                 </div>
             </div>
 
             <!-- Right Hero Image — Hardware Photo -->
-            <div class="lg:col-span-6 relative w-full flex items-center justify-center overflow-visible">
-                <!-- Image overflows column to fill visual space equal to text block -->
-                <div class="relative w-[130%] -ml-[10%] flex items-center justify-center">
+            <div class="lg:col-span-6 relative w-full flex items-center justify-end overflow-visible">
+                <!-- Image container aligned right with negative right margin on desktop -->
+                <div class="relative w-[130%] lg:-mr-[15%] flex items-center justify-end">
 
                     <!-- Soft orange glow -->
-                    <div class="absolute inset-0 m-auto w-3/4 h-3/4 bg-gradient-to-tr from-[#E35D25]/30 to-[#f4733e]/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-duration: 6s;"></div>
+                    <div class="absolute inset-0 m-auto left-auto right-0 w-3/4 h-3/4 bg-gradient-to-tr from-[#E35D25]/30 to-[#f4733e]/15 rounded-full blur-3xl pointer-events-none animate-pulse" style="animation-duration: 6s;"></div>
 
                     <!-- Hardware Image -->
                     <img
                         src="{{ asset('assets/hardware.png') }}"
                         alt="Perangkat hardware MikroTik dan transceiver Jogjatouch"
-                        class="relative z-10 w-full drop-shadow-2xl hover:scale-105 transition-transform duration-500"
+                        class="relative z-10 w-full max-w-[650px] ml-auto drop-shadow-2xl hover:scale-105 transition-transform duration-500"
                         draggable="false"
                     >
 
