@@ -69,6 +69,35 @@
                 <h2 class="font-serif-display text-3xl font-semibold text-[#1E1B19]">Pilih jenis cetak</h2>
             </div>
 
+            {{-- Lebar kartu carousel.
+
+                 Sebelumnya lebarnya ditulis inline `width:calc(33.333% - 11px)`
+                 pada tiap kartu, jadi selalu sepertiga layar - termasuk di
+                 ponsel. Di layar ~360px, setelah dikurangi margin track, tiap
+                 kartu hanya tersisa ~90px sehingga isinya terjepit jadi pita
+                 vertikal yang tidak terbaca.
+
+                 Diletakkan sebagai CSS, bukan inline style, karena inline style
+                 tidak bisa ditimpa media query.
+
+                 Di bawah breakpoint md hanya kartu AKTIF yang ditampilkan dengan
+                 lebar penuh; perpindahan antar-produk tetap lewat tombol panah
+                 yang sudah ada. Carousel ini memang tidak menggeser posisi
+                 (tidak memakai translateX) melainkan mengurutkan ulang kartu
+                 lewat `order`, jadi menyembunyikan yang tidak aktif adalah cara
+                 paling aman - tanpa mengubah logika navigasinya sama sekali. --}}
+            <style>
+                .print-product-card { width: 100%; }
+
+                @media (max-width: 767px) {
+                    .print-product-card:not(.is-active) { display: none; }
+                }
+
+                @media (min-width: 768px) {
+                    .print-product-card { width: calc(33.333% - 11px); }
+                }
+            </style>
+
             {{-- 2. Product carousel --}}
             <div class="relative mb-2">
                 <button onclick="printCarouselPrev()" class="absolute -left-2 md:left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-white border border-[#1E1B19]/10 flex items-center justify-center shadow-md hover:bg-[#FBF9F6] transition-colors">
@@ -82,7 +111,6 @@
                             class="print-product-card flex-shrink-0 flex flex-col rounded-3xl border-2 cursor-pointer transition-all duration-500 overflow-hidden select-none bg-white"
                             data-index="{{ $i }}"
                             onclick="setPrintActive({{ $i }})"
-                            style="width:calc(33.333% - 11px);"
                         >
                             <div class="p-7 md:p-10 relative">
                                 @if(isset($opt['is_popular']) && $opt['is_popular'])
@@ -1276,6 +1304,12 @@
                 const n = cards.length;
                 cards.forEach((card, i) => {
                     const pos = ((i - printActiveIndex) % n + n) % n;
+
+                    // Penanda kartu aktif. Dipakai CSS untuk menampilkan HANYA
+                    // kartu ini di layar ponsel; di desktop kelasnya tidak
+                    // berpengaruh karena ketiga kartu tetap tampil.
+                    card.classList.toggle('is-active', pos === 0);
+
                     // pos 0 = active/center, 1 = right, 2 = left
                     if (pos === 0) {
                         card.style.order = 2;
