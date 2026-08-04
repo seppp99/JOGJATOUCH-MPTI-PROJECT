@@ -14,36 +14,55 @@ class OrdersTable
     {
         return $table
             ->columns([
-                TextColumn::make('service_slug')
+                TextColumn::make('order_code')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('layanan_id')
+                    ->label('Layanan')
                     ->searchable(),
-                TextColumn::make('package_selected')
+                TextColumn::make('paket_dipilih')
+                    ->label('Paket'),
+                TextColumn::make('nama_pelanggan')
+                    ->label('Nama')
                     ->searchable(),
-                TextColumn::make('nama_perusahaan')
-                    ->searchable(),
-                TextColumn::make('no_whatsapp')
-                    ->searchable(),
-                TextColumn::make('email_kerja')
-                    ->searchable(),
-                TextColumn::make('jumlah_karyawan')
-                    ->searchable(),
-                TextColumn::make('jumlah_lokasi')
-                    ->searchable(),
-                TextColumn::make('perangkat_utama')
-                    ->searchable(),
+                TextColumn::make('whatsapp_number')
+                    ->label('WhatsApp'),
                 TextColumn::make('status')
-                    ->searchable(),
+                    ->badge()
+                    // Dipetakan ke warna yang sama dengan badge status di situs
+                    // customer (dashboard-orders.blade.php baris 22-25):
+                    // pending=blue, deal=amber, completed=emerald, canceled=rose.
+                    // Sebelumnya pending memakai warning (amber) dan deal memakai
+                    // success (emerald), sehingga tidak cocok dengan customer.
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'info',      // blue
+                        'deal' => 'warning',      // amber
+                        'completed' => 'success', // emerald
+                        'canceled' => 'danger',   // rose
+                        default => 'gray',
+                    }),
+                TextColumn::make('harga_fix')
+                    ->label('Harga Fix')
+                    ->numeric()
+                    ->money('IDR', locale: 'id'),
+                TextColumn::make('tanggal_pelaksanaan')
+                    ->label('Tanggal Pelaksanaan')
+                    ->date(),
                 TextColumn::make('created_at')
+                    ->label('Dipesan')
                     ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->sortable(),
             ])
             ->filters([
-                //
+                \Filament\Tables\Filters\SelectFilter::make('status')
+                    ->options([
+                        'pending' => 'Pending',
+                        'deal' => 'Deal',
+                        'canceled' => 'Canceled',
+                        'completed' => 'Completed',
+                    ]),
             ])
+            ->defaultSort('created_at', 'desc')
             ->recordActions([
                 EditAction::make(),
             ])

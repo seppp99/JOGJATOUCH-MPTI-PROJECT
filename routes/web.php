@@ -4,12 +4,22 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\AkunController;
+use App\Http\Controllers\ProfilePhotoController;
 
 Route::get('/', function () {
     return view('pages.home');
 });
 
 Route::get('/layanan/{slug}', [LayananController::class, 'show'])->name('layanan.show');
+Route::post('/layanan/pemasangan-wifi/order', [LayananController::class, 'storeWifiOrder'])->name('layanan.wifi.order')->middleware('auth');
+Route::post('/layanan/network-analyst/order', [LayananController::class, 'storeNetworkOrder'])->name('layanan.network.order')->middleware('auth');
+Route::post('/layanan/perawatan-rutin/order', [LayananController::class, 'storePerawatanOrder'])->name('layanan.perawatan.order')->middleware('auth');
+Route::post('/layanan/desain-grafis/order', [LayananController::class, 'storeDesainOrder'])->name('layanan.desain.order')->middleware('auth');
+Route::post('/layanan/rakit-pc/order', [LayananController::class, 'storeRakitOrder'])->name('layanan.rakit.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/buku-custom/order', [LayananController::class, 'storePrintingBukuOrder'])->name('layanan.printing.buku.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/photobook/order', [LayananController::class, 'storePrintingPhotobookOrder'])->name('layanan.printing.photobook.order')->middleware('auth');
+Route::post('/layanan/printing-cetak/cetak-foto/order', [LayananController::class, 'storePrintingCetakFotoOrder'])->name('layanan.printing.cetakfoto.order')->middleware('auth');
 Route::post('/layanan/{slug}/order', [LayananController::class, 'store'])->name('layanan.store');
 
 // Account and Auth Routes
@@ -28,8 +38,16 @@ Route::post('/lupa-password/verify-otp', [App\Http\Controllers\PasswordResetCont
 Route::get('/lupa-password/baru', [App\Http\Controllers\PasswordResetController::class, 'newPassPage'])->name('lupa-password.baru');
 Route::post('/lupa-password/reset', [App\Http\Controllers\PasswordResetController::class, 'reset'])->name('lupa-password.reset');
 
-Route::get('/akun', function () {
-    return view('pages.akun');
-})->middleware('auth')->name('akun');
+Route::get('/akun', [AkunController::class, 'index'])->middleware('auth')->name('akun');
+Route::get('/akun/riwayat', [AkunController::class, 'riwayat'])->middleware('auth')->name('akun.riwayat');
+Route::get('/akun/pesanan/{order_code}', [AkunController::class, 'detail'])->middleware('auth')->name('akun.pesanan.detail');
+
+// Foto profil. Keduanya hanya dipanggil lewat fetch() dari modal di dashboard
+// akun, dan selalu bekerja pada pengguna yang SEDANG login - tidak menerima
+// id pengguna dari input, sehingga tidak ada celah mengubah foto orang lain.
+Route::post('/akun/foto', [ProfilePhotoController::class, 'update'])->middleware('auth')->name('akun.foto.update');
+Route::delete('/akun/foto', [ProfilePhotoController::class, 'destroy'])->middleware('auth')->name('akun.foto.destroy');
 
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+
+

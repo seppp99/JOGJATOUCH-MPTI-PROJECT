@@ -1,0 +1,1038 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+/* =========================================================================
+   TEMA ADMIN JOGJATOUCH
+   Menyelaraskan panel Filament dengan desain situs customer, di LIGHT & DARK.
+
+   Acuan desain:
+     - resources/views/components/layouts/app.blade.php (baris 18-55) -> token
+     - resources/views/components/navbar.blade.php                    -> topbar
+     - resources/views/components/dashboard-sidebar.blade.php         -> sidebar
+     - resources/views/components/dashboard-orders.blade.php (22-25)  -> status
+     - resources/views/components/hero.blade.php (baris 12)           -> eyebrow
+
+   SELECTOR DI BERKAS INI DIAMBIL DARI DOM YANG BENAR-BENAR DIRENDER (halaman
+   diambil lewat sesi login sungguhan, bukan ditebak dari nama file Blade).
+
+   -- ORGANISASI BERKAS (penting saat menambah aturan baru) ----------------
+     BAGIAN 1  Token warna
+     BAGIAN 2  STRUKTUR - berlaku di KEDUA mode
+               (display, padding, gap, radius, ukuran, font-family/weight,
+                posisi, animasi). TIDAK BOLEH dikunci ke satu mode.
+     BAGIAN 3  WARNA - LIGHT  (html:not(.dark))
+     BAGIAN 4  WARNA - DARK   (html.dark)
+     BAGIAN 5  Elemen brand yang warnanya memang sama di kedua mode
+
+   Pemisahan struktur/warna ini lahir dari bug nyata: pill profil dulu pecah di
+   dark mode karena `display: flex` ikut terkunci di `html:not(.dark)`, sehingga
+   nama & chevron meluber keluar topbar. Aturan sekarang: kalau sebuah properti
+   bukan warna, ia TIDAK BOLEH berada di blok bermode.
+
+   Komentar di berkas ini sengaja memakai ASCII saja (tanpa karakter kotak atau
+   panah Unicode). Alasannya praktis: berkas ini beberapa kali disunting lewat
+   PowerShell, dan Get-Content/Set-Content tanpa -Encoding merusak karakter
+   non-ASCII menjadi mojibake yang sulit dipulihkan.
+
+   Catatan teknis: berkas ini hanya dimuat di halaman panel admin, jadi selector
+   selebar `body` tidak bocor ke situs customer. Aturan ditulis DI LUAR @layer
+   sehingga selalu menang atas utility Filament yang berlapis - dalam cascade
+   layers, CSS tanpa layer mengalahkan CSS berlayer berapa pun specificity-nya.
+   Karena itu tidak ada satu pun !important di berkas ini.
+
+   Playfair Display dimuat lewat <link> di <head> (renderHook HEAD_END pada
+   AdminPanelProvider), bukan @import: setelah Tailwind meng-inline CSS
+   Filament, @import berada di tengah bundel dan DIBUANG oleh Lightning CSS.
+   ========================================================================= */
+
+/* == BAGIAN 1 - TOKEN ==================================================== */
+
+:root {
+    /* Palet brand (dipakai kedua mode) */
+    --jt-orange: #e35d25;
+    --jt-orange-light: #f4733e;
+    --jt-orange-hover: #c74c1a; /* light: hover lebih GELAP */
+    --jt-serif: 'Playfair Display', Georgia, serif;
+
+    /* Light */
+    --jt-cream: #fbf9f6;
+    --jt-cream-deep: #f3efea;
+    --jt-ink: #1e1b19;
+    --jt-surface: #ffffff;
+    --jt-border: rgb(30 27 25 / 0.05);
+    --jt-border-strong: rgb(30 27 25 / 0.1);
+
+    /* Dark - diturunkan dari warna brand yang sama, bukan abu netral baru.
+       Latar memakai ink (#1E1B19), permukaan memakai cokelat gelap hangat
+       (#2A2320) supaya kartu tetap terbaca "naik" satu tingkat dari latar. */
+    --jt-d-bg: #1e1b19;
+    --jt-d-surface: #2a2320;
+    --jt-d-text: #fbf9f6;
+    --jt-d-border: rgb(251 249 246 / 0.08);
+    --jt-d-border-strong: rgb(251 249 246 / 0.1);
+
+    /* Pill item nav aktif di dark mode (Dashboard / Orders / Users). Krem penuh
+       (#FBF9F6) terlalu menyilaukan di atas panel gelap, jadi dicondongkan ke
+       cokelat: krem dicampur 63% cokelat #6B4F3A. Rasio dihitung, bukan
+       dikira-kira - hasilnya menurunkan luminansi tepat 70% (0,949 -> 0,285).
+
+       Teks TETAP gelap, tidak diputihkan: kontras ink di atasnya 5,44:1 (lolos
+       WCAG AA), sedangkan teks putih justru cuma 3,15:1 alias GAGAL. Jadi di
+       warna ini teks hitam bukan yang samar - teks putih yang akan samar. */
+    --jt-d-active: #a08e80;
+
+    /* Radius */
+    --jt-radius-card: 1.5rem; /* rounded-3xl */
+    --jt-radius-menu: 1rem; /* rounded-2xl */
+    --jt-radius-logo: 0.75rem; /* rounded-xl */
+}
+
+/* == BAGIAN 2 - STRUKTUR (berlaku di KEDUA mode) ========================= */
+
+/* Padanan .font-serif-display situs customer, tersedia untuk dipakai manual. */
+.font-serif-display {
+    font-family: var(--jt-serif);
+}
+
+/* Blok seleksi teks: oranye brand, bukan biru bawaan browser. Menyamakan
+   dengan situs customer yang memakai `selection:bg-[#E35D25] selection:text-white`
+   pada <body> (layouts/app.blade.php baris 59). Berlaku di kedua mode karena
+   oranye solid + teks putih sudah kontras di latar terang maupun gelap. */
+::selection {
+    background-color: var(--jt-orange);
+    color: #ffffff;
+}
+
+/* -- Sidebar --------------------------------------------------------------
+   Hanya sudut kanan yang dibulatkan - sidebar Filament berposisi fixed
+   setinggi layar; membulatkan keempat sudut menyisakan celah di tepi viewport
+   dan mengganggu mode collapsible. */
+.fi-sidebar {
+    border-radius: 0 var(--jt-radius-card) var(--jt-radius-card) 0;
+}
+
+/* Item navigasi = pill (pengecualian radius yang disepakati). */
+.fi-sidebar-item-btn {
+    border-radius: 9999px;
+    font-weight: 600;
+    transition:
+        background-color 0.3s ease,
+        color 0.3s ease;
+}
+
+.fi-sidebar-group-label {
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+/* -- Search: topbar (global) & tabel --------------------------------------
+   Keduanya container input, bukan tombol/input form - pembulatan penuh di sini
+   termasuk pengecualian yang disepakati. */
+.fi-global-search .fi-input-wrp,
+.fi-ta-search-field .fi-input-wrp {
+    border-radius: 9999px;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+/* -- Kartu tabel ----------------------------------------------------------
+   Sengaja TIDAK memakai overflow:hidden untuk memotong sudut, karena itu
+   berisiko memotong dropdown filter/kolom yang dirender di dalam container.
+   Sebagai gantinya anak pertama & terakhir mewarisi radius induknya. */
+.fi-ta-ctn {
+    border-radius: var(--jt-radius-card);
+}
+
+.fi-ta-ctn > :first-child {
+    border-start-start-radius: inherit;
+    border-start-end-radius: inherit;
+}
+
+.fi-ta-ctn > :last-child {
+    border-end-start-radius: inherit;
+    border-end-end-radius: inherit;
+}
+
+.fi-ta-header-cell {
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
+/* -- Kartu section, modal, dropdown, notifikasi ---------------------------
+   Radius saja; warnanya per mode. Radius kontrol form (input/tombol) tetap
+   bawaan Filament sesuai keputusan fase sebelumnya. */
+.fi-section {
+    border-radius: var(--jt-radius-card);
+}
+
+.fi-modal-window {
+    border-radius: var(--jt-radius-card);
+}
+
+.fi-dropdown-panel {
+    border-radius: var(--jt-radius-menu);
+}
+
+.fi-no-notification {
+    border-radius: var(--jt-radius-menu);
+    border-left-width: 4px;
+}
+
+.fi-fo-field-label {
+    font-weight: 600;
+}
+
+/* -- Tipografi judul ------------------------------------------------------
+   Playfair Display adalah identitas brand, jadi font-family-nya WAJIB berlaku
+   di kedua mode - hanya warnanya yang berbeda. Sebelumnya ini ikut terkunci di
+   html:not(.dark) sehingga judul di dark mode jatuh ke sans biasa.
+   Tetap TERBATAS pada judul halaman & judul section besar; deskripsi,
+   breadcrumb, subjudul, label form, isi tabel, badge, dan tombol tetap
+   Instrument Sans. */
+.fi-header-heading,
+.fi-section-header-heading {
+    font-family: var(--jt-serif);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.fi-header-subheading,
+.fi-section-header-description,
+.fi-breadcrumbs {
+    font-family: inherit;
+}
+
+/* -- Empty state tabel ----------------------------------------------------
+   Tabel Filament TIDAK memakai komponen x-filament::empty-state - markup-nya
+   ditulis inline di vendor/filament/tables/resources/views/index.blade.php
+   (2500+ baris) dengan kelas .fi-ta-empty-state-*. Menyalin view sebesar itu
+   demi satu ikon terlalu mahal dirawat, jadi ilustrasinya dipasang lewat
+   pseudo-element:
+
+     ::before -> awan glow oranye (padanan .ac-cloud-a milik app.css customer)
+     ::after  -> SVG PC + router, PATH-nya disalin persis dari
+                 dashboard-orders.blade.php baris 93-107, digabung jadi satu
+                 data URI. Router ditempatkan memakai perhitungan yang sama
+                 dengan versi customer: ikon PC 64px (viewBox 24 = 2.667px per
+                 unit), router 44px dengan offset bottom -10px / right -14px,
+                 sehingga dalam satuan viewBox PC router menempati
+                 12.75..29.25 (x) dan 11.25..27.75 (y).
+
+   Warna stroke SVG ikut mode (data URI-nya berbeda), jadi background-image ada
+   di BAGIAN 3 & 4; di sini hanya penempatan dan ukurannya. */
+.fi-ta-empty-state-icon-bg {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 11rem;
+    height: 9rem;
+    background: none;
+    border-radius: 0;
+    box-shadow: none;
+    animation: jt-empty-drift 7s ease-in-out infinite;
+    will-change: transform;
+}
+
+/* Ikon bawaan Filament disembunyikan, bukan dihapus, agar struktur tetap utuh. */
+.fi-ta-empty-state-icon-bg > svg,
+.fi-ta-empty-state-icon-bg > .fi-icon {
+    display: none;
+}
+
+.fi-ta-empty-state-icon-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0.75rem;
+    border-radius: 58% 42% 55% 45% / 52% 58% 42% 48%;
+    filter: blur(26px);
+}
+
+.fi-ta-empty-state-icon-bg::after {
+    content: '';
+    position: relative;
+    z-index: 1;
+    width: 7.5rem;
+    aspect-ratio: 30 / 28;
+    background-position: center;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.fi-ta-empty-state-heading,
+.fi-empty-state-heading {
+    font-family: inherit;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+@keyframes jt-empty-drift {
+    0%,
+    100% {
+        transform: translate3d(0, 0, 0);
+    }
+    50% {
+        transform: translate3d(4px, -7px, 0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .fi-ta-empty-state-icon-bg {
+        animation: none;
+    }
+}
+
+/* == BAGIAN 3 - WARNA: LIGHT MODE ======================================== */
+
+/* -- Permukaan halaman ----------------------------------------------------
+   Krem dipasang eksplisit (bukan hanya mengandalkan token --gray-50) supaya
+   hasil akhirnya pasti #FBF9F6 apa pun yang terjadi pada palet. */
+html:not(.dark) body.fi-body {
+    background-color: var(--jt-cream);
+    color: var(--jt-ink);
+}
+
+html:not(.dark) .fi-main-ctn,
+html:not(.dark) .fi-main,
+html:not(.dark) .fi-page,
+html:not(.dark) .fi-page-content {
+    background-color: transparent;
+}
+
+/* Topbar meniru navbar customer: krem 85% + blur + garis bawah tipis.
+   Struktur asli: <div class="fi-topbar-ctn"><nav class="fi-topbar">. */
+html:not(.dark) .fi-topbar-ctn,
+html:not(.dark) nav.fi-topbar {
+    background-color: rgb(251 249 246 / 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: none;
+}
+
+html:not(.dark) nav.fi-topbar {
+    border-bottom: 1px solid var(--jt-border);
+}
+
+/* Filament menggambar "border" input lewat box-shadow ring; ring dimatikan
+   lalu diganti border asli. */
+html:not(.dark) .fi-global-search .fi-input-wrp,
+html:not(.dark) .fi-ta-search-field .fi-input-wrp {
+    border: 1px solid var(--jt-border-strong);
+    background-color: var(--jt-surface);
+    box-shadow: none;
+}
+
+html:not(.dark) .fi-global-search .fi-input-wrp:focus-within,
+html:not(.dark) .fi-ta-search-field .fi-input-wrp:focus-within {
+    border-color: var(--jt-orange);
+    box-shadow: 0 0 0 3px rgb(227 93 37 / 0.15);
+}
+
+/* -- Sidebar ------------------------------------------------------------ */
+html:not(.dark) .fi-sidebar {
+    background-color: var(--jt-surface);
+    border-right: 1px solid var(--jt-border);
+    box-shadow: 0 1px 2px 0 rgb(30 27 25 / 0.05);
+}
+
+html:not(.dark) .fi-sidebar-header {
+    background-color: var(--jt-surface);
+    border-bottom: 1px solid var(--jt-border);
+    box-shadow: none;
+}
+
+html:not(.dark) .fi-logo-jt-wordmark {
+    color: var(--jt-ink);
+}
+
+html:not(.dark) .fi-sidebar-item-btn {
+    color: rgb(30 27 25 / 0.6);
+}
+
+html:not(.dark) .fi-sidebar-item-btn:hover {
+    background-color: rgb(30 27 25 / 0.05);
+    color: var(--jt-ink);
+}
+
+html:not(.dark) .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: rgb(30 27 25 / 0.5);
+}
+
+html:not(.dark) .fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
+    color: var(--jt-orange);
+}
+
+/* Tab aktif: pill gelap solid, sama seperti $tabActive di sidebar customer. */
+html:not(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
+    background-color: var(--jt-ink);
+    color: var(--jt-surface);
+}
+
+html:not(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-icon,
+html:not(.dark) .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--jt-surface);
+}
+
+html:not(.dark) .fi-sidebar-group-label {
+    color: rgb(30 27 25 / 0.5);
+}
+
+/* -- Kartu tabel & isinya ----------------------------------------------- */
+html:not(.dark) .fi-ta-ctn {
+    background-color: var(--jt-surface);
+    border: 1px solid var(--jt-border);
+    box-shadow: 0 1px 2px 0 rgb(30 27 25 / 0.05); /* shadow-sm */
+}
+
+html:not(.dark) .fi-ta-header-ctn {
+    border-bottom-color: var(--jt-border);
+}
+
+/* Header kolom mengikuti badge "eyebrow" situs customer - pill kecil
+   "Kreativitas Tanpa Batas" di hero.blade.php baris 12:
+       text-[#E35D25] / bg-[#E35D25]/10 / border-[#E35D25]/20 / font-semibold
+   Nilai disalin apa adanya dari kelas Tailwind tersebut. Uppercase &
+   tracking-wider milik badge sengaja TIDAK diikuti supaya header tidak ramai.
+
+   Latar dipasang di SEL <th>, bukan di <thead>: computed style pada <thead>
+   terbaca benar tapi pikselnya tidak pernah tercetak. Selectornya `thead th`
+   (bukan .fi-ta-header-cell) karena kolom checkbox memakai
+   `fi-ta-cell fi-ta-selection-cell` dan kolom aksi `fi-ta-actions-header-cell`
+   - menyasar .fi-ta-header-cell saja menyisakan celah di ujung pita. */
+html:not(.dark) .fi-ta-ctn thead th {
+    background-color: rgb(227 93 37 / 0.1);
+    border-bottom: 1px solid rgb(227 93 37 / 0.2);
+}
+
+html:not(.dark) .fi-ta-header-cell,
+html:not(.dark) .fi-ta-header-cell svg {
+    color: var(--jt-orange);
+}
+
+html:not(.dark) .fi-ta-row {
+    border-color: var(--jt-border);
+}
+
+html:not(.dark) .fi-ta-row:hover {
+    background-color: rgb(30 27 25 / 0.03);
+}
+
+html:not(.dark) .fi-ta-cell {
+    color: rgb(30 27 25 / 0.85);
+}
+
+html:not(.dark) .fi-ta-footer-ctn,
+html:not(.dark) .fi-pagination {
+    border-top-color: var(--jt-border);
+    background-color: transparent;
+}
+
+/* Ring badge filter menyatu dengan latar di belakangnya. */
+html:not(.dark) .fi-icon-btn-badge-ctn .fi-badge {
+    box-shadow: 0 0 0 2px var(--jt-cream);
+}
+
+/* -- Pill profil & avatar ----------------------------------------------- */
+html:not(.dark) .fi-user-menu-trigger.jt-user-pill {
+    border: 1px solid var(--jt-border-strong);
+    background-color: var(--jt-surface);
+}
+
+html:not(.dark) .fi-user-menu-trigger.jt-user-pill:hover {
+    background-color: var(--jt-cream);
+}
+
+html:not(.dark) .fi-user-menu-trigger.jt-user-pill .fi-user-menu-trigger-text {
+    color: var(--jt-ink);
+}
+
+html:not(.dark) .fi-user-menu-trigger.jt-user-pill svg {
+    color: rgb(30 27 25 / 0.5);
+}
+
+html:not(.dark) .jt-avatar {
+    box-shadow: 0 0 0 3px var(--jt-cream); /* ring tipis, pola avatar customer */
+}
+
+/* -- Empty state -------------------------------------------------------- */
+html:not(.dark) .fi-ta-empty-state-icon-bg::before {
+    background: radial-gradient(closest-side, rgb(227 93 37 / 0.4), rgb(244 115 62 / 0.2) 55%, transparent 100%);
+}
+
+html:not(.dark) .fi-ta-empty-state-icon-bg::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 28' fill='none' stroke='%23E35D25' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath stroke-width='1.1' d='M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25'/%3E%3Cg transform='translate(12.75 11.25) scale(0.6875)' stroke-width='1.6'%3E%3Crect x='3' y='13.5' width='18' height='6' rx='1.5'/%3E%3Cpath d='M7.5 13.5l-1.5-5'/%3E%3Cpath d='M16.5 13.5l1.5-5'/%3E%3Cpath d='M6.5 16.5h.01'/%3E%3Cpath d='M9.5 16.5h.01'/%3E%3Cpath d='M15.5 16.5h2.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+html:not(.dark) .fi-ta-empty-state-heading,
+html:not(.dark) .fi-empty-state-heading {
+    color: var(--jt-ink);
+}
+
+html:not(.dark) .fi-ta-empty-state-description,
+html:not(.dark) .fi-empty-state-description {
+    color: rgb(30 27 25 / 0.6);
+}
+
+/* -- Form, modal, dropdown, notifikasi ---------------------------------- */
+html:not(.dark) .fi-input-wrp {
+    border: 1px solid var(--jt-border-strong);
+    box-shadow: none;
+}
+
+html:not(.dark) .fi-input-wrp:focus-within {
+    border-color: var(--jt-orange);
+    box-shadow: 0 0 0 3px rgb(227 93 37 / 0.15);
+}
+
+html:not(.dark) .fi-fo-field-label {
+    color: var(--jt-ink);
+}
+
+html:not(.dark) .fi-modal-window {
+    background-color: var(--jt-surface);
+    border: 1px solid var(--jt-border);
+    box-shadow:
+        0 20px 25px -5px rgb(30 27 25 / 0.1),
+        0 8px 10px -6px rgb(30 27 25 / 0.1); /* shadow-xl */
+}
+
+html:not(.dark) .fi-dropdown-panel {
+    background-color: var(--jt-surface);
+    border: 1px solid var(--jt-border-strong);
+    box-shadow:
+        0 20px 25px -5px rgb(30 27 25 / 0.1),
+        0 8px 10px -6px rgb(30 27 25 / 0.1);
+}
+
+html:not(.dark) .fi-no-notification {
+    background-color: var(--jt-surface);
+    border: 1px solid var(--jt-border);
+    border-left-width: 4px;
+    box-shadow:
+        0 20px 25px -5px rgb(30 27 25 / 0.1),
+        0 8px 10px -6px rgb(30 27 25 / 0.1);
+}
+
+/* Kelas statusnya `fi-status-*`, BUKAN `fi-color-*`. Sumbernya
+   vendor/filament/notifications/src/Notification.php baris 368-371:
+   ->class(['fi-no-notification', "fi-status-{$status}" => $status]).
+   Versi sebelumnya memakai fi-color-* sehingga tidak pernah cocok. */
+html:not(.dark) .fi-no-notification.fi-status-success {
+    border-left-color: #10b981; /* emerald-500 */
+}
+
+html:not(.dark) .fi-no-notification.fi-status-danger {
+    border-left-color: #f43f5e; /* rose-500 */
+}
+
+html:not(.dark) .fi-no-notification.fi-status-warning {
+    border-left-color: #f59e0b; /* amber-500 */
+}
+
+html:not(.dark) .fi-no-notification.fi-status-info {
+    border-left-color: #3b82f6; /* blue-500 */
+}
+
+/* -- Kartu section & judul ---------------------------------------------- */
+html:not(.dark) .fi-section {
+    background-color: var(--jt-surface);
+    border: 1px solid var(--jt-border);
+    box-shadow: 0 1px 2px 0 rgb(30 27 25 / 0.05);
+}
+
+html:not(.dark) .fi-section-header {
+    border-color: var(--jt-border);
+}
+
+html:not(.dark) .fi-header-heading,
+html:not(.dark) .fi-section-header-heading {
+    color: var(--jt-ink);
+}
+
+html:not(.dark) .fi-header-subheading,
+html:not(.dark) .fi-section-header-description,
+html:not(.dark) .fi-breadcrumbs {
+    color: rgb(30 27 25 / 0.6);
+}
+
+/* -- Tombol primary -------------------------------------------------------
+   Filament v5 merender tombol solid di light mode sebagai latar PASTEL + teks
+   gelap (`fi-bg-color-400 fi-text-color-950`), hasilnya #FD8B61 - jauh lebih
+   pucat dari CTA customer. Penyebabnya Color::hex() memaksa lightness tiap stop
+   ke ramp bakunya sehingga tidak ada stop yang sama dengan warna brand
+   (500 = 0.683, 600 = 0.598, sedangkan #E35D25 = 0.643). Karena itu warnanya
+   dipasang eksplisit, bukan lewat palet. Radius & padding tidak disentuh. */
+html:not(.dark) .fi-btn.fi-color-primary {
+    background-color: var(--jt-orange);
+    color: #ffffff;
+    box-shadow:
+        0 10px 15px -3px rgb(227 93 37 / 0.15),
+        0 4px 6px -4px rgb(227 93 37 / 0.15);
+}
+
+html:not(.dark) .fi-btn.fi-color-primary:hover {
+    background-color: var(--jt-orange-hover);
+    color: #ffffff;
+}
+
+html:not(.dark) .fi-btn.fi-color-primary .fi-btn-icon {
+    color: #ffffff;
+}
+
+/* == BAGIAN 4 - WARNA: DARK MODE =========================================
+   Pendekatan bayangan BERBEDA dari light mode: box-shadow praktis tak terlihat
+   di atas latar gelap, jadi kesan "mengambang" dibangun dari kombinasi border
+   tipis (krem 8-10%) + permukaan yang satu tingkat lebih terang dari latar
+   (#2A2320 di atas #1E1B19), bukan dari bayangan.
+   ========================================================================= */
+
+/* -- Permukaan halaman -------------------------------------------------- */
+html.dark body.fi-body {
+    background-color: var(--jt-d-bg);
+    color: var(--jt-d-text);
+}
+
+html.dark .fi-main-ctn,
+html.dark .fi-main,
+html.dark .fi-page,
+html.dark .fi-page-content {
+    background-color: transparent;
+}
+
+html.dark .fi-topbar-ctn,
+html.dark nav.fi-topbar {
+    background-color: rgb(30 27 25 / 0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: none;
+}
+
+html.dark nav.fi-topbar {
+    border-bottom: 1px solid var(--jt-d-border);
+}
+
+html.dark .fi-global-search .fi-input-wrp,
+html.dark .fi-ta-search-field .fi-input-wrp {
+    border: 1px solid var(--jt-d-border-strong);
+    background-color: var(--jt-d-surface);
+    box-shadow: none;
+}
+
+html.dark .fi-global-search .fi-input-wrp:focus-within,
+html.dark .fi-ta-search-field .fi-input-wrp:focus-within {
+    border-color: var(--jt-orange);
+    box-shadow: 0 0 0 3px rgb(227 93 37 / 0.2);
+}
+
+/* -- Sidebar --------------------------------------------------------------
+   Item aktif memakai pill KREM SOLID dengan teks gelap - kebalikan dari light
+   (pill gelap, teks terang). Polanya sama: yang aktif selalu memakai warna
+   paling kontras terhadap sekitarnya, sehingga sama-sama menonjol. */
+html.dark .fi-sidebar {
+    background-color: var(--jt-d-surface);
+    border-right: 1px solid var(--jt-d-border);
+    box-shadow: none;
+}
+
+html.dark .fi-sidebar-header {
+    background-color: var(--jt-d-surface);
+    border-bottom: 1px solid var(--jt-d-border);
+    box-shadow: none;
+}
+
+html.dark .fi-logo-jt-wordmark {
+    color: var(--jt-d-text);
+}
+
+html.dark .fi-sidebar-item-btn {
+    color: rgb(251 249 246 / 0.65);
+}
+
+html.dark .fi-sidebar-item-btn:hover {
+    background-color: rgb(251 249 246 / 0.06);
+    color: var(--jt-d-text);
+}
+
+html.dark .fi-sidebar-item-btn .fi-sidebar-item-icon {
+    color: rgb(251 249 246 / 0.5);
+}
+
+html.dark .fi-sidebar-item-btn:hover .fi-sidebar-item-icon {
+    color: var(--jt-orange-light);
+}
+
+html.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn {
+    background-color: var(--jt-d-active);
+    color: var(--jt-d-bg);
+}
+
+html.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-icon,
+html.dark .fi-sidebar-item.fi-active .fi-sidebar-item-btn .fi-sidebar-item-label {
+    color: var(--jt-d-bg);
+}
+
+html.dark .fi-sidebar-group-label {
+    color: rgb(251 249 246 / 0.5);
+}
+
+/* -- Kartu tabel & isinya -------------------------------------------------
+   Header memakai oranye di atas gelap, BUKAN peach #F8E8E1 milik light mode:
+   peach itu hasil 10% oranye di atas krem dan akan terlihat pucat/keruh di
+   atas permukaan gelap. Di sini opacity latar dinaikkan (12%) dan teksnya
+   memakai oranye terang #F4733E supaya kontrasnya cukup. */
+html.dark .fi-ta-ctn {
+    background-color: var(--jt-d-surface);
+    border: 1px solid var(--jt-d-border);
+    box-shadow: none;
+}
+
+html.dark .fi-ta-header-ctn {
+    border-bottom-color: var(--jt-d-border);
+}
+
+html.dark .fi-ta-ctn thead th {
+    background-color: rgb(227 93 37 / 0.12);
+    border-bottom: 1px solid rgb(227 93 37 / 0.28);
+}
+
+html.dark .fi-ta-header-cell,
+html.dark .fi-ta-header-cell svg {
+    color: var(--jt-orange-light);
+}
+
+html.dark .fi-ta-row {
+    border-color: var(--jt-d-border);
+}
+
+html.dark .fi-ta-row:hover {
+    background-color: rgb(251 249 246 / 0.05);
+}
+
+html.dark .fi-ta-cell {
+    color: rgb(251 249 246 / 0.85);
+}
+
+html.dark .fi-ta-footer-ctn,
+html.dark .fi-pagination {
+    border-top-color: var(--jt-d-border);
+    background-color: transparent;
+}
+
+html.dark .fi-icon-btn-badge-ctn .fi-badge {
+    box-shadow: 0 0 0 2px var(--jt-d-surface);
+}
+
+/* -- Pill profil & avatar ----------------------------------------------- */
+html.dark .fi-user-menu-trigger.jt-user-pill {
+    border: 1px solid var(--jt-d-border-strong);
+    background-color: var(--jt-d-surface);
+}
+
+html.dark .fi-user-menu-trigger.jt-user-pill:hover {
+    background-color: rgb(251 249 246 / 0.06);
+}
+
+html.dark .fi-user-menu-trigger.jt-user-pill .fi-user-menu-trigger-text {
+    color: var(--jt-d-text);
+}
+
+html.dark .fi-user-menu-trigger.jt-user-pill svg {
+    color: rgb(251 249 246 / 0.5);
+}
+
+/* Ring avatar memakai warna permukaan, bukan krem - kalau memakai krem, ring
+   putih akan menabrak gradien oranye avatar di atas latar gelap. */
+html.dark .jt-avatar {
+    box-shadow: 0 0 0 3px var(--jt-d-surface);
+}
+
+/* -- Empty state ----------------------------------------------------------
+   SVG-nya sama persis, hanya warna stroke yang dinaikkan ke #F4733E agar
+   terbaca di atas gelap. Glow diturunkan opacity-nya supaya tidak membakar. */
+html.dark .fi-ta-empty-state-icon-bg::before {
+    background: radial-gradient(closest-side, rgb(227 93 37 / 0.28), rgb(244 115 62 / 0.14) 55%, transparent 100%);
+}
+
+html.dark .fi-ta-empty-state-icon-bg::after {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 28' fill='none' stroke='%23F4733E' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath stroke-width='1.1' d='M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25'/%3E%3Cg transform='translate(12.75 11.25) scale(0.6875)' stroke-width='1.6'%3E%3Crect x='3' y='13.5' width='18' height='6' rx='1.5'/%3E%3Cpath d='M7.5 13.5l-1.5-5'/%3E%3Cpath d='M16.5 13.5l1.5-5'/%3E%3Cpath d='M6.5 16.5h.01'/%3E%3Cpath d='M9.5 16.5h.01'/%3E%3Cpath d='M15.5 16.5h2.5'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+html.dark .fi-ta-empty-state-heading,
+html.dark .fi-empty-state-heading {
+    color: var(--jt-d-text);
+}
+
+html.dark .fi-ta-empty-state-description,
+html.dark .fi-empty-state-description {
+    color: rgb(251 249 246 / 0.6);
+}
+
+/* -- Form, modal, dropdown, notifikasi ---------------------------------- */
+html.dark .fi-input-wrp {
+    border: 1px solid var(--jt-d-border-strong);
+    background-color: var(--jt-d-surface);
+    box-shadow: none;
+}
+
+html.dark .fi-input-wrp:focus-within {
+    border-color: var(--jt-orange);
+    box-shadow: 0 0 0 3px rgb(227 93 37 / 0.2);
+}
+
+html.dark .fi-fo-field-label {
+    color: rgb(251 249 246 / 0.9);
+}
+
+html.dark .fi-modal-window {
+    background-color: var(--jt-d-surface);
+    border: 1px solid var(--jt-d-border);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+}
+
+html.dark .fi-dropdown-panel {
+    background-color: var(--jt-d-surface);
+    border: 1px solid var(--jt-d-border-strong);
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+}
+
+html.dark .fi-no-notification {
+    background-color: var(--jt-d-surface);
+    border: 1px solid var(--jt-d-border);
+    border-left-width: 4px;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.5);
+}
+
+/* Varian 400 dipakai (bukan 500 seperti light) karena warna yang lebih terang
+   lebih terbaca sebagai penanda di atas permukaan gelap. */
+html.dark .fi-no-notification.fi-status-success {
+    border-left-color: #34d399; /* emerald-400 */
+}
+
+html.dark .fi-no-notification.fi-status-danger {
+    border-left-color: #fb7185; /* rose-400 */
+}
+
+html.dark .fi-no-notification.fi-status-warning {
+    border-left-color: #fbbf24; /* amber-400 */
+}
+
+html.dark .fi-no-notification.fi-status-info {
+    border-left-color: #60a5fa; /* blue-400 */
+}
+
+/* -- Kartu section & judul ---------------------------------------------- */
+html.dark .fi-section {
+    background-color: var(--jt-d-surface);
+    border: 1px solid var(--jt-d-border);
+    box-shadow: none;
+}
+
+html.dark .fi-section-header {
+    border-color: var(--jt-d-border);
+}
+
+html.dark .fi-header-heading,
+html.dark .fi-section-header-heading {
+    color: var(--jt-d-text);
+}
+
+html.dark .fi-header-subheading,
+html.dark .fi-section-header-description,
+html.dark .fi-breadcrumbs {
+    color: rgb(251 249 246 / 0.6);
+}
+
+/* -- Tombol primary -------------------------------------------------------
+   Dipaksa eksplisit, tidak mengandalkan `fi-bg-color-600` bawaan Filament yang
+   kebetulan tampak oranye - supaya benar-benar warna brand. Arah hover DIBALIK
+   dari light mode: di atas latar gelap, hover yang lebih TERANG lebih terbaca
+   sebagai umpan balik daripada hover yang lebih gelap. */
+html.dark .fi-btn.fi-color-primary {
+    background-color: var(--jt-orange);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+html.dark .fi-btn.fi-color-primary:hover {
+    background-color: var(--jt-orange-light);
+    color: #ffffff;
+}
+
+html.dark .fi-btn.fi-color-primary .fi-btn-icon {
+    color: #ffffff;
+}
+
+/* == BAGIAN 5 - BRAND: warna sama di KEDUA mode ========================== */
+
+/* -- Logo + wordmark ------------------------------------------------------
+   Markup dari override resources/views/vendor/filament-panels/components/
+   logo.blade.php. Kotak logo sengaja tetap putih di kedua mode: berkas logonya
+   dirancang untuk latar terang, sama seperti di navbar situs customer. */
+.fi-logo-jt {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.fi-logo-jt-mark {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.25rem;
+    border-radius: var(--jt-radius-logo);
+    background-color: #ffffff;
+    box-shadow: 0 4px 6px -1px rgb(227 93 37 / 0.2);
+}
+
+.fi-logo-jt-wordmark {
+    font-family: var(--jt-serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+}
+
+.fi-logo-jt-accent {
+    color: var(--jt-orange);
+}
+
+/* -- Avatar ---------------------------------------------------------------
+   Elemennya <span> (override avatar/user.blade.php), bukan <img> opak dari
+   ui-avatars - karena itu gradiennya benar-benar terlihat. Hanya ring-nya yang
+   berbeda per mode. */
+.jt-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 9999px;
+    background-image: linear-gradient(135deg, var(--jt-orange), var(--jt-orange-light));
+    color: #ffffff;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    user-select: none;
+    flex: none;
+}
+
+/* -- Pill profil di topbar ------------------------------------------------
+   LAYOUT berlaku di kedua mode. Trigger topbar bawaan Filament hanya berisi
+   avatar sehingga tidak punya aturan flex/gap; begitu override Blade menambah
+   nama + chevron, tanpa aturan ini teksnya turun baris dan meluber keluar
+   topbar - persis yang terjadi saat dark mode pertama kali diuji. */
+.fi-user-menu-trigger.jt-user-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.3125rem 0.75rem 0.3125rem 0.3125rem;
+    border-radius: 9999px;
+    max-width: 15rem;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.fi-user-menu-trigger.jt-user-pill .fi-user-menu-trigger-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fi-user-menu-trigger.jt-user-pill svg {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+}
+
+/* -- Badge jumlah filter aktif pada ikon corong ---------------------------
+   Struktur asli: <button class="fi-icon-btn ..."><svg/>
+                    <div class="fi-icon-btn-badge-ctn"><span class="fi-badge">0</span></div>
+   Kelas .jt-badge-zero dipasang oleh skrip di AdminPanelProvider ketika
+   angkanya 0 (CSS tidak bisa menyeleksi berdasarkan isi teks). Warna oranye
+   solid cukup kontras di kedua mode; hanya ring-nya yang menyesuaikan. */
+.fi-icon-btn-badge-ctn.jt-badge-zero {
+    display: none;
+}
+
+.fi-icon-btn-badge-ctn .fi-badge {
+    min-width: 1.15rem;
+    height: 1.15rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 9999px;
+    border-color: transparent;
+    background-color: var(--jt-orange);
+    color: #ffffff;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* Badge angka di sidebar: lingkaran oranye solid, sama di kedua mode.
+   Pembulatan DIBATASI pada badge di dalam sidebar; badge di tabel tetap bentuk
+   bawaan Filament. */
+.fi-sidebar-item-badge-ctn .fi-badge {
+    background-color: var(--jt-orange);
+    color: #ffffff;
+    border-color: transparent;
+    border-radius: 9999px;
+    font-weight: 700;
+}
+
+/* -- Tombol Sign out ------------------------------------------------------
+   Dua tempat, struktur DOM-nya berbeda (keduanya hasil inspect):
+
+   1. Widget dashboard /admin - form.fi-account-widget-logout-form berisi DUA
+      tombol sekaligus, dan keduanya harus diwarnai:
+        button.fi-icon-btn               -> ikon saja, tampil di layar kecil
+        button.fi-btn.fi-labeled-from-sm -> berlabel, tampil dari breakpoint sm
+      Yang terlihat di desktop adalah yang kedua.
+
+   2. Popup user menu di topbar
+      form[action$="/logout"] > button.fi-dropdown-list-item
+      Selector diikat ke form ber-action /logout supaya HANYA item Sign out yang
+      memerah - item dropdown lain tidak ikut.
+
+   Ikon kedua tombol memakai currentColor, jadi `color: #fff` sekaligus
+   memutihkan ikon dan tulisannya. Merahnya dari var(--danger-600), token yang
+   sama dengan warna Delete pada panel (Color::Rose = #E11D48). Shade 600
+   dipilih karena kontras teks putih di atasnya 4,9:1 (lolos WCAG AA). */
+.fi-account-widget-logout-form > .fi-icon-btn,
+.fi-account-widget-logout-form > .fi-btn,
+form[action$='/logout'] > .fi-dropdown-list-item {
+    background-color: var(--danger-600);
+    color: #ffffff;
+    border-color: transparent;
+}
+
+.fi-account-widget-logout-form > .fi-icon-btn:hover,
+.fi-account-widget-logout-form > .fi-btn:hover,
+form[action$='/logout'] > .fi-dropdown-list-item:hover {
+    background-color: var(--danger-700);
+    color: #ffffff;
+}
+
+.fi-account-widget-logout-form > .fi-icon-btn svg,
+.fi-account-widget-logout-form > .fi-btn svg,
+form[action$='/logout'] > .fi-dropdown-list-item svg,
+form[action$='/logout'] > .fi-dropdown-list-item .fi-dropdown-list-item-label {
+    color: #ffffff;
+}
+
+/* Inset dipasang sebagai PADDING pada <form>, bukan margin pada tombolnya:
+   tombol itu ber-width:100% terhadap form, sehingga margin hanya menggesernya
+   dan tepi kanannya justru melewati panel (terukur -1px). */
+.fi-dropdown-list > form[action$='/logout'] {
+    padding: 0.375rem;
+}
+
+form[action$='/logout'] > .fi-dropdown-list-item {
+    border-radius: 0.75rem;
+}
