@@ -10,7 +10,7 @@
             <!-- Left Hero Content -->
             <div class="lg:col-span-6 flex flex-col items-start text-left">
                 <span class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider text-[#E35D25] bg-[#E35D25]/10 border border-[#E35D25]/20 mb-6 uppercase">
-                    ✨ Kreativitas Tanpa Batas
+                    ONE STOP IT SOLUTION
                 </span>
                 
                 <h1 class="font-serif-display text-5xl md:text-7xl font-semibold tracking-tight text-[#1E1B19] leading-[1.1] mb-6">
